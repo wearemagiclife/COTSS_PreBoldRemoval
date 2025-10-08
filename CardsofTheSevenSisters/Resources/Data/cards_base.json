@@ -1,0 +1,375 @@
+{
+  "cards": [
+    {
+      "id": 1,
+      "name": "ACE OF HEARTS",
+      "value": "A",
+      "suit": "hearts",
+      "title": "The Instinctual Creator"
+    },
+    {
+      "id": 2,
+      "name": "TWO OF HEARTS",
+      "value": "2",
+      "suit": "hearts",
+      "title": "The Calibrator of Connection"
+    },
+    {
+      "id": 3,
+      "name": "THREE OF HEARTS",
+      "value": "3",
+      "suit": "hearts",
+      "title": "The Weaver of Serendipity"
+    },
+    {
+      "id": 4,
+      "name": "FOUR OF HEARTS",
+      "value": "4",
+      "suit": "hearts",
+      "title": "The Architect of Autonomy"
+    },
+    {
+      "id": 5,
+      "name": "FIVE OF HEARTS",
+      "value": "5",
+      "suit": "hearts",
+      "title": "The Alchemist of Present-Moment Truth"
+    },
+    {
+      "id": 6,
+      "name": "SIX OF HEARTS",
+      "value": "6",
+      "suit": "hearts",
+      "title": "The Radiator of Charm"
+    },
+    {
+      "id": 7,
+      "name": "SEVEN OF HEARTS",
+      "value": "7",
+      "suit": "hearts",
+      "title": "The Reminder of Inner Alignment"
+    },
+    {
+      "id": 8,
+      "name": "EIGHT OF HEARTS",
+      "value": "8",
+      "suit": "hearts",
+      "title": "The Channel of Resonant Authority"
+    },
+    {
+      "id": 9,
+      "name": "NINE OF HEARTS",
+      "value": "9",
+      "suit": "hearts",
+      "title": "The Keeper of Wisdom"
+    },
+    {
+      "id": 10,
+      "name": "TEN OF HEARTS",
+      "value": "10",
+      "suit": "hearts",
+      "title": "The Pathfinder"
+    },
+    {
+      "id": 11,
+      "name": "JACK OF HEARTS",
+      "value": "J",
+      "suit": "hearts",
+      "title": "The Intuitive Alchemist"
+    },
+    {
+      "id": 12,
+      "name": "QUEEN OF HEARTS",
+      "value": "Q",
+      "suit": "hearts",
+      "title": "The Sovereign of Intuition"
+    },
+    {
+      "id": 13,
+      "name": "KING OF HEARTS",
+      "value": "K",
+      "suit": "hearts",
+      "title": "The Sovereign of Influence"
+    },
+    {
+      "id": 14,
+      "name": "ACE OF CLUBS",
+      "value": "A",
+      "suit": "clubs",
+      "title": "The Visionary Thinker"
+    },
+    {
+      "id": 15,
+      "name": "TWO OF CLUBS",
+      "value": "2",
+      "suit": "clubs",
+      "title": "The Integrator of Shared Intelligence"
+    },
+    {
+      "id": 16,
+      "name": "THREE OF CLUBS",
+      "value": "3",
+      "suit": "clubs",
+      "title": "The Alchemist of Possibilities"
+    },
+    {
+      "id": 17,
+      "name": "FOUR OF CLUBS",
+      "value": "4",
+      "suit": "clubs",
+      "title": "The Balance Between Tradition and The Call to Revolution"
+    },
+    {
+      "id": 18,
+      "name": "FIVE OF CLUBS",
+      "value": "5",
+      "suit": "clubs",
+      "title": "The Refiner of Reality"
+    },
+    {
+      "id": 19,
+      "name": "SIX OF CLUBS",
+      "value": "6",
+      "suit": "clubs",
+      "title": "The Channel of Insight"
+    },
+    {
+      "id": 20,
+      "name": "SEVEN OF CLUBS",
+      "value": "7",
+      "suit": "clubs",
+      "title": "The Tuning Fork"
+    },
+    {
+      "id": 21,
+      "name": "EIGHT OF CLUBS",
+      "value": "8",
+      "suit": "clubs",
+      "title": "The Master of Focused Perception"
+    },
+    {
+      "id": 22,
+      "name": "NINE OF CLUBS",
+      "value": "9",
+      "suit": "clubs",
+      "title": "The Illuminated Mind"
+    },
+    {
+      "id": 23,
+      "name": "TEN OF CLUBS",
+      "value": "10",
+      "suit": "clubs",
+      "title": "The Mind as a Universe"
+    },
+    {
+      "id": 24,
+      "name": "JACK OF CLUBS",
+      "value": "J",
+      "suit": "clubs",
+      "title": "The Finger on the Pulse"
+    },
+    {
+      "id": 25,
+      "name": "QUEEN OF CLUBS",
+      "value": "Q",
+      "suit": "clubs",
+      "title": "The Shapeshifter"
+    },
+    {
+      "id": 26,
+      "name": "KING OF CLUBS",
+      "value": "K",
+      "suit": "clubs",
+      "title": "The Sovereign of Knowledge"
+    },
+    {
+      "id": 27,
+      "name": "ACE OF DIAMONDS",
+      "value": "A",
+      "suit": "diamonds",
+      "title": "The Initiator of Clarity"
+    },
+    {
+      "id": 28,
+      "name": "TWO OF DIAMONDS",
+      "value": "2",
+      "suit": "diamonds",
+      "title": "The Seeker of Shared Truths"
+    },
+    {
+      "id": 29,
+      "name": "THREE OF DIAMONDS",
+      "value": "3",
+      "suit": "diamonds",
+      "title": "The Fuel of Creation"
+    },
+    {
+      "id": 30,
+      "name": "FOUR OF DIAMONDS",
+      "value": "4",
+      "suit": "diamonds",
+      "title": "The Blueprint of Internal Authority"
+    },
+    {
+      "id": 31,
+      "name": "FIVE OF DIAMONDS",
+      "value": "5",
+      "suit": "diamonds",
+      "title": "The Explorer of Dynamic Systems"
+    },
+    {
+      "id": 32,
+      "name": "SIX OF DIAMONDS",
+      "value": "6",
+      "suit": "diamonds",
+      "title": "The Calibrator of Alignment"
+    },
+    {
+      "id": 33,
+      "name": "SEVEN OF DIAMONDS",
+      "value": "7",
+      "suit": "diamonds",
+      "title": "The Bridge Between Intellect and Intuition"
+    },
+    {
+      "id": 34,
+      "name": "EIGHT OF DIAMONDS",
+      "value": "8",
+      "suit": "diamonds",
+      "title": "The Embodied Leader"
+    },
+    {
+      "id": 35,
+      "name": "NINE OF DIAMONDS",
+      "value": "9",
+      "suit": "diamonds",
+      "title": "The Awakening of Purpose"
+    },
+    {
+      "id": 36,
+      "name": "TEN OF DIAMONDS",
+      "value": "10",
+      "suit": "diamonds",
+      "title": "The Channel of Manifestation"
+    },
+    {
+      "id": 37,
+      "name": "JACK OF DIAMONDS",
+      "value": "J",
+      "suit": "diamonds",
+      "title": "The Trailblazer of Opportunity"
+    },
+    {
+      "id": 38,
+      "name": "QUEEN OF DIAMONDS",
+      "value": "Q",
+      "suit": "diamonds",
+      "title": "The Sovereign of Worth"
+    },
+    {
+      "id": 39,
+      "name": "KING OF DIAMONDS",
+      "value": "K",
+      "suit": "diamonds",
+      "title": "The Sovereign of Value"
+    },
+    {
+      "id": 40,
+      "name": "ACE OF SPADES",
+      "value": "A",
+      "suit": "spades",
+      "title": "The Bridge Between Worlds"
+    },
+    {
+      "id": 41,
+      "name": "TWO OF SPADES",
+      "value": "2",
+      "suit": "spades",
+      "title": "The Initiator of Collaboration"
+    },
+    {
+      "id": 42,
+      "name": "THREE OF SPADES",
+      "value": "3",
+      "suit": "spades",
+      "title": "The Artisan of Transformation"
+    },
+    {
+      "id": 43,
+      "name": "FOUR OF SPADES",
+      "value": "4",
+      "suit": "spades",
+      "title": "The Builder of Systems"
+    },
+    {
+      "id": 44,
+      "name": "FIVE OF SPADES",
+      "value": "5",
+      "suit": "spades",
+      "title": "The Instigator of Coevolution"
+    },
+    {
+      "id": 45,
+      "name": "SIX OF SPADES",
+      "value": "6",
+      "suit": "spades",
+      "title": "The Hand of Fate"
+    },
+    {
+      "id": 46,
+      "name": "SEVEN OF SPADES",
+      "value": "7",
+      "suit": "spades",
+      "title": "The Conduit of Transmutation"
+    },
+    {
+      "id": 47,
+      "name": "EIGHT OF SPADES",
+      "value": "8",
+      "suit": "spades",
+      "title": "The Power of Resilient Strength"
+    },
+    {
+      "id": 48,
+      "name": "NINE OF SPADES",
+      "value": "9",
+      "suit": "spades",
+      "title": "The Mastery of Meaningful Work"
+    },
+    {
+      "id": 49,
+      "name": "TEN OF SPADES",
+      "value": "10",
+      "suit": "spades",
+      "title": "The Builder of Legacy Through Effort"
+    },
+    {
+      "id": 50,
+      "name": "JACK OF SPADES",
+      "value": "J",
+      "suit": "spades",
+      "title": "The Master of Catalytic Energy"
+    },
+    {
+      "id": 51,
+      "name": "QUEEN OF SPADES",
+      "value": "Q",
+      "suit": "spades",
+      "title": "The Sovereign of Inner Strength"
+    },
+    {
+      "id": 52,
+      "name": "KING OF SPADES",
+      "value": "K",
+      "suit": "spades",
+      "title": "The Embodiment of Mastery"
+    },
+    {
+      "id": 53,
+      "name": "THE JOKER",
+      "value": "Joker",
+      "suit": "joker",
+      "title": "The Infinite Initiate"
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+{
+  "karmaConnections1": {
+    "1": {
+      "cards": [27],
+      "description": ""
+    },
+    "2": {
+      "cards": [14],
+      "description": ""
+    },
+    "3": {
+      "cards": [1],
+      "description": ""
+    },
+    "4": {
+      "cards": [43],
+      "description": ""
+    },
+    "5": {
+      "cards": [30],
+      "description": ""
+    },
+    "6": {
+      "cards": [17],
+      "description": ""
+    },
+    "7": {
+      "cards": [8],
+      "description": ""
+    },
+    "8": {
+      "cards": [46],
+      "description": ""
+    },
+    "9": {
+      "cards": [33],
+      "description": ""
+    },
+    "10": {
+      "cards": [24],
+      "description": ""
+    },
+    "11": {
+      "cards": [52, 21],
+      "description": ""
+    },
+    "12": {
+      "cards": [49],
+      "description": ""
+    },
+    "13": {
+      "cards": [15],
+      "description": ""
+    },
+    "14": {
+      "cards": [2],
+      "description": ""
+    },
+    "15": {
+      "cards": [40],
+      "description": ""
+    },
+    "16": {
+      "cards": [31],
+      "description": ""
+    },
+    "17": {
+      "cards": [18],
+      "description": ""
+    },
+    "18": {
+      "cards": [5],
+      "description": ""
+    },
+    "19": {
+      "cards": [47],
+      "description": ""
+    },
+    "20": {
+      "cards": [34],
+      "description": ""
+    },
+    "21": {
+      "cards": [11, 52],
+      "description": ""
+    },
+    "22": {
+      "cards": [12],
+      "description": ""
+    },
+    "23": {
+      "cards": [50],
+      "description": ""
+    },
+    "24": {
+      "cards": [37],
+      "description": ""
+    },
+    "25": {
+      "cards": [3],
+      "description": ""
+    },
+    "26": {
+      "cards": [41],
+      "description": ""
+    },
+    "27": {
+      "cards": [28],
+      "description": ""
+    },
+    "28": {
+      "cards": [19],
+      "description": ""
+    },
+    "29": {
+      "cards": [6],
+      "description": ""
+    },
+    "30": {
+      "cards": [44],
+      "description": ""
+    },
+    "31": {
+      "cards": [35],
+      "description": ""
+    },
+    "32": {
+      "cards": [22],
+      "description": ""
+    },
+    "33": {
+      "cards": [9],
+      "description": ""
+    },
+    "34": {
+      "cards": [9],
+      "description": ""
+    },
+    "35": {
+      "cards": [51],
+      "description": ""
+    },
+    "36": {
+      "cards": [38],
+      "description": ""
+    },
+    "37": {
+      "cards": [25],
+      "description": ""
+    },
+    "38": {
+      "cards": [42],
+      "description": ""
+    },
+    "39": {
+      "cards": [29],
+      "description": ""
+    },
+    "40": {
+      "cards": [16],
+      "description": ""
+    },
+    "41": {
+      "cards": [7],
+      "description": ""
+    },
+    "42": {
+      "cards": [45],
+      "description": ""
+    },
+    "43": {
+      "cards": [32],
+      "description": ""
+    },
+    "44": {
+      "cards": [23],
+      "description": ""
+    },
+    "45": {
+      "cards": [10],
+      "description": ""
+    },
+    "46": {
+      "cards": [48],
+      "description": ""
+    },
+    "47": {
+      "cards": [39],
+      "description": ""
+    },
+    "48": {
+      "cards": [26],
+      "description": ""
+    },
+    "49": {
+      "cards": [13],
+      "description": ""
+    },
+    "50": {
+      "cards": [4],
+      "description": ""
+    },
+    "51": {
+      "cards": [20],
+      "description": ""
+    },
+    "52": {
+      "cards": [11, 21],
+      "description": ""
+    }
+  },
+  "karmaConnections2": {
+    "1": {
+      "cards": [3],
+      "description": ""
+    },
+    "2": {
+      "cards": [33, 9, 52, 11, 21],
+      "description": ""
+    },
+    "3": {
+      "cards": [25],
+      "description": ""
+    },
+    "4": {
+      "cards": [49],
+      "description": ""
+    },
+    "5": {
+      "cards": [18],
+      "description": ""
+    },
+    "6": {
+      "cards": [29],
+      "description": ""
+    },
+    "7": {
+      "cards": [40],
+      "description": ""
+    },
+    "8": {
+      "cards": [7],
+      "description": ""
+    },
+    "9": {
+      "cards": [14, 2, 52, 11, 21],
+      "description": ""
+    },
+    "10": {
+      "cards": [44],
+      "description": ""
+    },
+    "11": {
+      "cards": [14, 2, 9, 33],
+      "description": ""
+    },
+    "12": {
+      "cards": [22],
+      "description": ""
+    },
+    "13": {
+      "cards": [48],
+      "description": ""
+    },
+    "14": {
+      "cards": [33, 9, 11, 21, 52],
+      "description": ""
+    },
+    "15": {
+      "cards": [13],
+      "description": ""
+    },
+    "16": {
+      "cards": [39],
+      "description": ""
+    },
+    "17": {
+      "cards": [6],
+      "description": ""
+    },
+    "18": {
+      "cards": [17],
+      "description": ""
+    },
+    "19": {
+      "cards": [28],
+      "description": ""
+    },
+    "20": {
+      "cards": [50],
+      "description": ""
+    },
+    "21": {
+      "cards": [33, 9, 14, 2],
+      "description": ""
+    },
+    "22": {
+      "cards": [32],
+      "description": ""
+    },
+    "23": {
+      "cards": [43],
+      "description": ""
+    },
+    "24": {
+      "cards": [10],
+      "description": ""
+    },
+    "25": {
+      "cards": [36],
+      "description": ""
+    },
+    "26": {
+      "cards": [47],
+      "description": ""
+    },
+    "27": {
+      "cards": [1],
+      "description": ""
+    },
+    "28": {
+      "cards": [27],
+      "description": ""
+    },
+    "29": {
+      "cards": [38],
+      "description": ""
+    },
+    "30": {
+      "cards": [5],
+      "description": ""
+    },
+    "31": {
+      "cards": [16],
+      "description": ""
+    },
+    "32": {
+      "cards": [42],
+      "description": ""
+    },
+    "33": {
+      "cards": [14, 2, 52, 11, 21],
+      "description": ""
+    },
+    "34": {
+      "cards": [20],
+      "description": ""
+    },
+    "35": {
+      "cards": [31],
+      "description": ""
+    },
+    "36": {
+      "cards": [51],
+      "description": ""
+    },
+    "37": {
+      "cards": [24],
+      "description": ""
+    },
+    "38": {
+      "cards": [35],
+      "description": ""
+    },
+    "39": {
+      "cards": [46],
+      "description": ""
+    },
+    "40": {
+      "cards": [15],
+      "description": ""
+    },
+    "41": {
+      "cards": [26],
+      "description": ""
+    },
+    "42": {
+      "cards": [37],
+      "description": ""
+    },
+    "43": {
+      "cards": [4],
+      "description": ""
+    },
+    "44": {
+      "cards": [30],
+      "description": ""
+    },
+    "45": {
+      "cards": [41],
+      "description": ""
+    },
+    "46": {
+      "cards": [8],
+      "description": ""
+    },
+    "47": {
+      "cards": [19],
+      "description": ""
+    },
+    "48": {
+      "cards": [45],
+      "description": ""
+    },
+    "49": {
+      "cards": [12],
+      "description": ""
+    },
+    "50": {
+      "cards": [23],
+      "description": ""
+    },
+    "51": {
+      "cards": [34],
+      "description": ""
+    },
+    "52": {
+      "cards": [33, 9, 14, 2],
+      "description": ""
+    }
+  }
+}
