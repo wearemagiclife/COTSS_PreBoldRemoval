@@ -191,7 +191,7 @@ struct ProfileSetupBlockingView: View {
                 
                 VStack(spacing: 0) {
                     Spacer()
-                        .frame(maxHeight: geometry.size.height * 0.1)
+                        .frame(height: 68)
 
                     // Logo
                     titleSection(for: geometry.size)

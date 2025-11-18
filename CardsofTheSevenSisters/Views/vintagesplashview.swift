@@ -20,11 +20,12 @@ struct VintageSplashView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    Spacer(minLength: geometry.size.height * 0.08) // 8% from top
-                    
+                    Spacer()
+                        .frame(height: 68)
+
                     titleSection(for: geometry.size)
-                        .padding(.bottom, geometry.size.height * 0.06) // 6% spacing
-                    
+                        .padding(.bottom, 21)
+
                     cardAnimationArea(for: geometry.size)
                     
                     Spacer()
