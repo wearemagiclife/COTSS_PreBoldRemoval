@@ -127,10 +127,10 @@ struct StandardNavigation: ViewModifier {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 20))
                                 .foregroundColor(.black)
-                                .frame(width: AppConstants.Accessibility.minimumTouchTarget,
-                                      height: AppConstants.Accessibility.minimumTouchTarget)
+                                .frame(width: 44, height: 44)
                                 .contentShape(Rectangle())
                         }
+                        .buttonStyle(PlainButtonStyle())
                         .accessibilityLabel(AppConstants.Accessibility.Labels.backButton)
                         .accessibilityHint(AppConstants.Accessibility.Hints.doubleTapToClose)
                         .accessibilityIdentifier(AppConstants.Accessibility.Identifiers.backButton)

@@ -15,10 +15,57 @@ struct CardDetailModalView: View {
     let contentType: DetailContentType?
     @Binding var isPresented: Bool
 
-    // MARK: - Title glyph sizing to visually match (or exceed) 28pt text
-    private var titleUIFont: UIFont { UIFont(name: "Iowan Old Style", size: 28) ?? .systemFont(ofSize: 28) }
+    // MARK: - Title glyph sizing to visually match (or exceed) 24pt text
+    private var titleUIFont: UIFont { UIFont(name: "Iowan Old Style", size: 24) ?? .systemFont(ofSize: 24) }
     // Scale up slightly so the image reads like a typographic title
-    private var nameGlyphHeight: CGFloat { titleUIFont.lineHeight * 1.35 } // tweak factor as desired
+    private var nameGlyphHeight: CGFloat { titleUIFont.lineHeight * 1.25 } // reduced to match smaller card
+
+    // Helper to check if content is karma type
+    private var isKarmaContent: Bool {
+        if case .karma = contentType { return true }
+        return false
+    }
+
+    // iPad font scaling
+    private var isIPad: Bool {
+        UIScreen.main.bounds.width > 500
+    }
+
+    private func scaledFont(_ baseSize: CGFloat) -> CGFloat {
+        isIPad ? baseSize * 1.4 : baseSize
+    }
+    
+    private var navTitle: String {
+        switch cardType {
+        case .daily:
+            return "Daily Card"
+        case .birth:
+            return "Birth Card"
+        case .yearly:
+            return "Yearly Card"
+        case .fiftyTwoDay:
+            return "52-Day Card"
+        case .planetary:
+            if case .planetary(let planet) = contentType {
+                return "\(planet.capitalized) Influence"
+            } else {
+                return "Planetary Influence"
+            }
+        }
+    }
+
+    private var shareText: String {
+        let title: String = navTitle
+        let cardName: String = {
+            if let def = getCardDefinition(by: card.id) {
+                return def.name
+            } else {
+                return "\(card.value) of \(card.suit.rawValue)"
+            }
+        }()
+        let desc = descriptionText()
+        return "\(title): \(cardName)\n\n\(desc)"
+    }
 
     var body: some View {
         ZStack {
@@ -40,7 +87,7 @@ struct CardDetailModalView: View {
                                 Image(uiImage: planetImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(height: 300)
+                                    .frame(height: isIPad ? 320 : 240)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
                                     .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
                                     .accessibilityLabel("\(planet) planetary influence")
@@ -51,7 +98,7 @@ struct CardDetailModalView: View {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(height: 300)
+                                    .frame(height: isIPad ? 320 : 240)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
                                     .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
                                     .accessibilityLabel("\(card.value) of \(card.suit.rawValue)")
@@ -66,7 +113,7 @@ struct CardDetailModalView: View {
                             if case .planetary(let planet) = contentType {
                                 let planetInfo = AppConstants.PlanetDescriptions.getDescription(for: planet)
                                 Text(planetInfo.title.lowercased())
-                                    .font(.custom("Iowan Old Style", size: 22))
+                                    .font(.custom("Iowan Old Style", size: scaledFont(20)))
                                     .foregroundColor(.black)
                                     .multilineTextAlignment(.center)
                             } else {
@@ -78,65 +125,86 @@ struct CardDetailModalView: View {
                                             .resizable()
                                             .renderingMode(.original)
                                             .scaledToFit()
-                                            .frame(height: nameGlyphHeight)
+                                            .frame(height: isIPad ? nameGlyphHeight * 1.4 : nameGlyphHeight)
                                             .accessibilityLabel(def.name)
                                             .accessibilityAddTraits(.isHeader)
                                     } else {
-#if DEBUG
+    #if DEBUG
                                         // Visual debug: if asset is missing, show a subtle placeholder to catch it
                                         Text("Missing: \(assetName)")
                                             .font(.system(size: 14, weight: .regular))
                                             .foregroundColor(.red)
-#else
+    #else
                                         // In release, show nothing rather than fallback bold text
                                         EmptyView()
-#endif
+    #endif
                                     }
 
-                                    // Subtitle remains
-                                    Text(def.title.lowercased())
-                                        .font(.custom("Iowan Old Style", size: 21))
-                                        .foregroundColor(.black)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.top, 2)
+                                    // Subtitle - hide for karma cards
+                                    if case .karma = contentType {
+                                        // No subtitle for karma cards
+                                    } else {
+                                        Text(def.title.lowercased())
+                                            .font(.custom("Iowan Old Style", size: scaledFont(18)))
+                                            .foregroundColor(.black)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.top, 2)
+                                    }
                                 }
                             }
                         }
 
-                        if let lineImage = UIImage(named: "linedesign") {
-                            Image(uiImage: lineImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 120)
-                                .padding(.vertical, 15)
-                                .accessibilityHidden(true)
-                        }
+                        LineBreak(width: isIPad ? 260 : 180)
+                            .padding(.vertical, isKarmaContent ? 8 : 12)
 
                         Text(descriptionText())
-                            .font(.custom("Iowan Old Style", size: 20))
-                            .lineSpacing(5)
-                            .tracking(0.8)
+                            .font(.custom("Iowan Old Style", size: scaledFont(17)))
+                            .lineSpacing(isIPad ? 7 : 5)
+                            .tracking(0.3)
                             .foregroundColor(.black)
                             .multilineTextAlignment(.leading)
-                            .padding(.horizontal, 25)
+                            .padding(.horizontal, isIPad ? 20 : 10)
+
+                        // Birth dates for karma cards - below description
+                        if case .karma = contentType {
+                            VStack(spacing: 6) {
+                                Text("Birthdates with this Card:")
+                                    .font(.custom("Iowan Old Style", size: scaledFont(14)))
+                                    .foregroundColor(.black)
+                                    .multilineTextAlignment(.center)
+
+                                Text(formatBirthDates(for: card.id))
+                                    .font(.custom("Iowan Old Style", size: scaledFont(14)))
+                                    .foregroundColor(.black.opacity(0.7))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 20)
+                            }
+                            .padding(.top, 16)
+                        }
+
+                        LineBreak("linedesignd", width: isIPad ? 260 : 180)
+                            .padding(.top, 12)
+                            .padding(.bottom, 12)
                     }
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+                .padding(.bottom, 12)
             }
             .scrollIndicators(.hidden)
             .scrollTargetLayout()
             .scrollPosition(id: .constant("cardTop"))
+            .padding(.vertical, 30) // static top/bottom buffer so content never touches card edges
+            .padding(.horizontal, 12)
             .background(
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(Color(red: 0.86, green: 0.77, blue: 0.57).opacity(0.95))
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal)
+                    .fill(AppTheme.backgroundColor)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 25))
-            .scaleEffect(isPresented ? 1 : 0.8)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
+            .padding(25)
+            .scaleEffect(isPresented ? 1 : 1)
             .opacity(isPresented ? 1 : 0)
-            .padding(.horizontal, 25)
-            .padding(.top, 44)
-            .padding(.bottom, 20)
             .allowsHitTesting(isPresented)
             .zIndex(10)
         }
@@ -175,6 +243,21 @@ struct CardDetailModalView: View {
             }
         }
     }
+
+    private func formatBirthDates(for cardId: Int) -> String {
+        let dates = BirthCardLookup.shared.getDatesForCard(cardId)
+        guard !dates.isEmpty else { return "" }
+
+        let monthAbbr = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.",
+                         "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."]
+
+        let formatted = dates.map { date in
+            let monthName = monthAbbr[date.month - 1]
+            return "\(monthName) \(date.day)"
+        }.joined(separator: ", ")
+
+        return formatted
+    }
 }
 
 // MARK: - Asset name resolver for the small name glyph
@@ -193,3 +276,4 @@ private func cardNameAsset(_ raw: String) -> String {
         .replacingOccurrences(of: "  ", with: " ")
     return spaced.uppercased()
 }
+

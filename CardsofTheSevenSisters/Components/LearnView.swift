@@ -17,7 +17,7 @@ struct LearnView: View {
                         .foregroundColor(AppTheme.primaryText)
                         .padding(.bottom, 8)
 
-                    Text("Our app starts with your Birth Card, then explore the cards that influence your Yearly Solar Cycle, 52 Day Astral Cycles, and your Daily Card—a clear rhythm you can actually work with.")
+                    Text("Our app starts with your Birth Card, then explore the cards that influence your Yearly Cycle, 52-Day Cycles, and your Daily Card—a clear rhythm you can actually work with.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(AppTheme.secondaryText)
                         .padding(.bottom, 12)
@@ -34,11 +34,11 @@ struct LearnView: View {
                     }
                     .buttonStyle(.plain)
                     .sheet(isPresented: $showTutorial) {
-                        OnboardingTutorialView(
+                        OnboardingTutorialViewWrapper(
                             isPresented: $showTutorial,
                             birthCard: DataManager.shared.getCard(by: 1),
                             solarCard: DataManager.shared.getCard(by: 2),
-                            astralCard: DataManager.shared.getCard(by: 3),
+                            fiftytwoCard: DataManager.shared.getCard(by: 3),
                             dailyCard: DataManager.shared.getCard(by: 4),
                             userName: "You",
                             onComplete: {
@@ -70,14 +70,14 @@ struct LearnView: View {
                     )
 
                     LearnLinkCard(
-                        title: "Your 52 Day Astral Cycle",
-                        subtitle: "7 Rythms Each Year",
-                        url:"https://www.wearemagic.life/destiny-card-readings#52-day-card-astralcycle",
+                        title: "Your 52-Day Cycle",
+                        subtitle: "7 Rhythms Each Year",
+                        url:"https://www.wearemagic.life/destiny-card-readings#52-day-card-fiftytwocycle",
                         cardBackground: cardBackground
                     )
 
                     LearnLinkCard(
-                        title: "Your Yearly Solar Cycle",
+                        title: "Your Yearly Cycle",
                         subtitle: "Sets an Annual Focus",
                         url:"https://www.wearemagic.life/destiny-card-readings#yearly-card-solarcycle",
                         cardBackground: cardBackground

@@ -3,10 +3,12 @@ import SwiftUI
 struct SettingsMenuView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @StateObject private var authManager = AuthenticationManager.shared
+    @ObservedObject private var authManager = AuthenticationManager.shared
 
-    // Reuse the same parchment tone you use elsewhere
-    private let cardBackground = Color(red: 0.95, green: 0.91, blue: 0.82)
+    @State private var showingDeleteAccountAlert = false
+
+    // Subtle parchment tone closer to background but still contrasted
+    private let cardBackground = Color(red: 0.90, green: 0.83, blue: 0.67)
 
     var body: some View {
         NavigationStack {
@@ -81,16 +83,35 @@ struct SettingsMenuView: View {
 
                             // SIGN OUT BUTTON
                             Button {
-                                authManager.signOut()
+                                if DataManager.shared.isGuestMode {
+                                    DataManager.shared.clearProfile()
+                                } else {
+                                    authManager.signOut()
+                                }
                                 dismiss()
                             } label: {
                                 SettingsRow(
                                     systemImage: "rectangle.portrait.and.arrow.right",
-                                    title: "Sign Out",
-                                    subtitle: "Sign out of your account",
+                                    title: DataManager.shared.isGuestMode ? "Exit Guest Mode" : "Sign Out",
+                                    subtitle: DataManager.shared.isGuestMode ? "Return to sign in screen" : "Sign out of your account",
                                     cardBackground: cardBackground
                                 )
                             }
+
+                            // DELETE ACCOUNT BUTTON - only show for non-guests
+                            if !DataManager.shared.isGuestMode {
+                                Button {
+                                    showingDeleteAccountAlert = true
+                                } label: {
+                                    SettingsRow(
+                                        systemImage: "trash",
+                                        title: "Delete Account",
+                                        subtitle: "Permanently delete all data",
+                                        cardBackground: cardBackground
+                                    )
+                                }
+                            }
+
                         }
                     }
                     .padding(.horizontal, 20)
@@ -100,24 +121,34 @@ struct SettingsMenuView: View {
             .navigationTitle("") // we'll style our own header
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .bold))
-                            .padding(8)
-                            .background(
-                                Circle()
-                                    .fill(cardBackground.opacity(0.9))
-                            )
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(AppTheme.primaryText)
+                            .frame(width: 32, height: 28)
+                            .background(
+                                Capsule()
+                                    .fill(cardBackground)
+                            )
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
             // Match nav bar to background so it doesn't show as a gray bar
             .toolbarBackground(Color.appLaunchBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) {
+                    authManager.deleteAccount()
+                    dismiss()
+                }
+            } message: {
+                Text("This will permanently delete all your data including your profile, preferences, and card history. This action cannot be undone.")
+            }
         }
     }
 
@@ -126,6 +157,7 @@ struct SettingsMenuView: View {
             UIApplication.shared.open(url)
         }
     }
+
 }
 
 private struct SettingsRow: View {
@@ -144,6 +176,7 @@ private struct SettingsRow: View {
                 Image(systemName: systemImage)
                     .font(.system(size: AppConstants.FontSizes.subheadline, weight: .semibold))
                     .foregroundColor(AppTheme.primaryText)
+                    .accessibilityHidden(true)
             }
 
             VStack(alignment: .leading, spacing: 2) {

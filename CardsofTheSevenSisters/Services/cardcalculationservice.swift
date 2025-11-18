@@ -10,17 +10,15 @@ class CardCalculationService: ObservableObject {
         return calendar
     }
     
-    private var transformationLookup: [Int: Int] {
-        return [
-            1: 27, 2: 14, 3: 1, 4: 43, 5: 30, 6: 17, 7: 8, 8: 46,
-            9: 33, 10: 24, 12: 49, 13: 15, 14: 2, 15: 40, 16: 31,
-            17: 18, 18: 5, 19: 47, 20: 34, 22: 12, 23: 50, 24: 37,
-            25: 3, 26: 41, 27: 28, 28: 19, 29: 6, 30: 44, 31: 35,
-            32: 22, 33: 9, 34: 51, 35: 38, 36: 25, 37: 42, 38: 29,
-            39: 16, 40: 7, 41: 45, 42: 32, 43: 23, 44: 10, 45: 48,
-            46: 39, 47: 26, 48: 13, 49: 4, 50: 20, 51: 36
-        ]
-    }
+    private static let transformationLookup: [Int: Int] = [
+        1: 27, 2: 14, 3: 1, 4: 43, 5: 30, 6: 17, 7: 8, 8: 46,
+        9: 33, 10: 24, 12: 49, 13: 15, 14: 2, 15: 40, 16: 31,
+        17: 18, 18: 5, 19: 47, 20: 34, 22: 12, 23: 50, 24: 37,
+        25: 3, 26: 41, 27: 28, 28: 19, 29: 6, 30: 44, 31: 35,
+        32: 22, 33: 9, 34: 51, 35: 38, 36: 25, 37: 42, 38: 29,
+        39: 16, 40: 7, 41: 45, 42: 32, 43: 23, 44: 10, 45: 48,
+        46: 39, 47: 26, 48: 13, 49: 4, 50: 20, 51: 36
+    ]
     
     private func resetArrayStructure() {
         s0 = Array(0...52)
@@ -31,8 +29,8 @@ class CardCalculationService: ObservableObject {
         guard s0.count > 52 && s1.count > 52 else {
             return
         }
-        
-        for (sourceIndex, targetIndex) in transformationLookup {
+
+        for (sourceIndex, targetIndex) in Self.transformationLookup {
             s1[targetIndex] = s0[sourceIndex]
         }
         
@@ -76,13 +74,13 @@ class CardCalculationService: ObservableObject {
             return DailyCardResult(card: fallbackCard, planet: "Mer", planetNum: 1)
         }
         
-        let celestialPhase = retrieveCelestialPhase(remainingDays + 1)
+        let planetPhase = retrievePlanetPhase(remainingDays + 1)
         let resultCardId = s1[finalIndex]
         let resultCard = DataManager.shared.getCard(by: resultCardId)
         
         return DailyCardResult(
             card: resultCard,
-            planet: celestialPhase,
+            planet: planetPhase,
             planetNum: remainingDays + 1
         )
     }
@@ -187,13 +185,13 @@ class CardCalculationService: ObservableObject {
         return ageData.year ?? 0
     }
     
-    func retrieveCelestialPhase(_ dayValue: Int) -> String {
-        let celestialCodes = ["", "Mer", "Ven", "Mar", "Jup", "Sat", "Ura", "Nep"]
-        let code = celestialCodes.indices.contains(dayValue) ? celestialCodes[dayValue] : ""
-        return expandCelestialCode(code)
+    func retrievePlanetPhase(_ dayValue: Int) -> String {
+        let planetCodes = ["", "Mer", "Ven", "Mar", "Jup", "Sat", "Ura", "Nep"]
+        let code = planetCodes.indices.contains(dayValue) ? planetCodes[dayValue] : ""
+        return expandPlanetCode(code)
     }
     
-    private func expandCelestialCode(_ code: String) -> String {
+    private func expandPlanetCode(_ code: String) -> String {
         switch code {
         case "Mer": return "Mercury"
         case "Ven": return "Venus"

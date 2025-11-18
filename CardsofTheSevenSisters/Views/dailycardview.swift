@@ -44,6 +44,20 @@ struct DailyCardView: View {
         return (info.title, info.description)
     }
     
+    private var navigationTitle: String {
+        if showCardDetail, let card = selectedCard {
+            if case .planetary(let planet) = selectedContentType {
+                return "\(planet.capitalized) Influence"
+            } else {
+                if let def = getCardDefinition(by: card.id) {
+                    return def.name
+                }
+                return card.name
+            }
+        }
+        return AppConstants.Strings.dailyInfluence
+    }
+    
     var body: some View {
         ZStack {
             Color(red: 0.86, green: 0.77, blue: 0.57)
@@ -77,7 +91,7 @@ struct DailyCardView: View {
             }
         }
         .standardNavigation(
-            title: AppConstants.Strings.dailyInfluence,
+            title: navigationTitle,
             backAction: {
                 if showCardDetail {
                     withAnimation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping)) {
@@ -169,7 +183,7 @@ struct DailyCardView: View {
         HStack(spacing: AppConstants.Spacing.cardSpacing) {
             CardWithLabel(
                 card: viewModel.yesterdayCard.card,
-                label: AppConstants.Strings.lastCycle,
+                label: "Yesterday",
                 size: AppConstants.CardSizes.medium,
                 action: {
                     showCardDetail(
@@ -179,10 +193,10 @@ struct DailyCardView: View {
                     )
                 }
             )
-            
+
             CardWithLabel(
                 card: viewModel.tomorrowCard.card,
-                label: AppConstants.Strings.nextCycle,
+                label: "Tomorrow",
                 size: AppConstants.CardSizes.medium,
                 action: {
                     showCardDetail(

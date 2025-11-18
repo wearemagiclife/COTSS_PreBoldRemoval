@@ -44,8 +44,9 @@ struct VintageSplashView: View {
     }
     
     private func titleSection(for size: CGSize) -> some View {
-        let titleWidth = min(size.width * 0.85, 340) // 85% of screen width, max 340
-        
+        let isIPad = size.width > 500
+        let titleWidth = isIPad ? min(size.width * 0.5, 400) : min(size.width * 0.85, 340)
+
         return Group {
             if let titleImage = UIImage(named: "apptitle") {
                 Image(uiImage: titleImage)
@@ -80,9 +81,10 @@ struct VintageSplashView: View {
     }
     
     private func cardAnimationArea(for size: CGSize) -> some View {
-        let ellipseWidth = min(size.width * 0.75, 320) // 80% of screen width, max 320
+        let isIPad = size.width > 500
+        let ellipseWidth = isIPad ? min(size.width * 0.45, 400) : min(size.width * 0.75, 320)
         let ellipseHeight = ellipseWidth * 0.75 // Maintain aspect ratio
-        let scaleFactor = size.width / 390 // iPhone 14 Pro width as base
+        let scaleFactor = min(size.width / 390, 1.3) // Cap at 1.3 for iPad
         
         return ZStack {
             Ellipse()
@@ -142,7 +144,7 @@ struct VintageSplashView: View {
             onStart()
         }) {
             Text("Let's Begin")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
                 .tracking(0.5)
                 .foregroundColor(.white)
                 .padding(.horizontal, 50)
@@ -153,12 +155,13 @@ struct VintageSplashView: View {
         }
         .scaleEffect(1.0)
         .cardShadow(isLarge: true)
-        .opacity(showButton ? 1 : 0)
+        .opacity(showButton && !isTransitioning ? 1 : 0)
         .animation(.easeInOut(duration: 1.0).delay(2.5), value: showButton)
+        .animation(.easeOut(duration: 0.3), value: isTransitioning)
     }
     
     private func startAnimation(for size: CGSize) {
-        let scaleFactor = size.width / 390 // iPhone 14 Pro width as base
+        let scaleFactor = min(size.width / 390, 1.3) // Cap at 1.3 for iPad
         
         cardScales[3] = 1.0
         cardOffsets[3] = .zero
@@ -204,15 +207,19 @@ struct VintageCardImageView: View {
     let imageName: String
     let isCenter: Bool
     let scaleFactor: CGFloat
-    
+
+    private var cappedScale: CGFloat {
+        min(scaleFactor, 1.3)
+    }
+
     private var cardWidth: CGFloat {
         let baseWidth: CGFloat = isCenter ? 121 : 91
-        return baseWidth * scaleFactor
+        return baseWidth * cappedScale
     }
-    
+
     private var cardHeight: CGFloat {
         let baseHeight: CGFloat = isCenter ? 170 : 128
-        return baseHeight * scaleFactor
+        return baseHeight * cappedScale
     }
     
     var body: some View {
@@ -225,6 +232,7 @@ struct VintageCardImageView: View {
                     .scaleEffect(1.05)
                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
                     .cardShadow()
+                    .accessibilityHidden(true)
             } else {
                 ZStack {
                     RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small)

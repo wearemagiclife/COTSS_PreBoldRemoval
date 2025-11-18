@@ -1,6 +1,66 @@
 import SwiftUI
 import UIKit
 import LinkPresentation
+import AuthenticationServices
+
+// MARK: - Guest Share Blocked View
+
+struct GuestShareBlockedView: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var authManager = AuthenticationManager.shared
+
+    var body: some View {
+        ZStack {
+            // Blurred background
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image(systemName: "square.and.arrow.up.trianglebadge.exclamationmark")
+                    .font(.system(size: 50))
+                    .foregroundColor(.white)
+
+                Text("Feature not available for Guest Users")
+                    .font(.custom("Iowan Old Style", size: 20))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+
+                Text("Please register for access.")
+                    .font(.custom("Iowan Old Style", size: 16))
+                    .foregroundColor(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+
+                SignInWithAppleButton(
+                    .signIn,
+                    onRequest: { request in
+                        request.requestedScopes = [.email, .fullName]
+                    },
+                    onCompletion: { result in
+                        authManager.handleAuthorization(result)
+                        if case .success = result {
+                            // Clear guest mode when signing in
+                            DataManager.shared.isGuestMode = false
+                            dismiss()
+                        }
+                    }
+                )
+                .signInWithAppleButtonStyle(.white)
+                .frame(height: 44)
+                .frame(width: 240)
+                .cornerRadius(8)
+                .padding(.top, 10)
+
+                Button("Cancel") {
+                    dismiss()
+                }
+                .font(.custom("Iowan Old Style", size: 16))
+                .foregroundColor(.white.opacity(0.8))
+                .padding(.top, 10)
+            }
+            .padding(30)
+        }
+    }
+}
 
 // MARK: - Core Share Content Model
 
@@ -51,7 +111,7 @@ struct SingleCardShareView: View {
     let card: Card
     let cardTitle: String
     let cardDescription: String
-    let readingType: String // e.g., "Birth Card", "Yearly Card"
+    let spreadType: String // e.g., "Birth Card", "Yearly Card"
     let subtitle: String?   // Optional subtitle like date or year
 
     private let inkColor = Color.black
@@ -65,7 +125,7 @@ struct SingleCardShareView: View {
             VStack(spacing: 20) {
                 // Header
                 VStack(spacing: 2) {
-                    Text("\(readingType) Reading")
+                    Text("My \(spreadType) Card")
                         .font(.custom("Iowan Old Style", size: 38))
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
@@ -137,13 +197,13 @@ struct SingleCardShareView: View {
 
                 // Footer
                 VStack(spacing: 8) {
-                    Text("Find out what The Cards hold for you with a free personalized reading.")
+                    Text("Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(inkColor.opacity(0.8))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
 
-                    Text("sevensisters.cards")
+                    Text("find yours at sevensisters.cards")
                         .font(.custom("Iowan Old Style", size: 20))
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
@@ -156,9 +216,9 @@ struct SingleCardShareView: View {
     }
 }
 
-// MARK: - Astral Cycle (Card + Planet spread)
+// MARK: - fiftytwo Cycle (Card + Planet spread)
 
-struct AstralCycleShareView: View {
+struct fiftytwoCycleShareView: View {
     let cycleCard: Card
     let cycleCardTitle: String
     let cycleCardDescription: String
@@ -178,7 +238,7 @@ struct AstralCycleShareView: View {
             VStack(spacing: 14) {
                 // Header
                 VStack(spacing: 2) {
-                    Text("Astral Cycle Reading")
+                    Text("Here is my 52-Day Card & Influence")
                         .font(.custom("Iowan Old Style", size: 38))
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
@@ -291,13 +351,13 @@ struct AstralCycleShareView: View {
 
                 // Footer
                 VStack(spacing: 8) {
-                    Text("Find out what The Cards hold for you with a free personalized reading.")
+                    Text(".")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(inkColor.opacity(0.8))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
 
-                    Text("sevensisters.cards")
+                    Text("find yours at sevensisters.cards")
                         .font(.custom("Iowan Old Style", size: 20))
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
@@ -357,13 +417,9 @@ struct LifeSpreadShareView: View {
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
 
-                    Text("Find yours at sevensisters.cards")
+                    Text("find yours at sevensisters.cards")
                         .font(.custom("Iowan Old Style", size: 24))
                         .foregroundColor(inkColor.opacity(0.8))
-
-                    Text(formatDate(birthDate))
-                        .font(.custom("Iowan Old Style", size: 26))
-                        .foregroundColor(inkColor.opacity(0.6))
                         .padding(.top, 2)
                 }
                 .padding(.bottom, 12)
@@ -454,13 +510,13 @@ struct LifeSpreadShareView: View {
 
                 // Footer
                 VStack(spacing: 10) {
-                    Text("Get your free personalized reading")
+                    Text("Your card's are waiting for you")
                         .font(.custom("Iowan Old Style", size: 20))
                         .foregroundColor(inkColor.opacity(0.8))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 50)
 
-                    Text("sevensisters.cards")
+                    Text("find yours at sevensisters.cards")
                         .font(.custom("Iowan Old Style", size: 26))
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
@@ -523,7 +579,7 @@ struct DailyCardShareView: View {
             VStack(spacing: 14) {
                 // Header
                 VStack(spacing: 2) {
-                    Text("Daily Card Reading")
+                    Text("Today's Theme & Focus")
                         .font(.custom("Iowan Old Style", size: 38))
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
@@ -636,13 +692,13 @@ struct DailyCardShareView: View {
 
                 // Footer
                 VStack(spacing: 8) {
-                    Text("Find out what The Cards hold for you with a free personalized reading.")
+                    Text("Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(inkColor.opacity(0.8))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
 
-                    Text("sevensisters.cards")
+                    Text("find yours at sevensisters.cards")
                         .font(.custom("Iowan Old Style", size: 20))
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
@@ -946,11 +1002,18 @@ struct DailyCardShareLink: View {
 
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
+    @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
 
     var body: some View {
-        Button(action: shareCard) {
+        Button(action: {
+            if DataManager.shared.isGuestMode {
+                isShowingGuestBlockedView = true
+            } else {
+                shareCard()
+            }
+        }) {
             if isLoading {
                 ProgressView()
                     .scaleEffect(0.8)
@@ -981,6 +1044,12 @@ struct DailyCardShareLink: View {
                 ShareSheetWrapper(activityItems: shareItems)
                     .ignoresSafeArea()
             }
+        }
+        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
+            GuestShareBlockedView()
+        }
+        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
+            GuestShareBlockedView()
         }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
@@ -1020,7 +1089,7 @@ struct DailyCardShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My \(cardTypeName) reading by Cards of The Seven Sisters.jpg"
+                let fileName = "My \(cardTypeName) Cards by SevenSitersCards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1029,7 +1098,7 @@ struct DailyCardShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My \(cardTypeName) reading by Cards of The Seven Sisters"
+                        subject: "My \(cardTypeName) Cards by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]
@@ -1075,11 +1144,18 @@ struct LifeSpreadShareLink: View {
 
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
+    @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
 
     var body: some View {
-        Button(action: shareCard) {
+        Button(action: {
+            if DataManager.shared.isGuestMode {
+                isShowingGuestBlockedView = true
+            } else {
+                shareCard()
+            }
+        }) {
             if isLoading {
                 ProgressView()
                     .scaleEffect(0.8)
@@ -1110,6 +1186,9 @@ struct LifeSpreadShareLink: View {
                 ShareSheetWrapper(activityItems: shareItems)
                     .ignoresSafeArea()
             }
+        }
+        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
+            GuestShareBlockedView()
         }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
@@ -1157,7 +1236,7 @@ struct LifeSpreadShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My Life Spread reading by Cards of The Seven Sisters.jpg"
+                let fileName = "My Life Spread by SevenSister.Cards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1166,7 +1245,7 @@ struct LifeSpreadShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My Life Spread reading by Cards of The Seven Sisters"
+                        subject: "My Life Spread by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]
@@ -1196,9 +1275,9 @@ struct LifeSpreadShareLink: View {
     }
 }
 
-// MARK: - Share Link: Astral Cycle
+// MARK: - Share Link: fiftytwo Cycle
 
-struct AstralCycleShareLink: View {
+struct fiftytwoCycleShareLink: View {
     let cycleCard: Card
     let cycleCardTitle: String
     let cycleCardDescription: String
@@ -1209,11 +1288,18 @@ struct AstralCycleShareLink: View {
 
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
+    @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
 
     var body: some View {
-        Button(action: shareCard) {
+        Button(action: {
+            if DataManager.shared.isGuestMode {
+                isShowingGuestBlockedView = true
+            } else {
+                shareCard()
+            }
+        }) {
             if isLoading {
                 ProgressView()
                     .scaleEffect(0.8)
@@ -1245,6 +1331,9 @@ struct AstralCycleShareLink: View {
                     .ignoresSafeArea()
             }
         }
+        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
+            GuestShareBlockedView()
+        }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
         } message: {
@@ -1258,7 +1347,7 @@ struct AstralCycleShareLink: View {
         isLoading = true
         Task {
             do {
-                let shareView = AstralCycleShareView(
+                let shareView = fiftytwoCycleShareView(
                     cycleCard: cycleCard,
                     cycleCardTitle: cycleCardTitle,
                     cycleCardDescription: cycleCardDescription,
@@ -1283,7 +1372,7 @@ struct AstralCycleShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My Astral Cycle reading by Cards of The Seven Sisters.jpg"
+                let fileName = "My 52-Day Cycle by SevenSister.Cards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1292,7 +1381,7 @@ struct AstralCycleShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My Astral Cycle reading by Cards of The Seven Sisters"
+                        subject: "My 52-Day Cycle by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]
@@ -1328,16 +1417,23 @@ struct SingleCardShareLink: View {
     let card: Card
     let cardTitle: String
     let cardDescription: String
-    let readingType: String  // e.g., "Birth Card"
+    let spreadType: String  // e.g., "Birth Card"
     let subtitle: String?    // Optional subtitle
 
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
+    @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
 
     var body: some View {
-        Button(action: shareCard) {
+        Button(action: {
+            if DataManager.shared.isGuestMode {
+                isShowingGuestBlockedView = true
+            } else {
+                shareCard()
+            }
+        }) {
             if isLoading {
                 ProgressView()
                     .scaleEffect(0.8)
@@ -1369,6 +1465,9 @@ struct SingleCardShareLink: View {
                     .ignoresSafeArea()
             }
         }
+        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
+            GuestShareBlockedView()
+        }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
         } message: {
@@ -1386,7 +1485,7 @@ struct SingleCardShareLink: View {
                     card: card,
                     cardTitle: cardTitle,
                     cardDescription: cardDescription,
-                    readingType: readingType,
+                    spreadType: spreadType,
                     subtitle: subtitle
                 )
 
@@ -1405,7 +1504,7 @@ struct SingleCardShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My \(readingType) reading by Cards of The Seven Sisters.jpg"
+                let fileName = "My \(spreadType) Card by SevenSister.Cards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1414,7 +1513,7 @@ struct SingleCardShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My \(readingType) reading by Cards of The Seven Sisters"
+                        subject: "My \(spreadType) Card by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]

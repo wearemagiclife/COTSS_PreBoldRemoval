@@ -3,10 +3,12 @@ import SwiftUI
 
 class ImageManager: ObservableObject {
     static let shared = ImageManager()
-    
+
     private var imageCache: [String: UIImage] = [:]
+    private var accessOrder: [String] = []  // Track access order for LRU
+    private let maxCacheSize = 30
     private let cacheQueue = DispatchQueue(label: "ImageCacheQueue", attributes: .concurrent)
-    
+
     private init() {}
     
     func loadCardImage(for card: Card) -> UIImage? {
@@ -33,39 +35,41 @@ class ImageManager: ObservableObject {
     }
     
     private func attemptImageLoad(named imageName: String) -> UIImage? {
-        let namesToTry = [
-            imageName,
-            imageName.uppercased(),
-            "\(imageName).png",
-            "\(imageName.uppercased()).png",
-            "Resources/Images/\(imageName)",
-            "Resources/Images/\(imageName.uppercased())",
-            "card_\(imageName)",
-            "Card_\(imageName)"
-        ]
-        
-        for name in namesToTry {
-            if let image = UIImage(named: name) {
-                return image
-            }
-        }
-        
-        if let path = Bundle.main.path(forResource: imageName, ofType: "png", inDirectory: "Resources/Images"),
-           let image = UIImage(contentsOfFile: path) {
+        // Try exact name first (most common case - assets use lowercase)
+        if let image = UIImage(named: imageName) {
             return image
         }
-        
+        // Fallback to lowercase for legacy calls
+        if let image = UIImage(named: imageName.lowercased()) {
+            return image
+        }
         return nil
     }
     
     private func getCachedImage(named imageName: String) -> UIImage? {
         return cacheQueue.sync {
-            return imageCache[imageName]
+            if let image = imageCache[imageName] {
+                // Move to end (most recently used)
+                accessOrder.removeAll { $0 == imageName }
+                accessOrder.append(imageName)
+                return image
+            }
+            return nil
         }
     }
-    
+
     private func setCachedImage(_ image: UIImage?, named imageName: String) {
         cacheQueue.async(flags: .barrier) {
+            // Update access order
+            self.accessOrder.removeAll { $0 == imageName }
+            self.accessOrder.append(imageName)
+
+            // Evict oldest if over limit
+            while self.accessOrder.count > self.maxCacheSize {
+                let oldest = self.accessOrder.removeFirst()
+                self.imageCache.removeValue(forKey: oldest)
+            }
+
             self.imageCache[imageName] = image
         }
     }
@@ -73,6 +77,23 @@ class ImageManager: ObservableObject {
     func clearCache() {
         cacheQueue.async(flags: .barrier) {
             self.imageCache.removeAll()
+            self.accessOrder.removeAll()
+        }
+    }
+
+    func preloadAllCards() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let suits = ["h", "d", "c", "s"]
+            let ranks = ["a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k"]
+
+            for suit in suits {
+                for rank in ranks {
+                    _ = self.loadImage(named: "\(rank)\(suit)")
+                }
+            }
+            // Load special cards
+            _ = self.loadImage(named: "joker")
+            _ = self.loadImage(named: "cardback")
         }
     }
     

@@ -72,11 +72,7 @@ class NotificationManager: ObservableObject {
         )
 
         // Schedule notification
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error.localizedDescription)")
-            }
-        }
+        UNUserNotificationCenter.current().add(request) { _ in }
     }
 
     // MARK: - Canceling

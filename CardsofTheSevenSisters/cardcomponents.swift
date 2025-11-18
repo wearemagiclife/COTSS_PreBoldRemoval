@@ -264,11 +264,22 @@ struct SectionHeader: View {
 
 struct LineBreak: View {
     let imageName: String
-    let height: CGFloat
+    let width: CGFloat
 
-    init(_ imageName: String = "linedesign", height: CGFloat = 20) {
+    private var clampedWidth: CGFloat {
+        min(max(width, 280), 300)
+    }
+    private var effectiveWidth: CGFloat {
+        clampedWidth * 0.75
+    }
+
+    private var calculatedHeight: CGFloat {
+        effectiveWidth * 0.1
+    }
+
+    init(_ imageName: String = "linedesign", width: CGFloat = 280) {
         self.imageName = imageName
-        self.height = height
+        self.width = width
     }
 
     var body: some View {
@@ -276,13 +287,36 @@ struct LineBreak: View {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(height: height)
+                .frame(width: effectiveWidth, height: calculatedHeight)
                 .accessibilityHidden(true)
         } else {
             Rectangle()
-                .frame(height: 1)
+                .frame(width: effectiveWidth, height: calculatedHeight)
                 .foregroundColor(.black.opacity(0.3))
                 .accessibilityHidden(true)
         }
     }
 }
+
+// MARK: - Simple Divider Line (2/3 of LineBreak width)
+
+struct SimpleDivider: View {
+    let width: CGFloat
+
+    private var dividerWidth: CGFloat {
+        let lineBreakWidth = min(max(width, 280), 300) * 0.75
+        return lineBreakWidth * 0.67  // 2/3 of LineBreak width
+    }
+
+    init(width: CGFloat = 200) {
+        self.width = width
+    }
+
+    var body: some View {
+        Rectangle()
+            .fill(Color.black.opacity(0.3))
+            .frame(width: dividerWidth, height: 1)
+            .accessibilityHidden(true)
+    }
+}
+

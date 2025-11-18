@@ -3,14 +3,42 @@ import Foundation
 class DataManager: ObservableObject {
     static let shared = DataManager()
 
+    // MARK: - Static DateFormatters (reused to avoid repeated allocation)
+    // Note: DateFormatter defaults to system timezone, so no explicit timezone needed
+    private static let dateFormatter_yyyyMMdd: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    private static let dateFormatter_MMdd: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MM/dd"
+        return f
+    }()
+
+    private static let dateFormatter_MMddyyyy: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MM/dd/yyyy"
+        return f
+    }()
+
+    private static let dateFormatter_MMMd: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f
+    }()
+
     @Published var userProfile = UserProfile()
     @Published var explorationDate: Date?
     @Published var isDailyCardRevealed: Bool = false
     @Published var isInitialized: Bool = false
+    @Published var isGuestMode: Bool = false
 
     private var cards: [Card] = []
     private var karmaConnections1: [String: KarmaConnection] = [:]
     private var karmaConnections2: [String: KarmaConnection] = [:]
+    private var cachedPlanetaryPeriods: [String: PlanetaryPeriod]?
     private var dailyCardRevealDate: String? {
         get { UserDefaults.standard.string(forKey: "dailyCardRevealDate") }
         set { UserDefaults.standard.set(newValue, forKey: "dailyCardRevealDate") }
@@ -97,11 +125,7 @@ class DataManager: ObservableObject {
     
     
     private func checkDailyCardRevealStatus() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        
-        let todayString = formatter.string(from: Date())
+        let todayString = Self.dateFormatter_yyyyMMdd.string(from: Date())
         
         if let lastRevealDate = dailyCardRevealDate {
             if lastRevealDate == todayString {
@@ -115,27 +139,22 @@ class DataManager: ObservableObject {
     }
     
     func markDailyCardAsRevealed() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        
-        let todayString = formatter.string(from: Date())
-        
+        let todayString = Self.dateFormatter_yyyyMMdd.string(from: Date())
+
         DispatchQueue.main.async {
             self.isDailyCardRevealed = true
         }
         dailyCardRevealDate = todayString
         UserDefaults.standard.set(true, forKey: "isDailyCardRevealed")
+
+        // Track for rating prompts
+        RatingService.shared.trackDailyCardReveal()
     }
     
     private func resetDailyCardReveal() {
         isDailyCardRevealed = false
         UserDefaults.standard.set(false, forKey: "isDailyCardRevealed")
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        dailyCardRevealDate = formatter.string(from: Date())
+        dailyCardRevealDate = Self.dateFormatter_yyyyMMdd.string(from: Date())
     }
     
     func getTodayCard() -> Card {
@@ -265,11 +284,19 @@ class DataManager: ObservableObject {
         userProfile = UserProfile()
         isDailyCardRevealed = false
         explorationDate = nil
-        
+        isGuestMode = false
+
         // Clear any saved profile data
         UserDefaults.standard.removeObject(forKey: "userProfile")
         UserDefaults.standard.removeObject(forKey: "dailyCardRevealDate")
         UserDefaults.standard.removeObject(forKey: "isDailyCardRevealed")
+    }
+
+    // Guest Mode Sign In
+    func signInAsGuest(birthDate: Date) {
+        isGuestMode = true
+        userProfile = UserProfile(name: "Guest", birthDate: birthDate)
+        // Don't save to UserDefaults for guest mode
     }
 }
 
@@ -297,22 +324,28 @@ struct PeriodRange: Codable {
 // MARK: - 52-Day Cycle Extension
 extension DataManager {
     
-    // Load planetary periods from JSON with proper error handling
+    // Load planetary periods from JSON with caching
     private func loadPlanetaryPeriods() -> [String: PlanetaryPeriod]? {
+        // Return cached result if available
+        if let cached = cachedPlanetaryPeriods {
+            return cached
+        }
+
         // Try different possible paths for the JSON file
         let possiblePaths = [
             ("birth_card_planetary_periods", "json", "Resources/Data"),
             ("birth_card_planetary_periods", "json", "resources/data"),
             ("birth_card_planetary_periods", "json", nil)
         ]
-        
+
         for (resource, ext, subdir) in possiblePaths {
             if let url = Bundle.main.url(forResource: resource, withExtension: ext, subdirectory: subdir),
                let data = try? Data(contentsOf: url) {
-                
+
                 do {
                     let periodData = try JSONDecoder().decode(PlanetaryPeriodData.self, from: data)
-                    return periodData.planetaryPeriods
+                    cachedPlanetaryPeriods = periodData.planetaryPeriods
+                    return cachedPlanetaryPeriods
                 } catch {
                     continue
                 }
@@ -324,9 +357,7 @@ extension DataManager {
     
     // Get planetary period for a birth date
     func getPlanetaryPeriod(for birthDate: Date) -> PlanetaryPeriod? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd"
-        let birthKey = formatter.string(from: birthDate)
+        let birthKey = Self.dateFormatter_MMdd.string(from: birthDate)
 
         guard let periods = loadPlanetaryPeriods(),
               let period = periods[birthKey] else {
@@ -380,13 +411,10 @@ extension DataManager {
     
     // Helper function to convert MM/dd to day of year
     private func dayOfYearFromMMDD(_ dateString: String) -> Int? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd"
-        
         let calendar = Calendar.current
         let currentYear = calendar.component(.year, from: Date())
-        
-        guard let date = formatter.date(from: dateString) else { return nil }
+
+        guard let date = Self.dateFormatter_MMdd.date(from: dateString) else { return nil }
         
         // Set to current year for comparison
         var components = calendar.dateComponents([.month, .day], from: date)
@@ -443,9 +471,7 @@ extension DataManager {
     
     // Helper to create date from MM/dd string
     private func dateFromMMDD(_ dateString: String, year: Int) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy"
-        return formatter.date(from: "\(dateString)/\(year)")
+        return Self.dateFormatter_MMddyyyy.date(from: "\(dateString)/\(year)")
     }
     
     // Get previous cycle dates
@@ -476,12 +502,8 @@ extension DataManager {
     
     // Format date range with smart year handling
     func formatDateRange(start: Date, end: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-
-        let startString = formatter.string(from: start)
-        let endString = formatter.string(from: end)
-
+        let startString = Self.dateFormatter_MMMd.string(from: start)
+        let endString = Self.dateFormatter_MMMd.string(from: end)
         return "\(startString) - \(endString)"
     }
 }

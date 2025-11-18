@@ -50,6 +50,21 @@ struct FiftyTwoDayCycleView: View {
         return DataManager.shared.getCurrentPlanetaryPhase(for: DataManager.shared.userProfile.birthDate)
     }
 
+    private var navigationTitle: String {
+        if showCardDetail, let card = selectedCard, let contentType = selectedContentType {
+            switch contentType {
+            case .planetary(let planet):
+                return "\(planet.capitalized) Influence"
+            default:
+                if let def = getCardDefinition(by: card.id) {
+                    return def.name
+                }
+                return card.name
+            }
+        }
+        return AppConstants.Strings.fiftyTwoDayInfluence
+    }
+
     var body: some View {
         ZStack {
             Color(red: 0.86, green: 0.77, blue: 0.57)
@@ -82,7 +97,7 @@ struct FiftyTwoDayCycleView: View {
             }
         }
         .standardNavigation(
-            title: AppConstants.Strings.fiftyTwoDayInfluence,
+            title: navigationTitle,
             backAction: {
                 if showCardDetail {
                     withAnimation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping)) {
@@ -95,7 +110,7 @@ struct FiftyTwoDayCycleView: View {
             trailingContent: {
                 AnyView(
                     HStack(spacing: 12) {
-                        AstralCycleShareLink(
+                        fiftytwoCycleShareLink(
                             cycleCard: viewModel.currentPeriodCard,
                             cycleCardTitle: cycleCardTitle,
                             cycleCardDescription: cycleCardDescription,
@@ -264,3 +279,4 @@ struct FiftyTwoDayCycleView: View {
         FiftyTwoDayCycleView()
     }
 }
+

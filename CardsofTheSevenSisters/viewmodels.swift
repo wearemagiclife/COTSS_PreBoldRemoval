@@ -195,7 +195,7 @@ class FiftyTwoDayCycleViewModel: CardViewModel {
     }
     
     var planetaryPeriod: String {
-        return calculator.retrieveCelestialPhase(currentPeriodNumber)
+        return calculator.retrievePlanetPhase(currentPeriodNumber)
     }
     
     enum CyclePeriod {
@@ -289,39 +289,5 @@ class HomeViewModel: CardViewModel {
                 }
             }
         }
-    }
-
-    func cardToImageName(_ card: Card) -> String {
-        let value = String(describing: card.value).lowercased()
-        let suit = String(describing: card.suit).lowercased()
-
-        let suitChar: String
-        switch suit {
-        case "hearts": suitChar = "h"
-        case "diamonds": suitChar = "d"
-        case "clubs": suitChar = "c"
-        case "spades": suitChar = "s"
-        default: suitChar = "s"
-        }
-
-        let valueChar: String
-        switch value {
-        case "ace": valueChar = "a"
-        case "jack": valueChar = "j"
-        case "queen": valueChar = "q"
-        case "king": valueChar = "k"
-        case "two": valueChar = "2"
-        case "three": valueChar = "3"
-        case "four": valueChar = "4"
-        case "five": valueChar = "5"
-        case "six": valueChar = "6"
-        case "seven": valueChar = "7"
-        case "eight": valueChar = "8"
-        case "nine": valueChar = "9"
-        case "ten": valueChar = "10"
-        default: valueChar = value
-        }
-
-        return "\(valueChar)\(suitChar)"
     }
 }

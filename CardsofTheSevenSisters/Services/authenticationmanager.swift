@@ -137,12 +137,34 @@ class AuthenticationManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: userEmailKey)
         UserDefaults.standard.set(false, forKey: isSignedInKey)
         UserDefaults.standard.synchronize()
-        
+
         // Clear in-memory data
         userIdentifier = ""
         fullName = nil
         email = nil
-        
+
+        // Update signed-in state
+        DispatchQueue.main.async {
+            self.isSignedIn = false
+        }
+    }
+
+    /// Delete account and all associated data permanently
+    func deleteAccount() {
+        // Clear all UserDefaults for the app
+        if let bundleID = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleID)
+        }
+        UserDefaults.standard.synchronize()
+
+        // Clear DataManager profile data
+        DataManager.shared.clearProfile()
+
+        // Clear in-memory data
+        userIdentifier = ""
+        fullName = nil
+        email = nil
+
         // Update signed-in state
         DispatchQueue.main.async {
             self.isSignedIn = false

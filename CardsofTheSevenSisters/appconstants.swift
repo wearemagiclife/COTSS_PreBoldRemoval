@@ -285,7 +285,7 @@ struct AppConstants {
         static let fiftyTwoDayCycle = "52-Day Cycle"
         static let dailyInfluence = "Today's Cycle"
         static let yearlyInfluence = "Your Yearly Spread"
-        static let fiftyTwoDayInfluence = "Your 52-Day Cycle"
+        static let fiftyTwoDayInfluence = "Your 52-Day Spread"
         static let exploring = "Exploring Cards for"
         static let missingImage = "Missing:"
     }

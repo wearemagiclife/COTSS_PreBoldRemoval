@@ -1,9 +1,7 @@
 import SwiftUI
 
 extension Color {
-    static var appLaunchBackground: Color {
-        Color(red: 0.86, green: 0.77, blue: 0.57)
-    }
+    static let appLaunchBackground = Color(red: 0.86, green: 0.77, blue: 0.57)
 }
 
 struct AppTheme {
@@ -21,7 +19,7 @@ struct AppTheme {
     static let headline = Font.custom("Iowan Old Style", size: 18)
     static let body = Font.custom("Iowan Old Style", size: 16)
     static let caption = Font.custom("Iowan Old Style", size: 12)
-    static let mysticalTitle = Font.custom("Iowan Old Style", size: 28)
+    static let bookTitle = Font.custom("Iowan Old Style", size: 28)
     
     static let paddingSmall: CGFloat = 8
     static let paddingMedium: CGFloat = 16
@@ -79,9 +77,9 @@ extension View {
                    y: AppTheme.deepShadow.y)
     }
     
-    func mysticalTitleStyle() -> some View {
+    func bookTitleStyle() -> some View {
         self
-            .font(AppTheme.mysticalTitle)
+            .font(AppTheme.bookTitle)
             .foregroundColor(AppTheme.primaryText)
             .multilineTextAlignment(.center)
     }
