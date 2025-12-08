@@ -178,8 +178,24 @@ class FiftyTwoDayCycleViewModel: CardViewModel {
         return dataManager.getCard(by: cardId)
     }
     
+    // Canonical planet order and mapping
+    private let phaseOrder: [String] = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+    private func periodNumber(from planet: String) -> Int {
+        switch planet.lowercased() {
+        case "mercury": return 1
+        case "venus": return 2
+        case "mars": return 3
+        case "jupiter": return 4
+        case "saturn": return 5
+        case "uranus": return 6
+        case "neptune": return 7
+        default: return 1
+        }
+    }
+    
     var currentPeriodNumber: Int {
-        calculator.retrieveCurrentPhase(userBirthDate: dataManager.userProfile.birthDate, evaluationDate: calculationDate)
+        let planet = DataManager.shared.getCurrentPlanetaryPhase(for: dataManager.userProfile.birthDate)
+        return periodNumber(from: planet)
     }
     
     var currentPeriodCard: Card {
@@ -195,17 +211,21 @@ class FiftyTwoDayCycleViewModel: CardViewModel {
     }
     
     var planetaryPeriod: String {
-        return calculator.retrievePlanetPhase(currentPeriodNumber)
+        DataManager.shared.getCurrentPlanetaryPhase(for: dataManager.userProfile.birthDate)
     }
     
     var previousPlanetaryPhase: String {
-        let prevPeriod = currentPeriodNumber == 1 ? 7 : currentPeriodNumber - 1
-        return calculator.retrievePlanetPhase(prevPeriod)
+        let current = planetaryPeriod
+        let idx = phaseOrder.firstIndex(of: current) ?? 0
+        let prevIdx = (idx - 1 + phaseOrder.count) % phaseOrder.count
+        return phaseOrder[prevIdx]
     }
     
     var nextPlanetaryPhase: String {
-        let nextPeriod = currentPeriodNumber == 7 ? 1 : currentPeriodNumber + 1
-        return calculator.retrievePlanetPhase(nextPeriod)
+        let current = planetaryPeriod
+        let idx = phaseOrder.firstIndex(of: current) ?? 0
+        let nextIdx = (idx + 1) % phaseOrder.count
+        return phaseOrder[nextIdx]
     }
     
     enum CyclePeriod {
@@ -217,9 +237,12 @@ class FiftyTwoDayCycleViewModel: CardViewModel {
         let periodNumber: Int
         
         switch period {
-        case .last: periodNumber = currentPeriodNumber == 1 ? 7 : currentPeriodNumber - 1
-        case .current: periodNumber = currentPeriodNumber
-        case .next: periodNumber = currentPeriodNumber == 7 ? 1 : currentPeriodNumber + 1
+        case .last:
+            periodNumber = currentPeriodNumber == 1 ? 7 : currentPeriodNumber - 1
+        case .current:
+            periodNumber = currentPeriodNumber
+        case .next:
+            periodNumber = currentPeriodNumber == 7 ? 1 : currentPeriodNumber + 1
         }
         
         let cardId = calculator.extractCycleCard(primaryCard: birthCard.id, personAge: age, phaseNumber: periodNumber)
@@ -244,18 +267,29 @@ class HomeViewModel: CardViewModel {
         return dataManager.getCard(by: cardId)
     }
     
+    private func periodNumber(from planet: String) -> Int {
+        switch planet.lowercased() {
+        case "mercury": return 1
+        case "venus": return 2
+        case "mars": return 3
+        case "jupiter": return 4
+        case "saturn": return 5
+        case "uranus": return 6
+        case "neptune": return 7
+        default: return 1
+        }
+    }
+    
+    var user52DayCard: Card {
+        DataManager.shared.current52DayCard(for: dataManager.userProfile.birthDate, on: dataManager.explorationDate)
+    }
+
     var userYearlyCard: Card {
         let age = calculator.calculatePersonAge(birthDate: dataManager.userProfile.birthDate, onDate: Date())
         let cardId = calculator.deriveAnnualInfluence(primaryCard: userBirthCard.id, personAge: age)
         return dataManager.getCard(by: cardId)
     }
     
-    var user52DayCard: Card {
-        let age = calculator.calculatePersonAge(birthDate: dataManager.userProfile.birthDate, onDate: Date())
-        let currentPeriod = calculator.retrieveCurrentPhase(userBirthDate: dataManager.userProfile.birthDate, evaluationDate: Date())
-        let cardId = calculator.extractCycleCard(primaryCard: userBirthCard.id, personAge: age, phaseNumber: currentPeriod)
-        return dataManager.getCard(by: cardId)
-    }
 
     var userDailyCard: Card {
         let dailyResult = calculator.generateTimeInfluence(

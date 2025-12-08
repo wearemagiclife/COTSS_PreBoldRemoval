@@ -408,6 +408,70 @@ extension DataManager {
         
         return "Mercury" // fallback
     }
+
+    // Get planetary phase for a specific evaluation date (explicit date, not using explorationDate)
+    func getPlanetaryPhase(for birthDate: Date, on evaluationDate: Date) -> String {
+        guard let period = getPlanetaryPeriod(for: birthDate) else {
+            return "Mercury" // fallback
+        }
+        
+        let calendar = Calendar.current
+        let dayOfYear = calendar.ordinality(of: .day, in: .year, for: evaluationDate) ?? 1
+        
+        let phases: [(String, PeriodRange)] = [
+            ("Mercury", period.mercury),
+            ("Venus", period.venus),
+            ("Mars", period.mars),
+            ("Jupiter", period.jupiter),
+            ("Saturn", period.saturn),
+            ("Uranus", period.uranus),
+            ("Neptune", period.neptune)
+        ]
+        
+        for (phaseName, range) in phases {
+            if let startDay = dayOfYearFromMMDD(range.start),
+               let endDay = dayOfYearFromMMDD(range.end) {
+                if startDay <= endDay {
+                    if dayOfYear >= startDay && dayOfYear <= endDay {
+                        return phaseName
+                    }
+                } else {
+                    if dayOfYear >= startDay || dayOfYear <= endDay {
+                        return phaseName
+                    }
+                }
+            }
+        }
+        
+        return "Mercury" // fallback
+    }
+
+    private func phaseNumber(from planet: String) -> Int {
+        switch planet.lowercased() {
+        case "mercury": return 1
+        case "venus": return 2
+        case "mars": return 3
+        case "jupiter": return 4
+        case "saturn": return 5
+        case "uranus": return 6
+        case "neptune": return 7
+        default: return 1
+        }
+    }
+
+    // Unified 52-day card resolver used across the app
+    func current52DayCard(for birthDate: Date, on evaluationDate: Date? = nil) -> Card {
+        let eval = evaluationDate ?? (explorationDate ?? Date())
+        let calc = CardCalculationService()
+        let age = calc.calculatePersonAge(birthDate: birthDate, onDate: eval)
+        
+        let planet = getPlanetaryPhase(for: birthDate, on: eval)
+        let period = phaseNumber(from: planet)
+        
+        let primaryCardId = BirthCardLookup.shared.calculateCardForDate(for: birthDate)
+        let resultId = calc.extractCycleCard(primaryCard: primaryCardId, personAge: age, phaseNumber: period)
+        return getCard(by: resultId)
+    }
     
     // Helper function to convert MM/dd to day of year
     private func dayOfYearFromMMDD(_ dateString: String) -> Int? {
