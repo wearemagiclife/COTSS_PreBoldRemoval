@@ -264,19 +264,27 @@ struct LifeSpreadView: View {
     }
 
     // MARK: - Main Section (Page Header)
-
+    
     private var mainTitleSection: some View {
         VStack(spacing: AppConstants.Spacing.titleSpacing) {
-            SectionHeader(
-                birthCardTitle.uppercased(),
-                fontSize: AppConstants.FontSizes.large
-            )
-
-            Text(birthCardSubtitle)
+            // "YOUR BIRTH CARD" as main title
+            
+            Text("YOUR BIRTH CARD")
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
+                .fontWeight(.heavy)
+                .foregroundColor(.black)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.7)
+            
+            Text("this is your main archetypal influence")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                 .foregroundColor(.black)
                 .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
+        
+    
         .padding(.top, AppConstants.Spacing.small)
     }
 
@@ -286,8 +294,8 @@ struct LifeSpreadView: View {
             TappableCard(
                 card: birthCard,
                 size: CGSize(
-                    width: AppConstants.CardSizes.largeWidth * 1.2,
-                    height: AppConstants.CardSizes.largeWidth * 1.2 * AppConstants.CardSizes.aspect
+                    width: AppConstants.CardSizes.largeWidth * 1.1,
+                    height: AppConstants.CardSizes.largeWidth * 1.1 * AppConstants.CardSizes.aspect
                 ),
                 action: showBirthCard
             )

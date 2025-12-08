@@ -46,8 +46,8 @@ struct CardDetailModalView: View {
         case .fiftyTwoDay:
             return "52-Day Card"
         case .planetary:
-            if case .planetary(let planet) = contentType {
-                return "\(planet.capitalized) Influence"
+            if case .planetary(let planetName) = contentType {
+                return "Your \(planetName.capitalized) Period"
             } else {
                 return "Planetary Influence"
             }
@@ -90,7 +90,7 @@ struct CardDetailModalView: View {
                                     .frame(height: isIPad ? 320 : 240)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
                                     .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                                    .accessibilityLabel("\(planet) planetary influence")
+                                    .accessibilityLabel("The Influence of \(planet).uppercaseFirst")
                                     .accessibilityAddTraits(.isImage)
                             }
                         } else {
@@ -129,20 +129,22 @@ struct CardDetailModalView: View {
                                             .accessibilityLabel(def.name)
                                             .accessibilityAddTraits(.isHeader)
                                     } else {
-    #if DEBUG
+#if DEBUG
                                         // Visual debug: if asset is missing, show a subtle placeholder to catch it
                                         Text("Missing: \(assetName)")
                                             .font(.system(size: 14, weight: .regular))
                                             .foregroundColor(.red)
-    #else
+#else
                                         // In release, show nothing rather than fallback bold text
                                         EmptyView()
-    #endif
+#endif
                                     }
 
-                                    // Subtitle - hide for karma cards
+                                    // Subtitle - hide for karma and 52-Day cards
                                     if case .karma = contentType {
                                         // No subtitle for karma cards
+                                    } else if cardType == .fiftyTwoDay {
+                                        // No subtitle for 52-Day card modal
                                     } else {
                                         Text(def.title.lowercased())
                                             .font(.custom("Iowan Old Style", size: scaledFont(18)))

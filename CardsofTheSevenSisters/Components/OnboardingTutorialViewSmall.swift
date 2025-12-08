@@ -367,6 +367,24 @@ struct OnboardingTutorialViewSmall: View {
         .padding(.horizontal, 20)
         .padding(.top, 40)
         .padding(.bottom, currentStep == 0 ? 40 : 70)
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onEnded { value in
+                    guard !isTransitioning else { return }
+                    let horizontalDistance = value.translation.width
+                    if horizontalDistance < -50 {
+                        // Swipe left - advance
+                        if currentStep < 4 {
+                            advanceStep()
+                        }
+                    } else if horizontalDistance > 50 {
+                        // Swipe right - go back
+                        if currentStep > 1 {
+                            goBack()
+                        }
+                    }
+                }
+        )
     }
 
     // MARK: - Welcome Screen Content
@@ -507,41 +525,25 @@ struct OnboardingTutorialViewSmall: View {
                         .shadow(color: .black.opacity(currentStep == 4 ? 0.2 : 0.15), radius: currentStep == 4 ? 6 : 4, x: 0, y: 2)
                 }
 
-                // Progress dots with back button
-                HStack(spacing: 8) {
-                    // Back button - always present but invisible when not needed
-                    Group {
-                        if currentStep > 1 {
-                            Button(action: goBack) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(.black)
-                                    .frame(width: 24, height: 44)
-                                    .contentShape(Rectangle())
+                // Progress dots (tappable)
+                HStack(spacing: 12) {
+                    ForEach(1..<5, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentStep ? Color.black : Color.black.opacity(0.15))
+                            .frame(width: 10, height: 10)
+                            .scaleEffect(index == currentStep ? 1.3 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
+                            .frame(width: 40, height: 44)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                guard !isTransitioning else { return }
+                                if index > currentStep && currentStep < 4 {
+                                    advanceStep()
+                                } else if index < currentStep && currentStep > 1 {
+                                    goBack()
+                                }
                             }
-                            .disabled(isTransitioning)
-                        } else {
-                            // Invisible spacer
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.clear)
-                                .frame(width: 24)
-                        }
                     }
-
-                    // Progress dots
-                    HStack(spacing: 8) {
-                        ForEach(1..<5, id: \.self) { index in
-                            Circle()
-                                .fill(index == currentStep ? Color.black : Color.black.opacity(0.15))
-                                .frame(width: 7, height: 7)
-                                .scaleEffect(index == currentStep ? 1.4 : 1.0)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
-                        }
-                    }
-
-                    // Right spacer for symmetry
-                    Color.clear.frame(width: 24)
                 }
                 .padding(.top, 10)
                 .padding(.bottom, 24)

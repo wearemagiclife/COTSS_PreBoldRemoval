@@ -105,6 +105,25 @@ enum ShareCardExportSize: CaseIterable {
     }
 }
 
+// MARK: - Share Output Format (for choosing export size)
+enum ShareExportFormat {
+    case square1200
+    case portrait1080x1440
+    case deviceScreen
+
+    var proposedSize: CGSize {
+        switch self {
+        case .square1200:
+            return CGSize(width: 1200, height: 1200)
+        case .portrait1080x1440:
+            return CGSize(width: 1080, height: 1440)
+        case .deviceScreen:
+            let size = UIScreen.main.bounds.size
+            return CGSize(width: size.width, height: size.height)
+        }
+    }
+}
+
 // MARK: - Single Card Share (Birth / Yearly / etc.)
 
 struct SingleCardShareView: View {
@@ -113,6 +132,7 @@ struct SingleCardShareView: View {
     let cardDescription: String
     let spreadType: String // e.g., "Birth Card", "Yearly Card"
     let subtitle: String?   // Optional subtitle like date or year
+    let overrideImage: UIImage?
 
     private let inkColor = Color.black
     private let backgroundColor = Color(red: 0.86, green: 0.77, blue: 0.57)
@@ -125,7 +145,7 @@ struct SingleCardShareView: View {
             VStack(spacing: 20) {
                 // Header
                 VStack(spacing: 2) {
-                    Text("My \(spreadType) Card")
+                    Text("\(spreadType)")
                         .font(.custom("Iowan Old Style", size: 38))
                         .fontWeight(.bold)
                         .foregroundColor(inkColor)
@@ -154,7 +174,14 @@ struct SingleCardShareView: View {
 
                 // Card image
                 VStack(spacing: 6) {
-                    if let cardImage = ImageManager.shared.loadCardImage(for: card) {
+                    if let overrideImage = overrideImage {
+                        Image(uiImage: overrideImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 400)
+                            .cornerRadius(16)
+                            .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+                    } else if let cardImage = ImageManager.shared.loadCardImage(for: card) {
                         Image(uiImage: cardImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
@@ -219,6 +246,7 @@ struct SingleCardShareView: View {
 // MARK: - fiftytwo Cycle (Card + Planet spread)
 
 struct fiftytwoCycleShareView: View {
+    // Core content
     let cycleCard: Card
     let cycleCardTitle: String
     let cycleCardDescription: String
@@ -227,146 +255,160 @@ struct fiftytwoCycleShareView: View {
     let planetDescription: String
     let cycleInfo: String // e.g., "Mercury Phase – Jan 1 to Feb 21"
 
+    // Presentation labels (editable)
+    let headerTitle: String
+    let headerSubtitle: String
+    let contextLabel: String? // e.g., "Last Cycle", "Current Cycle", "Next Cycle"
+    let cycleSectionTitle: String // e.g., "Cycle Card"
+    let planetSectionTitle: String // e.g., "Planetary Influence"
+    let footerBlurb: String
+    let footerCTA: String
+
     private let inkColor = Color.black
     private let backgroundColor = Color(red: 0.86, green: 0.77, blue: 0.57)
 
     var body: some View {
-        ZStack {
-            backgroundColor
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
 
-            VStack(spacing: 14) {
-                // Header
-                VStack(spacing: 2) {
-                    Text("Here is my 52-Day Card & Influence")
-                        .font(.custom("Iowan Old Style", size: 38))
-                        .fontWeight(.bold)
-                        .foregroundColor(inkColor)
+                VStack(spacing: space(14, geometry)) {
+                    // Header: Title + byline only
+                    VStack(spacing: space(2, geometry)) {
+                        Text(headerTitle)
+                            .font(.custom("Iowan Old Style", size: fontSize(56, geometry)))
+                            .fontWeight(.bold)
+                            .foregroundColor(inkColor)
 
-                    Text("by Cards of The Seven Sisters")
-                        .font(.custom("Iowan Old Style", size: 22))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor.opacity(0.8))
+                        Text(headerSubtitle)
+                            .font(.custom("Iowan Old Style", size: fontSize(28, geometry)))
+                            .fontWeight(.semibold)
+                            .foregroundColor(inkColor.opacity(0.8))
+                    }
 
-                    Text(cycleInfo)
-                        .font(.custom("Iowan Old Style", size: 15))
-                        .foregroundColor(inkColor.opacity(0.6))
-                        .padding(.top, 2)
-                }
+                    // Line design above cards
+                    if let lineImage = UIImage(named: "linedesign") {
+                        Image(uiImage: lineImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: max(120, geometry.size.width * 0.14))
+                            .padding(.vertical, space(4, geometry))
+                    }
 
-                // Line design above cards
-                if let lineImage = UIImage(named: "linedesign") {
-                    Image(uiImage: lineImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 160)
-                        .padding(.vertical, 4)
-                }
+                    // Card + planet images
+                    HStack(spacing: space(20, geometry)) {
+                        let imageWidth = min(geometry.size.width * 0.28, 400)
 
-                // Card + planet images
-                HStack(spacing: 20) {
-                    VStack(spacing: 6) {
-                        if let cardImage = ImageManager.shared.loadCardImage(for: cycleCard) {
-                            Image(uiImage: cardImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 300)
-                                .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        VStack(spacing: space(6, geometry)) {
+                            if let cardImage = ImageManager.shared.loadCardImage(for: cycleCard) {
+                                Image(uiImage: cardImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: imageWidth)
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                            }
                         }
-                        VStack(spacing: 2) {
-                            Text(cycleCardTitle)
-                                .font(.custom("Iowan Old Style", size: 16))
-                                .fontWeight(.semibold)
-                                .foregroundColor(inkColor)
-                            Text("Cycle Card")
-                                .font(.custom("Iowan Old Style", size: 14))
-                                .foregroundColor(inkColor.opacity(0.6))
+
+                        VStack(spacing: space(6, geometry)) {
+                            if let planetImage = ImageManager.shared.loadPlanetImage(for: planetName) {
+                                Image(uiImage: planetImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: imageWidth)
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                            }
                         }
                     }
 
-                    VStack(spacing: 6) {
-                        if let planetImage = ImageManager.shared.loadPlanetImage(for: planetName) {
-                            Image(uiImage: planetImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 300)
-                                .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                        }
-                        VStack(spacing: 2) {
-                            Text(planetName.uppercased())
-                                .font(.custom("Iowan Old Style", size: 16))
-                                .fontWeight(.semibold)
-                                .foregroundColor(inkColor)
-                            Text("Planetary Phase")
-                                .font(.custom("Iowan Old Style", size: 14))
-                                .foregroundColor(inkColor.opacity(0.6))
-                        }
+                    // Line design below cards
+                    if let lineImage = UIImage(named: "linedesignd") {
+                        Image(uiImage: lineImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: max(120, geometry.size.width * 0.14))
+                            .padding(.vertical, space(4, geometry))
                     }
-                }
 
-                // Line design below cards
-                if let lineImage = UIImage(named: "linedesignd") {
-                    Image(uiImage: lineImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 160)
-                        .padding(.vertical, 4)
-                }
-
-                // Cycle card section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(cycleCardTitle.uppercased())
-                        .font(.custom("Iowan Old Style", size: 28))
+                    // Combined single-line title
+                    Text(combinedTitle(cycleCardTitle, planetName: planetName))
+                        .font(.custom("Iowan Old Style", size: fontSize(40, geometry)))
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
-
-                    Text(cycleCardDescription)
-                        .font(.custom("Iowan Old Style", size: 18))
-                        .foregroundColor(inkColor)
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: 950)
-                .padding(.horizontal, 30)
-
-                // Planet section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(planetTitle.uppercased())
-                        .font(.custom("Iowan Old Style", size: 28))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor)
-
-                    Text(planetDescription)
-                        .font(.custom("Iowan Old Style", size: 18))
-                        .foregroundColor(inkColor)
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: 950)
-                .padding(.horizontal, 30)
-
-                Spacer()
-
-                // Footer
-                VStack(spacing: 8) {
-                    Text(".")
-                        .font(.custom("Iowan Old Style", size: 16))
-                        .foregroundColor(inkColor.opacity(0.8))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
+                        .padding(.top, space(6, geometry))
 
-                    Text("find yours at sevensisters.cards")
-                        .font(.custom("Iowan Old Style", size: 20))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor)
+                    // Cycle + Planet sections side by side
+                    HStack(alignment: .top, spacing: space(36, geometry)) {
+                        VStack(alignment: .leading, spacing: space(10, geometry)) {
+                            Text(cycleCardDescription)
+                                .font(.custom("Iowan Old Style", size: fontSize(30, geometry)))
+                                .foregroundColor(inkColor)
+                                .lineSpacing(space(4, geometry))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.trailing, space(8, geometry))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: space(10, geometry)) {
+                            Text(planetDescription)
+                                .font(.custom("Iowan Old Style", size: fontSize(30, geometry)))
+                                .foregroundColor(inkColor)
+                                .lineSpacing(space(4, geometry))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.leading, space(10, geometry))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxWidth: 1000)
+                    .padding(.horizontal, space(20, geometry))
+
+                    Spacer()
+
+                    // Footer
+                    VStack(spacing: space(8, geometry)) {
+                        Text(footerBlurb)
+                            .font(.custom("Iowan Old Style", size: fontSize(18, geometry)))
+                            .foregroundColor(inkColor.opacity(0.8))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, space(40, geometry))
+
+                        Text(footerCTA)
+                            .font(.custom("Iowan Old Style", size: fontSize(22, geometry)))
+                            .fontWeight(.semibold)
+                            .foregroundColor(inkColor)
+                    }
+                    .padding(.bottom, space(20, geometry))
                 }
-                .padding(.bottom, 20)
+                .padding(space(40, geometry))
             }
-            .padding(40)
         }
-        .frame(width: 1200, height: 1200)
+    }
+
+    // MARK: - Title builder
+    private func combinedTitle(_ cardTitle: String, planetName: String) -> String {
+        let lower = cardTitle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let needsThe = !lower.hasPrefix("the ")
+        let prefix = needsThe ? "The " : ""
+        return "\(prefix)\(cardTitle) in \(planetName.capitalized)"
+    }
+
+    // MARK: - Dynamic scaling helpers (1200x1200 base)
+    private func scale(for geometry: GeometryProxy) -> CGFloat {
+        let base = min(geometry.size.width, geometry.size.height)
+        return max(0.9, min(1.6, base / 1080.0))
+    }
+
+    private func fontSize(_ base: CGFloat, _ geometry: GeometryProxy) -> CGFloat {
+        base * scale(for: geometry)
+    }
+
+    private func space(_ base: CGFloat, _ geometry: GeometryProxy) -> CGFloat {
+        base * scale(for: geometry)
     }
 }
 
@@ -572,149 +614,147 @@ struct DailyCardShareView: View {
     private let backgroundColor = Color(red: 0.86, green: 0.77, blue: 0.57)
 
     var body: some View {
-        ZStack {
-            backgroundColor
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
 
-            VStack(spacing: 14) {
-                // Header
-                VStack(spacing: 2) {
-                    Text("Today's Theme & Focus")
-                        .font(.custom("Iowan Old Style", size: 38))
-                        .fontWeight(.bold)
-                        .foregroundColor(inkColor)
+                VStack(spacing: space(14, geometry)) {
+                    // Header: Title + byline only
+                    VStack(spacing: space(2, geometry)) {
+                        Text("Today's Theme & Focus")
+                            .font(.custom("Iowan Old Style", size: fontSize(56, geometry)))
+                            .fontWeight(.bold)
+                            .foregroundColor(inkColor)
 
-                    Text("by Cards of The Seven Sisters")
-                        .font(.custom("Iowan Old Style", size: 22))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor.opacity(0.8))
+                        Text("by Cards of The Seven Sisters")
+                            .font(.custom("Iowan Old Style", size: fontSize(28, geometry)))
+                            .fontWeight(.semibold)
+                            .foregroundColor(inkColor.opacity(0.8))
+                    }
 
-                    Text(formatDate(date))
-                        .font(.custom("Iowan Old Style", size: 15))
-                        .foregroundColor(inkColor.opacity(0.6))
-                        .padding(.top, 2)
-                }
+                    // Line design above cards
+                    if let lineImage = UIImage(named: "linedesign") {
+                        Image(uiImage: lineImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: max(120, geometry.size.width * 0.14))
+                            .padding(.vertical, space(4, geometry))
+                    }
 
-                // Line design above cards
-                if let lineImage = UIImage(named: "linedesign") {
-                    Image(uiImage: lineImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 160)
-                        .padding(.vertical, 4)
-                }
+                    // Card + planet images
+                    HStack(spacing: space(20, geometry)) {
+                        let imageWidth = min(geometry.size.width * 0.28, 400)
 
-                // Card + planet images
-                HStack(spacing: 20) {
-                    VStack(spacing: 6) {
-                        if let cardImage = ImageManager.shared.loadCardImage(for: dailyCard) {
-                            Image(uiImage: cardImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 300)
-                                .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                        VStack(spacing: space(6, geometry)) {
+                            if let cardImage = ImageManager.shared.loadCardImage(for: dailyCard) {
+                                Image(uiImage: cardImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: imageWidth)
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                            }
                         }
-                        VStack(spacing: 2) {
-                            Text(dailyCardTitle)
-                                .font(.custom("Iowan Old Style", size: 16))
-                                .fontWeight(.semibold)
-                                .foregroundColor(inkColor)
-                            Text("Daily Card")
-                                .font(.custom("Iowan Old Style", size: 14))
-                                .foregroundColor(inkColor.opacity(0.6))
+
+                        VStack(spacing: space(6, geometry)) {
+                            if let planetImage = ImageManager.shared.loadPlanetImage(for: planetName) {
+                                Image(uiImage: planetImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: imageWidth)
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                            }
                         }
                     }
 
-                    VStack(spacing: 6) {
-                        if let planetImage = ImageManager.shared.loadPlanetImage(for: planetName) {
-                            Image(uiImage: planetImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 300)
-                                .cornerRadius(12)
-                                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                        }
-                        VStack(spacing: 2) {
-                            Text(planetName.uppercased())
-                                .font(.custom("Iowan Old Style", size: 16))
-                                .fontWeight(.semibold)
-                                .foregroundColor(inkColor)
-                            Text("Planetary Card")
-                                .font(.custom("Iowan Old Style", size: 14))
-                                .foregroundColor(inkColor.opacity(0.6))
-                        }
+                    // Line design below cards
+                    if let lineImage = UIImage(named: "linedesignd") {
+                        Image(uiImage: lineImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: max(120, geometry.size.width * 0.14))
+                            .padding(.vertical, space(4, geometry))
                     }
-                }
 
-                // Line design below cards
-                if let lineImage = UIImage(named: "linedesignd") {
-                    Image(uiImage: lineImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 160)
-                        .padding(.vertical, 4)
-                }
-
-                // Daily card section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(dailyCardTitle.uppercased())
-                        .font(.custom("Iowan Old Style", size: 28))
+                    // Combined single-line title
+                    Text(combinedTitle(dailyCardTitle, planetName: planetName))
+                        .font(.custom("Iowan Old Style", size: fontSize(40, geometry)))
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
-
-                    Text(dailyCardDescription)
-                        .font(.custom("Iowan Old Style", size: 18))
-                        .foregroundColor(inkColor)
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: 950)
-                .padding(.horizontal, 30)
-
-                // Planetary section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(planetTitle.uppercased())
-                        .font(.custom("Iowan Old Style", size: 28))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor)
-
-                    Text(planetDescription)
-                        .font(.custom("Iowan Old Style", size: 18))
-                        .foregroundColor(inkColor)
-                        .lineSpacing(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: 950)
-                .padding(.horizontal, 30)
-
-                Spacer()
-
-                // Footer
-                VStack(spacing: 8) {
-                    Text("Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
-                        .font(.custom("Iowan Old Style", size: 16))
-                        .foregroundColor(inkColor.opacity(0.8))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
+                        .padding(.top, space(6, geometry))
 
-                    Text("find yours at sevensisters.cards")
-                        .font(.custom("Iowan Old Style", size: 20))
-                        .fontWeight(.semibold)
-                        .foregroundColor(inkColor)
+                    // Daily card + Planet sections side by side
+                    HStack(alignment: .top, spacing: space(36, geometry)) {
+                        VStack(alignment: .leading, spacing: space(10, geometry)) {
+                            Text(dailyCardDescription)
+                                .font(.custom("Iowan Old Style", size: fontSize(24, geometry)))
+                                .foregroundColor(inkColor)
+                                .lineSpacing(space(4, geometry))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.trailing, space(8, geometry))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: space(10, geometry)) {
+                            Text(planetDescription)
+                                .font(.custom("Iowan Old Style", size: fontSize(24, geometry)))
+                                .foregroundColor(inkColor)
+                                .lineSpacing(space(4, geometry))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.leading, space(8, geometry))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxWidth: 1000)
+                    .padding(.horizontal, space(30, geometry))
+
+                    Spacer()
+
+                    // Footer
+                    VStack(spacing: space(8, geometry)) {
+                        Text("Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
+                            .font(.custom("Iowan Old Style", size: fontSize(18, geometry)))
+                            .foregroundColor(inkColor.opacity(0.8))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, space(40, geometry))
+
+                        Text("find yours at sevensisters.cards")
+                            .font(.custom("Iowan Old Style", size: fontSize(22, geometry)))
+                            .fontWeight(.semibold)
+                            .foregroundColor(inkColor)
+                    }
+                    .padding(.bottom, space(20, geometry))
                 }
-                .padding(.bottom, 20)
+                .padding(space(40, geometry))
             }
-            .padding(40)
         }
-        .frame(width: 1200, height: 1200)
     }
 
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
+    // MARK: - Title builder
+    private func combinedTitle(_ cardTitle: String, planetName: String) -> String {
+        let lower = cardTitle.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let needsThe = !lower.hasPrefix("the ")
+        let prefix = needsThe ? "The " : ""
+        return "\(prefix)\(cardTitle) in \(planetName.capitalized)"
+    }
+
+    // MARK: - Dynamic scaling helpers (1200x1200 base)
+    private func scale(for geometry: GeometryProxy) -> CGFloat {
+        let base = min(geometry.size.width, geometry.size.height)
+        return max(0.9, min(1.6, base / 1080.0))
+    }
+
+    private func fontSize(_ base: CGFloat, _ geometry: GeometryProxy) -> CGFloat {
+        base * scale(for: geometry)
+    }
+
+    private func space(_ base: CGFloat, _ geometry: GeometryProxy) -> CGFloat {
+        base * scale(for: geometry)
     }
 }
 
@@ -1005,13 +1045,14 @@ struct DailyCardShareLink: View {
     @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
+    @State private var showFormatPicker = false
 
     var body: some View {
         Button(action: {
             if DataManager.shared.isGuestMode {
                 isShowingGuestBlockedView = true
             } else {
-                shareCard()
+                showFormatPicker = true
             }
         }) {
             if isLoading {
@@ -1048,8 +1089,13 @@ struct DailyCardShareLink: View {
         .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
             GuestShareBlockedView()
         }
-        .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
-            GuestShareBlockedView()
+        .confirmationDialog("Choose share format", isPresented: $showFormatPicker, titleVisibility: .visible) {
+            Button("Portrait 3×4 (1080×1440)") { shareCard(format: .portrait1080x1440) }
+            Button("Square (1200×1200)") { shareCard(format: .square1200) }
+            Button("iPhone Screen Size") { shareCard(format: .deviceScreen) }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Select the export size for your share image.")
         }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
@@ -1060,7 +1106,7 @@ struct DailyCardShareLink: View {
         }
     }
 
-    private func shareCard() {
+    private func shareCard(format: ShareExportFormat) {
         isLoading = true
         Task {
             do {
@@ -1075,7 +1121,7 @@ struct DailyCardShareLink: View {
                 )
 
                 let renderer = ImageRenderer(content: shareView)
-                renderer.proposedSize = ProposedViewSize(width: 1200, height: 1200)
+                renderer.proposedSize = ProposedViewSize(width: format.proposedSize.width, height: format.proposedSize.height)
                 renderer.scale = 2.0
 
                 guard let renderedImage = renderer.uiImage else {
@@ -1089,7 +1135,7 @@ struct DailyCardShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My \(cardTypeName) Cards by SevenSitersCards.jpg"
+                let fileName = "\(cardTypeName) by SevenSitersCards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1278,6 +1324,7 @@ struct LifeSpreadShareLink: View {
 // MARK: - Share Link: fiftytwo Cycle
 
 struct fiftytwoCycleShareLink: View {
+    // Core content
     let cycleCard: Card
     let cycleCardTitle: String
     let cycleCardDescription: String
@@ -1286,18 +1333,28 @@ struct fiftytwoCycleShareLink: View {
     let planetDescription: String
     let cycleInfo: String
 
+    // Presentation labels (optional/overridable)
+    var headerTitle: String = "Current 52-Day Card & Planetary Influence"
+    var headerSubtitle: String = "by Cards of The Seven Sisters"
+    var contextLabel: String? = nil
+    var cycleSectionTitle: String = "Cycle Card"
+    var planetSectionTitle: String = "Planetary Card"
+    var footerBlurb: String = "Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction."
+    var footerCTA: String = "find yours at sevensisters.cards"
+
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
     @State private var isShowingGuestBlockedView = false
     @State private var shareItems: [Any] = []
     @State private var errorMessage: String?
+    @State private var showFormatPicker = false
 
     var body: some View {
         Button(action: {
             if DataManager.shared.isGuestMode {
                 isShowingGuestBlockedView = true
             } else {
-                shareCard()
+                showFormatPicker = true
             }
         }) {
             if isLoading {
@@ -1334,6 +1391,14 @@ struct fiftytwoCycleShareLink: View {
         .fullScreenCover(isPresented: $isShowingGuestBlockedView) {
             GuestShareBlockedView()
         }
+        .confirmationDialog("Choose share format", isPresented: $showFormatPicker, titleVisibility: .visible) {
+            Button("Portrait 3×4 (1080×1440)") { shareCard(format: .portrait1080x1440) }
+            Button("Square (1200×1200)") { shareCard(format: .square1200) }
+            Button("iPhone Screen Size") { shareCard(format: .deviceScreen) }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Select the export size for your share image.")
+        }
         .alert("Share Error", isPresented: .constant(errorMessage != nil)) {
             Button("OK") { errorMessage = nil }
         } message: {
@@ -1343,7 +1408,7 @@ struct fiftytwoCycleShareLink: View {
         }
     }
 
-    private func shareCard() {
+    private func shareCard(format: ShareExportFormat) {
         isLoading = true
         Task {
             do {
@@ -1354,11 +1419,18 @@ struct fiftytwoCycleShareLink: View {
                     planetName: planetName,
                     planetTitle: planetTitle,
                     planetDescription: planetDescription,
-                    cycleInfo: cycleInfo
+                    cycleInfo: cycleInfo,
+                    headerTitle: headerTitle,
+                    headerSubtitle: headerSubtitle,
+                    contextLabel: contextLabel,
+                    cycleSectionTitle: cycleSectionTitle,
+                    planetSectionTitle: planetSectionTitle,
+                    footerBlurb: footerBlurb,
+                    footerCTA: footerCTA
                 )
 
                 let renderer = ImageRenderer(content: shareView)
-                renderer.proposedSize = ProposedViewSize(width: 1200, height: 1200)
+                renderer.proposedSize = ProposedViewSize(width: format.proposedSize.width, height: format.proposedSize.height)
                 renderer.scale = 2.0
 
                 guard let renderedImage = renderer.uiImage else {
@@ -1372,7 +1444,7 @@ struct fiftytwoCycleShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My 52-Day Cycle by SevenSister.Cards.jpg"
+                let fileName = "YOUR 52-DAY SPREADS.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1419,6 +1491,7 @@ struct SingleCardShareLink: View {
     let cardDescription: String
     let spreadType: String  // e.g., "Birth Card"
     let subtitle: String?    // Optional subtitle
+    var overrideImage: UIImage? = nil
 
     @State private var isLoading = false
     @State private var isShowingShareSheet = false
@@ -1486,7 +1559,8 @@ struct SingleCardShareLink: View {
                     cardTitle: cardTitle,
                     cardDescription: cardDescription,
                     spreadType: spreadType,
-                    subtitle: subtitle
+                    subtitle: subtitle,
+                    overrideImage: overrideImage
                 )
 
                 let renderer = ImageRenderer(content: shareView)
@@ -1504,7 +1578,7 @@ struct SingleCardShareLink: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My \(spreadType) Card by SevenSister.Cards.jpg"
+                let fileName = "\(spreadType) by SevenSister.Cards.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -1513,7 +1587,7 @@ struct SingleCardShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My \(spreadType) Card by SevenSister.Cards"
+                        subject: "\(spreadType) by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]
@@ -1617,3 +1691,4 @@ extension ShareCardContent {
         )
     }
 }
+

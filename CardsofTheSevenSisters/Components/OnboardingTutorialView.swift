@@ -361,6 +361,24 @@ struct OnboardingTutorialView: View {
         .padding(.horizontal, 25)
         .padding(.top, 44)
         .padding(.bottom, 20)
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onEnded { value in
+                    guard !isTransitioning else { return }
+                    let horizontalDistance = value.translation.width
+                    if horizontalDistance < -50 {
+                        // Swipe left - advance
+                        if currentStep < 4 {
+                            advanceStep()
+                        }
+                    } else if horizontalDistance > 50 {
+                        // Swipe right - go back
+                        if currentStep > 1 {
+                            goBack()
+                        }
+                    }
+                }
+        )
     }
 
     // MARK: - Welcome Screen Content
@@ -449,6 +467,7 @@ struct OnboardingTutorialView: View {
             // Invisible placeholder for card (actual card is floating)
             Color.clear
                 .frame(height: 240)
+                .padding(.top, 20)
                 .padding(.bottom, 10)
 
             Text(tutorialSteps[currentStep].cardTypeHeader)
@@ -485,6 +504,7 @@ struct OnboardingTutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 120)
+                        .padding(.bottom, 20)
                 }
             }
             .opacity(showContent ? 1 : 0)
@@ -521,49 +541,25 @@ struct OnboardingTutorialView: View {
                         .shadow(color: .black.opacity(currentStep == 4 ? 0.2 : 0.15), radius: currentStep == 4 ? 6 : 4, x: 0, y: 2)
                 }
 
-                // Progress dots with back button
-                HStack(spacing: 20) {
-                    // Back button - always present but invisible when not needed
-                    Group {
-                        if currentStep > 1 {
-                            Button(action: goBack) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "chevron.left")
-                                        .font(.system(size: 14, weight: .semibold))
-                                    Text("Back")
-                                        .font(.custom("Iowan Old Style", size: 16))
+                // Progress dots (tappable)
+                HStack(spacing: 16) {
+                    ForEach(1..<5, id: \.self) { index in
+                        Circle()
+                            .fill(index == currentStep ? Color.black : Color.black.opacity(0.15))
+                            .frame(width: 12, height: 12)
+                            .scaleEffect(index == currentStep ? 1.3 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                guard !isTransitioning else { return }
+                                if index > currentStep && currentStep < 4 {
+                                    advanceStep()
+                                } else if index < currentStep && currentStep > 1 {
+                                    goBack()
                                 }
-                                .foregroundColor(.black)
-                                .frame(minHeight: 44)
-                                .contentShape(Rectangle())
                             }
-                            .disabled(isTransitioning)
-                        } else {
-                            // Invisible spacer
-                            HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 14, weight: .semibold))
-                                Text("Back")
-                                    .font(.custom("Iowan Old Style", size: 16))
-                            }
-                            .foregroundColor(.clear)
-                        }
                     }
-                    .frame(width: 70)
-
-                    // Progress dots
-                    HStack(spacing: 10) {
-                        ForEach(1..<5, id: \.self) { index in
-                            Circle()
-                                .fill(index == currentStep ? Color.black : Color.black.opacity(0.15))
-                                .frame(width: 8, height: 8)
-                                .scaleEffect(index == currentStep ? 1.4 : 1.0)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
-                        }
-                    }
-
-                    // Right spacer for symmetry
-                    Color.clear.frame(width: 70)
                 }
                 .padding(.top, 12)
                 .padding(.bottom, 24)

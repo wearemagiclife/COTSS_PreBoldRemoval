@@ -153,7 +153,7 @@ struct HomeView: View {
 
                     Spacer(minLength: isSmallScreen ? 4 : 12)
                 } else {
-                    Spacer(minLength: isSmallScreen ? 6 : 10)
+                    Spacer(minLength: isSmallScreen ? 2 : 4)
                 }
 
                 LineBreak("linedesignd", width: 320)
@@ -219,6 +219,7 @@ struct ProfileSetupBlockingView: View {
                     Text("Cardology for Self-Discovery")
                         .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 20)))
                         .foregroundColor(AppTheme.primaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                         .opacity(showSubtitle ? 1 : 0)
                         .animation(.easeInOut(duration: 1.0).delay(0.5), value: showSubtitle)
                         .padding(.bottom, 16)
@@ -230,7 +231,7 @@ struct ProfileSetupBlockingView: View {
                                 Image(uiImage: lineImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 260)
+                                    .frame(width: 260, height: 26)
                                     .opacity(showContent ? 1 : 0)
                                     .animation(.easeInOut(duration: 1.0).delay(0.8), value: showContent)
                             }
@@ -269,6 +270,7 @@ struct ProfileSetupBlockingView: View {
                                     .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 16)))
                                     .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
 
                                 Button(action: {
                                     if let url = URL(string: "https://www.wearemagic.life/privacy-policy") {
@@ -279,6 +281,7 @@ struct ProfileSetupBlockingView: View {
                                         .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 16)))
                                         .underline()
                                         .foregroundColor(AppTheme.primaryText)
+                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -292,7 +295,7 @@ struct ProfileSetupBlockingView: View {
                                 Image(uiImage: lineImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: 260)
+                                    .frame(width: 260, height: 26)
                                     .opacity(showContent ? 1 : 0)
                                     .animation(.easeInOut(duration: 1.0).delay(1.2), value: showContent)
                             }
@@ -305,6 +308,7 @@ struct ProfileSetupBlockingView: View {
                                     .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 17)))
                                     .foregroundColor(AppTheme.primaryText)
                                     .underline()
+                                    .fixedSize(horizontal: false, vertical: true)
                                     .frame(minHeight: AppConstants.Accessibility.minimumTouchTarget)
                                     .contentShape(Rectangle())
                             }
@@ -317,6 +321,7 @@ struct ProfileSetupBlockingView: View {
                                 .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 14)))
                                 .foregroundColor(AppTheme.primaryText)
                                 .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .padding(.horizontal, 40)
                                 .padding(.top, -12)
                                 .opacity(showContent ? 1 : 0)

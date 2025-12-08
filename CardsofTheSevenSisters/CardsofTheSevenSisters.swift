@@ -50,16 +50,17 @@ struct CardsOfTheSevenSisters: App {
         navBarAppearance.backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
         navBarAppearance.titleTextAttributes = [
             .foregroundColor: UIColor.black,
-            .font: UIFont(name: "Iowan Old Style", size: 20) ?? UIFont.systemFont(ofSize: 20)
+            .font: UIFont(name: "Iowan Old Style", size: 24) ?? UIFont.systemFont(ofSize: 24)
         ]
         navBarAppearance.largeTitleTextAttributes = [
             .foregroundColor: UIColor.black,
-            .font: UIFont(name: "Iowan Old Style", size: 34) ?? UIFont.systemFont(ofSize: 34)
+            .font: UIFont(name: "Iowan Old Style", size: 24) ?? UIFont.systemFont(ofSize: 24)
         ]
         
         UINavigationBar.appearance().standardAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
         UINavigationBar.appearance().compactAppearance = navBarAppearance
+        UINavigationBar.appearance().prefersLargeTitles = false
         
         UIView.appearance().tintColor = UIColor.black
         
@@ -72,3 +73,4 @@ struct CardsOfTheSevenSisters: App {
         UIScrollView.appearance().backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
     }
 }
+

@@ -278,12 +278,14 @@ struct AppConstants {
         static let welcome = "Welcome"
         static let yourDailyCard = "TODAY'S CYCLE"
         static let karmaConnections = "Life Connections"
-        static let lastCycle = "Your Last Cycle"
-        static let nextCycle = "Your Next Cycle"
         static let birthCard = "Birth Card"
         static let yearlyCard = "Yearly Cycle"
+        static let lastYear = "Last Year"
+        static let nextYear = "Next Year"
         static let fiftyTwoDayCycle = "52-Day Cycle"
-        static let dailyInfluence = "Today's Cycle"
+        static let lastFiftyTwoDays = "Last 52 Days"
+        static let nextFiftyTwoDays = "Next 52 Days"
+        static let dailyInfluence = "Your Daily Spread"
         static let yearlyInfluence = "Your Yearly Spread"
         static let fiftyTwoDayInfluence = "Your 52-Day Spread"
         static let exploring = "Exploring Cards for"
@@ -353,6 +355,3 @@ struct AppConstants {
             }
         }
     }}
-
-
-

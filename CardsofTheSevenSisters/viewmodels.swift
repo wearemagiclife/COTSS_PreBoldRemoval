@@ -198,6 +198,16 @@ class FiftyTwoDayCycleViewModel: CardViewModel {
         return calculator.retrievePlanetPhase(currentPeriodNumber)
     }
     
+    var previousPlanetaryPhase: String {
+        let prevPeriod = currentPeriodNumber == 1 ? 7 : currentPeriodNumber - 1
+        return calculator.retrievePlanetPhase(prevPeriod)
+    }
+    
+    var nextPlanetaryPhase: String {
+        let nextPeriod = currentPeriodNumber == 7 ? 1 : currentPeriodNumber + 1
+        return calculator.retrievePlanetPhase(nextPeriod)
+    }
+    
     enum CyclePeriod {
         case last, current, next
     }
@@ -291,3 +301,4 @@ class HomeViewModel: CardViewModel {
         }
     }
 }
+

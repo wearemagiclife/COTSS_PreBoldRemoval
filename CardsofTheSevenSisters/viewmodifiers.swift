@@ -141,9 +141,10 @@ struct StandardNavigation: ViewModifier {
                     Text(title)
                         .font(.custom("Iowan Old Style", size: scaledTitleSize))
                         .foregroundColor(.black)
-                        
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.3)
                         .lineLimit(1)
+                        .truncationMode(.tail)
+                        .allowsTightening(true)
                 }
                 
                 if let trailingContent = trailingContent {
@@ -155,8 +156,8 @@ struct StandardNavigation: ViewModifier {
     }
     
     private var scaledTitleSize: CGFloat {
-        let metrics = UIFontMetrics(forTextStyle: .title2)
-        return metrics.scaledValue(for: AppConstants.FontSizes.title)
+        let metrics = UIFontMetrics(forTextStyle: .callout)
+        return metrics.scaledValue(for: 15)
     }
 }
 
