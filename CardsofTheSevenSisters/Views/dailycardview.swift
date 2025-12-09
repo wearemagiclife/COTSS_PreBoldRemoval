@@ -46,7 +46,13 @@ struct DailyCardView: View {
     
     private var navigationTitle: String {
         if showCardDetail, let card = selectedCard {
-            if case .planetary(let planet) = selectedContentType {
+            if card.id == viewModel.yesterdayCard.card.id {
+                return "Yesterday's Card"
+            } else if card.id == viewModel.todayCard.card.id {
+                return "Today's Card"
+            } else if card.id == viewModel.tomorrowCard.card.id {
+                return "Tomorrow's Card"
+            } else if case .planetary(let planet) = selectedContentType {
                 return "\(planet.capitalized) Influence"
             } else {
                 if let def = getCardDefinition(by: card.id) {
@@ -104,15 +110,26 @@ struct DailyCardView: View {
             trailingContent: {
                 AnyView(
                     HStack(spacing: 12) {
+                        let shareCardTypeName: String = {
+                            if showCardDetail, let card = selectedCard {
+                                if card.id == viewModel.yesterdayCard.card.id ||
+                                    card.id == viewModel.todayCard.card.id ||
+                                    card.id == viewModel.tomorrowCard.card.id {
+                                    return navigationTitle
+                                }
+                            }
+                            return "Daily Card"
+                        }()
+
                         DailyCardShareLink(
-                            dailyCard: viewModel.todayCard.card,
+                            dailyCard: selectedCard ?? viewModel.todayCard.card,
                             dailyCardTitle: dailyCardTitle,
                             dailyCardDescription: dailyCardDescription,
                             planetName: viewModel.todayCard.planet,
                             planetTitle: planetInfo.title,
                             planetDescription: planetInfo.description,
                             date: viewModel.calculationDate,
-                            cardTypeName: "Daily Card"
+                            cardTypeName: shareCardTypeName
                         )
 
                         if DataManager.shared.explorationDate != nil {
