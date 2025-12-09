@@ -116,6 +116,9 @@ struct FiftyTwoDayCycleView: View {
             if card.id == viewModel.nextPeriodCard.id {
                 return "Your Next 52-Day Card"
             }
+            if card.id == viewModel.currentPeriodCard.id {
+                return "Your Current 52-Day Card"
+            }
             
             switch contentType {
             case .planetary(let planet):
@@ -127,6 +130,8 @@ struct FiftyTwoDayCycleView: View {
                 return card.name
             }
         }
+
+        // Default when no detail is showing
         return AppConstants.Strings.fiftyTwoDayInfluence
     }
 
@@ -178,51 +183,118 @@ struct FiftyTwoDayCycleView: View {
             trailingContent: {
                 AnyView(
                     HStack(spacing: 12) {
-                        Group {
-                            if showCardDetail, let card = selectedCard {
-                                if case .planetary(let planet) = selectedContentType {
-                                    let planetDetails = AppConstants.PlanetDescriptions.getDescription(for: planet)
-                                    let planetImage = ImageManager.shared.loadPlanetImage(for: planet)
-                                    SingleCardShareLink(
-                                        card: card,
-                                        cardTitle: planetDetails.title,
-                                        cardDescription: planetDetails.description,
-                                        spreadType: "Current Planetary Influence",
-                                        subtitle: cycleInfoText,
-                                        overrideImage: planetImage
-                                    )
-                                } else {
-                                    let selectedTitle: String = {
-                                        if let def = getCardDefinition(by: card.id) { return def.name }
-                                        return card.name
-                                    }()
-                                    let selectedDescription: String = {
-                                        let repo = DescriptionRepository.shared
-                                        return repo.fiftyTwoDescriptions[String(card.id)] ?? "No 52-day description available."
-                                    }()
+                        // 1. When a card detail modal is open
+                        if showCardDetail, let card = selectedCard {
+                            // Planetary detail share
+                            if case .planetary(let planet) = selectedContentType {
+                                let planetDetails = AppConstants.PlanetDescriptions.getDescription(for: planet)
+                                let planetImage = ImageManager.shared.loadPlanetImage(for: planet)
+
+                                SingleCardShareLink(
+                                    card: card,
+                                    cardTitle: planetDetails.title,
+                                    cardDescription: planetDetails.description,
+                                    spreadType: "Your" + navigationTitle,
+                                    subtitle: cycleInfoText,
+                                    overrideImage: planetImage
+                                )
+                            } else {
+                                // 52-day card detail share (last / current / next)
+                                let selectedTitle: String = {
+                                    if let def = getCardDefinition(by: card.id) { return def.name }
+                                    return card.name
+                                }()
+
+                                let selectedDescription: String = {
+                                    let repo = DescriptionRepository.shared
+                                    return repo.fiftyTwoDescriptions[String(card.id)]
+                                        ?? "No 52-day description available."
+                                }()
+
+                                // Determine which cycle we are sharing (last / current / next)
+                                let (sharePlanetName, shareDates): (String, (start: Date, end: Date)?) = {
+                                    if card.id == viewModel.lastPeriodCard.id {
+                                        return (viewModel.previousPlanetaryPhase, previousCycleDates)
+                                    } else if card.id == viewModel.nextPeriodCard.id {
+                                        return (viewModel.nextPlanetaryPhase, nextCycleDates)
+                                    } else if card.id == viewModel.currentPeriodCard.id {
+                                        return (currentPlanetaryPhase, currentCycleDates)
+                                    } else {
+                                        return (currentPlanetaryPhase, currentCycleDates)
+                                    }
+                                }()
+
+                                let sharePlanetInfo = AppConstants.PlanetDescriptions.getDescription(for: sharePlanetName)
+
+                                let shareCycleInfoText: String = {
+                                    if let dates = shareDates {
+                                        return "\(sharePlanetName) Phase - " +
+                                            DataManager.shared.formatDateRange(start: dates.start, end: dates.end)
+                                    } else {
+                                        return "\(sharePlanetName) Phase"
+                                    }
+                                }()
+
+                                if card.id == viewModel.lastPeriodCard.id {
                                     fiftytwoCycleShareLink(
                                         cycleCard: card,
                                         cycleCardTitle: selectedTitle,
                                         cycleCardDescription: selectedDescription,
-                                        planetName: currentPlanetaryPhase,
-                                        planetTitle: planetInfo.title,
-                                        planetDescription: planetInfo.description,
-                                        cycleInfo: cycleInfoText
+                                        planetName: sharePlanetName,
+                                        planetTitle: sharePlanetInfo.title,
+                                        planetDescription: sharePlanetInfo.description,
+                                        cycleInfo: shareCycleInfoText,
+                                        headerTitle: "Your Last 52-Day Cycle"
+                                    )
+                                } else if card.id == viewModel.nextPeriodCard.id {
+                                    fiftytwoCycleShareLink(
+                                        cycleCard: card,
+                                        cycleCardTitle: selectedTitle,
+                                        cycleCardDescription: selectedDescription,
+                                        planetName: sharePlanetName,
+                                        planetTitle: sharePlanetInfo.title,
+                                        planetDescription: sharePlanetInfo.description,
+                                        cycleInfo: shareCycleInfoText,
+                                        headerTitle: "Your Next 52-Day Card"
+                                    )
+                                } else if card.id == viewModel.currentPeriodCard.id {
+                                    fiftytwoCycleShareLink(
+                                        cycleCard: card,
+                                        cycleCardTitle: selectedTitle,
+                                        cycleCardDescription: selectedDescription,
+                                        planetName: sharePlanetName,
+                                        planetTitle: sharePlanetInfo.title,
+                                        planetDescription: sharePlanetInfo.description,
+                                        cycleInfo: shareCycleInfoText,
+                                        headerTitle: "Your Current 52-Day Card"
+                                    )
+                                } else {
+                                    fiftytwoCycleShareLink(
+                                        cycleCard: card,
+                                        cycleCardTitle: selectedTitle,
+                                        cycleCardDescription: selectedDescription,
+                                        planetName: sharePlanetName,
+                                        planetTitle: sharePlanetInfo.title,
+                                        planetDescription: sharePlanetInfo.description,
+                                        cycleInfo: shareCycleInfoText
                                     )
                                 }
-                            } else {
-                                fiftytwoCycleShareLink(
-                                    cycleCard: viewModel.currentPeriodCard,
-                                    cycleCardTitle: cycleCardTitle,
-                                    cycleCardDescription: cycleCardDescription,
-                                    planetName: currentPlanetaryPhase,
-                                    planetTitle: planetInfo.title,
-                                    planetDescription: planetInfo.description,
-                                    cycleInfo: cycleInfoText
-                                )
                             }
+                        // 2. No modal open – share current cycle
+                        } else {
+                            fiftytwoCycleShareLink(
+                                cycleCard: viewModel.currentPeriodCard,
+                                cycleCardTitle: cycleCardTitle,
+                                cycleCardDescription: cycleCardDescription,
+                                planetName: currentPlanetaryPhase,
+                                planetTitle: planetInfo.title,
+                                planetDescription: planetInfo.description,
+                                cycleInfo: cycleInfoText,
+                                headerTitle: "Your Current 52-Day Card"
+                            )
                         }
 
+                        // 3. Reset button (still inside the HStack!)
                         if DataManager.shared.explorationDate != nil {
                             Button(AppConstants.Strings.reset) {
                                 DataManager.shared.explorationDate = nil

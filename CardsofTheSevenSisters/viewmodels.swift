@@ -281,7 +281,11 @@ class HomeViewModel: CardViewModel {
     }
     
     var user52DayCard: Card {
-        DataManager.shared.current52DayCard(for: dataManager.userProfile.birthDate, on: dataManager.explorationDate)
+        let date = dataManager.explorationDate ?? Date()
+        return DataManager.shared.current52DayCard(
+            for: dataManager.userProfile.birthDate,
+            on: date
+        )
     }
 
     var userYearlyCard: Card {

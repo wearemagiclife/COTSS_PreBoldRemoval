@@ -280,11 +280,15 @@ struct fiftytwoCycleShareView: View {
                             .font(.custom("Iowan Old Style", size: fontSize(56, geometry)))
                             .fontWeight(.bold)
                             .foregroundColor(inkColor)
+                            .minimumScaleFactor(0.2)
+                            .lineLimit(1)
 
                         Text(headerSubtitle)
                             .font(.custom("Iowan Old Style", size: fontSize(28, geometry)))
                             .fontWeight(.semibold)
                             .foregroundColor(inkColor.opacity(0.8))
+                            .minimumScaleFactor(0.2)
+                            .lineLimit(1)
                     }
 
                     // Line design above cards
@@ -297,15 +301,15 @@ struct fiftytwoCycleShareView: View {
                     }
 
                     // Card + planet images
-                    HStack(spacing: space(20, geometry)) {
-                        let imageWidth = min(geometry.size.width * 0.28, 400)
+                    HStack(spacing: 0) {
+                        let imageWidth = geometry.size.width / 5
 
                         VStack(spacing: space(6, geometry)) {
                             if let cardImage = ImageManager.shared.loadCardImage(for: cycleCard) {
                                 Image(uiImage: cardImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: imageWidth)
+                                    .frame(width: imageWidth, alignment: .trailing)
                                     .cornerRadius(12)
                                     .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                             }
@@ -316,7 +320,7 @@ struct fiftytwoCycleShareView: View {
                                 Image(uiImage: planetImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                                    .frame(width: imageWidth)
+                                    .frame(width: imageWidth, alignment: .leading)
                                     .cornerRadius(12)
                                     .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
                             }
@@ -338,7 +342,7 @@ struct fiftytwoCycleShareView: View {
                         .fontWeight(.semibold)
                         .foregroundColor(inkColor)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.2)
                         .multilineTextAlignment(.center)
                         .padding(.top, space(6, geometry))
 
@@ -346,20 +350,24 @@ struct fiftytwoCycleShareView: View {
                     HStack(alignment: .top, spacing: space(36, geometry)) {
                         VStack(alignment: .leading, spacing: space(10, geometry)) {
                             Text(cycleCardDescription)
-                                .font(.custom("Iowan Old Style", size: fontSize(30, geometry)))
+                                .font(.custom("Iowan Old Style", size: 22))
                                 .foregroundColor(inkColor)
                                 .lineSpacing(space(4, geometry))
                                 .fixedSize(horizontal: false, vertical: true)
+                                .minimumScaleFactor(0.1)
+                                .lineLimit(nil)
                         }
                         .padding(.trailing, space(8, geometry))
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                         VStack(alignment: .leading, spacing: space(10, geometry)) {
                             Text(planetDescription)
-                                .font(.custom("Iowan Old Style", size: fontSize(30, geometry)))
+                                .font(.custom("Iowan Old Style", size: 22))
                                 .foregroundColor(inkColor)
                                 .lineSpacing(space(4, geometry))
                                 .fixedSize(horizontal: false, vertical: true)
+                                .minimumScaleFactor(0.1)
+                                .lineLimit(nil)
                         }
                         .padding(.leading, space(10, geometry))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -376,11 +384,15 @@ struct fiftytwoCycleShareView: View {
                             .foregroundColor(inkColor.opacity(0.8))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, space(40, geometry))
+                            .minimumScaleFactor(0.2)
+                            .lineLimit(nil)
 
                         Text(footerCTA)
                             .font(.custom("Iowan Old Style", size: fontSize(22, geometry)))
                             .fontWeight(.semibold)
                             .foregroundColor(inkColor)
+                            .minimumScaleFactor(0.2)
+                            .lineLimit(1)
                     }
                     .padding(.bottom, space(20, geometry))
                 }
@@ -1412,10 +1424,17 @@ struct fiftytwoCycleShareLink: View {
         isLoading = true
         Task {
             do {
+                await MainActor.run {
+                    DescriptionRepository.shared.ensureLoaded()
+                }
+
+                let repo = DescriptionRepository.shared
+                let correctDescription = repo.fiftyTwoDescriptions[String(cycleCard.id)] ?? "No 52-day description available."
+
                 let shareView = fiftytwoCycleShareView(
                     cycleCard: cycleCard,
                     cycleCardTitle: cycleCardTitle,
-                    cycleCardDescription: cycleCardDescription,
+                    cycleCardDescription: correctDescription,
                     planetName: planetName,
                     planetTitle: planetTitle,
                     planetDescription: planetDescription,
