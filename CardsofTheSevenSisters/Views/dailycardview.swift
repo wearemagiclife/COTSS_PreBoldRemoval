@@ -64,6 +64,104 @@ struct DailyCardView: View {
         return AppConstants.Strings.dailyInfluence
     }
     
+    private var shareDetails: (
+        cardTypeName: String,
+        card: Card,
+        cardTitle: String,
+        cardDescription: String,
+        planetName: String,
+        planetTitle: String,
+        planetDescription: String,
+        date: Date
+    ) {
+        var shareCardTypeName: String = "Daily Card"
+        var shareCard: Card = viewModel.todayCard.card
+        var shareCardTitle: String = dailyCardTitle
+        var shareCardDescription: String = dailyCardDescription
+        var sharePlanetName: String = viewModel.todayCard.planet
+        var sharePlanetTitle: String = planetInfo.title
+        var sharePlanetDescription: String = planetInfo.description
+        var shareDate: Date = viewModel.calculationDate
+        
+        if showCardDetail, let card = selectedCard {
+            if card.id == viewModel.yesterdayCard.card.id {
+                shareCardTypeName = "Yesterday's Card"
+                shareCard = viewModel.yesterdayCard.card
+                if let def = getCardDefinition(by: shareCard.id) {
+                    shareCardTitle = def.name
+                } else {
+                    shareCardTitle = shareCard.name
+                }
+                let repo = DescriptionRepository.shared
+                shareCardDescription = repo.dailyDescriptions[String(shareCard.id)] ?? "No description available."
+                sharePlanetName = viewModel.yesterdayCard.planet
+                let planetInfo = AppConstants.PlanetDescriptions.getDescription(for: sharePlanetName)
+                sharePlanetTitle = planetInfo.title
+                sharePlanetDescription = planetInfo.description
+                shareDate = viewModel.calculationDate.addingTimeInterval(-86400) // 1 day before
+            } else if card.id == viewModel.todayCard.card.id {
+                shareCardTypeName = "Today's Card"
+                shareCard = viewModel.todayCard.card
+                shareCardTitle = dailyCardTitle
+                shareCardDescription = dailyCardDescription
+                sharePlanetName = viewModel.todayCard.planet
+                sharePlanetTitle = planetInfo.title
+                sharePlanetDescription = planetInfo.description
+                shareDate = viewModel.calculationDate
+            } else if card.id == viewModel.tomorrowCard.card.id {
+                shareCardTypeName = "Tomorrow's Card"
+                shareCard = viewModel.tomorrowCard.card
+                if let def = getCardDefinition(by: shareCard.id) {
+                    shareCardTitle = def.name
+                } else {
+                    shareCardTitle = shareCard.name
+                }
+                let repo = DescriptionRepository.shared
+                shareCardDescription = repo.dailyDescriptions[String(shareCard.id)] ?? "No description available."
+                sharePlanetName = viewModel.tomorrowCard.planet
+                let planetInfo = AppConstants.PlanetDescriptions.getDescription(for: sharePlanetName)
+                sharePlanetTitle = planetInfo.title
+                sharePlanetDescription = planetInfo.description
+                shareDate = viewModel.calculationDate.addingTimeInterval(86400) // 1 day after
+            } else {
+                shareCard = card
+                if let def = getCardDefinition(by: shareCard.id) {
+                    shareCardTitle = def.name
+                } else {
+                    shareCardTitle = shareCard.name
+                }
+                let repo = DescriptionRepository.shared
+                shareCardDescription = repo.dailyDescriptions[String(shareCard.id)] ?? "No description available."
+                
+                if case .planetary(let planet) = selectedContentType {
+                    sharePlanetName = planet
+                    let planetInfo = AppConstants.PlanetDescriptions.getDescription(for: planet)
+                    sharePlanetTitle = planetInfo.title
+                    sharePlanetDescription = planetInfo.description
+                } else {
+                    sharePlanetName = viewModel.todayCard.planet
+                    sharePlanetTitle = planetInfo.title
+                    sharePlanetDescription = planetInfo.description
+                }
+                
+                shareDate = viewModel.calculationDate
+                
+                shareCardTypeName = navigationTitle
+            }
+        }
+        
+        return (
+            cardTypeName: shareCardTypeName,
+            card: shareCard,
+            cardTitle: shareCardTitle,
+            cardDescription: shareCardDescription,
+            planetName: sharePlanetName,
+            planetTitle: sharePlanetTitle,
+            planetDescription: sharePlanetDescription,
+            date: shareDate
+        )
+    }
+    
     var body: some View {
         ZStack {
             Color(red: 0.86, green: 0.77, blue: 0.57)
@@ -110,26 +208,17 @@ struct DailyCardView: View {
             trailingContent: {
                 AnyView(
                     HStack(spacing: 12) {
-                        let shareCardTypeName: String = {
-                            if showCardDetail, let card = selectedCard {
-                                if card.id == viewModel.yesterdayCard.card.id ||
-                                    card.id == viewModel.todayCard.card.id ||
-                                    card.id == viewModel.tomorrowCard.card.id {
-                                    return navigationTitle
-                                }
-                            }
-                            return "Daily Card"
-                        }()
-
+                        let details = shareDetails
+                        
                         DailyCardShareLink(
-                            dailyCard: selectedCard ?? viewModel.todayCard.card,
-                            dailyCardTitle: dailyCardTitle,
-                            dailyCardDescription: dailyCardDescription,
-                            planetName: viewModel.todayCard.planet,
-                            planetTitle: planetInfo.title,
-                            planetDescription: planetInfo.description,
-                            date: viewModel.calculationDate,
-                            cardTypeName: shareCardTypeName
+                            dailyCard: details.card,
+                            dailyCardTitle: details.cardTitle,
+                            dailyCardDescription: details.cardDescription,
+                            planetName: details.planetName,
+                            planetTitle: details.planetTitle,
+                            planetDescription: details.planetDescription,
+                            date: details.date,
+                            cardTypeName: details.cardTypeName
                         )
 
                         if DataManager.shared.explorationDate != nil {
