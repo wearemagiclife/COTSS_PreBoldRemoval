@@ -194,7 +194,7 @@ struct FiftyTwoDayCycleView: View {
                                     card: card,
                                     cardTitle: planetDetails.title,
                                     cardDescription: planetDetails.description,
-                                    spreadType: "Your" + navigationTitle,
+                                    spreadType:  navigationTitle,
                                     subtitle: cycleInfoText,
                                     overrideImage: planetImage
                                 )
