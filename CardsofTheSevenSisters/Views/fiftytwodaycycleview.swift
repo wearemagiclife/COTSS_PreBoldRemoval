@@ -111,7 +111,7 @@ struct FiftyTwoDayCycleView: View {
             
             // If showing detail for last or next period cards, show contextual titles
             if card.id == viewModel.lastPeriodCard.id {
-                return "Your Last 52-Day Card"
+                return "Last 52-Day Cycle"
             }
             if card.id == viewModel.nextPeriodCard.id {
                 return "Your Next 52-Day Card"
@@ -165,7 +165,10 @@ struct FiftyTwoDayCycleView: View {
             title: navigationTitle,
             backAction: {
                 if showCardDetail {
-                    withAnimation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping)) {
+                    withAnimation(.spring(
+                        response: AppConstants.Animation.springResponse,
+                        dampingFraction: AppConstants.Animation.springDamping
+                    )) {
                         showCardDetail = false
                     }
                 } else {
