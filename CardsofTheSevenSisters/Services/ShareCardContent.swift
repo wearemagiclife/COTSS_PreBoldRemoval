@@ -634,7 +634,7 @@ struct DailyCardShareView: View {
                 VStack(spacing: space(14, geometry)) {
                     // Header: Title + byline only
                     VStack(spacing: space(2, geometry)) {
-                        Text("Today's Theme & Focus")
+                        Text("Your Daily Theme & Focus")
                             .font(.custom("Iowan Old Style", size: fontSize(56, geometry)))
                             .fontWeight(.bold)
                             .foregroundColor(inkColor)
@@ -1156,7 +1156,7 @@ struct DailyCardShareLink: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My \(cardTypeName) Cards by SevenSister.Cards"
+                        subject: "\(cardTypeName)by SevenSister.Cards"
                     )
 
                     self.shareItems = [activityItemSource]
