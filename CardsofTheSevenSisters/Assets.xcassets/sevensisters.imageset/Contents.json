@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "apptitle_oneline@1x.png",
+      "filename" : "sevensisters@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "apptitle_oneline@2x.png",
+      "filename" : "sevensisters@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "apptitle_oneline@3x.png",
+      "filename" : "sevensisters@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
