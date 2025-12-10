@@ -227,6 +227,8 @@ struct DailyCardView: View {
                             }
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                             .foregroundColor(.black)
+                            .accessibilityLabel("Reset to today")
+                            .accessibilityHint("Returns to today's daily card")
                         }
                     }
                 )
