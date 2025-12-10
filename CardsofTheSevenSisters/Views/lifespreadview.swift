@@ -267,24 +267,16 @@ struct LifeSpreadView: View {
     
     private var mainTitleSection: some View {
         VStack(spacing: AppConstants.Spacing.titleSpacing) {
-            // "YOUR BIRTH CARD" as main title
-            
-            Text("YOUR BIRTH CARD")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
-                .fontWeight(.heavy)
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.7)
-            
-            Text("this is your main archetypal influence")
+            SectionHeader(
+                "YOUR BIRTH CARD",
+                fontSize: AppConstants.FontSizes.large
+            )
+
+            Text("your main archetypal influence")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                 .foregroundColor(.black)
                 .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
         }
-        
-    
         .padding(.top, AppConstants.Spacing.small)
     }
 
