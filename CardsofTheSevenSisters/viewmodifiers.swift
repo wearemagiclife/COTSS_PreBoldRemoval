@@ -1,5 +1,86 @@
 import SwiftUI
 
+// MARK: - Animated Gold Border with Sheen
+
+/// A gold border with a periodic angled sheen animation that sweeps across the button face
+struct AnimatedGoldBorder: View {
+    let cornerRadius: CGFloat
+    let lineWidth: CGFloat
+    let sweepDuration: Double
+    let initialDelay: Double
+    let pausePattern: [Double]  // Cycling pause durations: [8, 10, 9]
+
+    @State private var shimmerPosition: CGFloat = -1.0
+    @State private var cycleIndex: Int = 0
+
+    init(cornerRadius: CGFloat, lineWidth: CGFloat = 0.75, sweepDuration: Double = 2.5, initialDelay: Double = 2.0, pausePattern: [Double] = [8.0, 10.0, 9.0]) {
+        self.cornerRadius = cornerRadius
+        self.lineWidth = lineWidth
+        self.sweepDuration = sweepDuration
+        self.initialDelay = initialDelay
+        self.pausePattern = pausePattern
+    }
+
+    var body: some View {
+        ZStack {
+            // Angled sheen sweeping across button face
+            GeometryReader { geometry in
+                // Wide angled band that sweeps left to right
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .clear, location: 0.0),
+                                .init(color: .clear, location: 0.46),
+                                .init(color: .white.opacity(0.15), location: 0.49),
+                                .init(color: .white.opacity(0.25), location: 0.5),
+                                .init(color: .white.opacity(0.15), location: 0.51),
+                                .init(color: .clear, location: 0.54),
+                                .init(color: .clear, location: 1.0)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: geometry.size.width * 3)
+                    .rotationEffect(.degrees(25))
+                    .offset(x: shimmerPosition * geometry.size.width * 2.5)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .allowsHitTesting(false)
+
+            // Gold border
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(AppTheme.goldAccent.opacity(0.8), lineWidth: lineWidth)
+        }
+        .onAppear {
+            // Wait for card elements to load before first glint
+            DispatchQueue.main.asyncAfter(deadline: .now() + initialDelay) {
+                startShimmerCycle()
+            }
+        }
+    }
+
+    private func startShimmerCycle() {
+        // Reset position
+        shimmerPosition = -1.0
+
+        // Sweep across
+        withAnimation(.easeInOut(duration: sweepDuration)) {
+            shimmerPosition = 1.0
+        }
+
+        // Get current pause duration from pattern
+        let currentPause = pausePattern[cycleIndex % pausePattern.count]
+        cycleIndex += 1
+
+        // Schedule next cycle after sweep + pause
+        DispatchQueue.main.asyncAfter(deadline: .now() + sweepDuration + currentPause) {
+            startShimmerCycle()
+        }
+    }
+}
+
 struct AccessibleCard: ViewModifier {
     let card: Card
     let action: String
@@ -107,14 +188,18 @@ struct StandardNavigation: ViewModifier {
     let backAction: (() -> Void)?
     let trailingContent: (() -> AnyView)?
     @Environment(\.sizeCategory) var sizeCategory
-    
+
+    private var isSmallScreen: Bool {
+        UIScreen.main.bounds.height < 700
+    }
+
     init(title: String, hasBackButton: Bool = true, backAction: (() -> Void)? = nil, trailingContent: (() -> AnyView)? = nil) {
         self.title = title
         self.hasBackButton = hasBackButton
         self.backAction = backAction
         self.trailingContent = trailingContent
     }
-    
+
     func body(content: Content) -> some View {
         content
             .navigationTitle(title)
@@ -122,49 +207,88 @@ struct StandardNavigation: ViewModifier {
             .navigationBarBackButtonHidden(hasBackButton)
             .toolbar {
                 if hasBackButton {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: backAction ?? {}) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 20))
-                                .foregroundColor(.black)
-                                .frame(width: 44, height: 44)
-                                .contentShape(Rectangle())
+                    if #available(iOS 26.0, *) {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: backAction ?? {}) {
+                                if isSmallScreen {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppTheme.primaryText)
+                                        .frame(width: 28, height: 28)
+                                        .contentShape(Rectangle())
+                                } else {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(AppTheme.primaryText)
+                                        .frame(width: AppConstants.ButtonSizes.backButton, height: AppConstants.ButtonSizes.backButton)
+                                        .contentShape(Rectangle())
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(AppConstants.Accessibility.Labels.backButton)
+                            .accessibilityHint(AppConstants.Accessibility.Hints.doubleTapToClose)
+                            .accessibilityIdentifier(AppConstants.Accessibility.Identifiers.backButton)
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .accessibilityLabel(AppConstants.Accessibility.Labels.backButton)
-                        .accessibilityHint(AppConstants.Accessibility.Hints.doubleTapToClose)
-                        .accessibilityIdentifier(AppConstants.Accessibility.Identifiers.backButton)
+                        .sharedBackgroundVisibility(.hidden)
+                    } else {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: backAction ?? {}) {
+                                if isSmallScreen {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(AppTheme.primaryText)
+                                        .frame(width: 28, height: 28)
+                                        .contentShape(Rectangle())
+                                } else {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(AppTheme.primaryText)
+                                        .frame(width: AppConstants.ButtonSizes.backButton, height: AppConstants.ButtonSizes.backButton)
+                                        .contentShape(Rectangle())
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(AppConstants.Accessibility.Labels.backButton)
+                            .accessibilityHint(AppConstants.Accessibility.Hints.doubleTapToClose)
+                            .accessibilityIdentifier(AppConstants.Accessibility.Identifiers.backButton)
+                        }
                     }
                 }
-                
+
                 ToolbarItem(placement: .principal) {
                     Text(title)
-                        .font(.custom("Iowan Old Style", size: scaledTitleSize))
-                        .foregroundColor(.black)
-                        .minimumScaleFactor(0.3)
+                        .font(.custom("Iowan Old Style", size: 18))
+                        .foregroundColor(AppTheme.primaryText)
+                        .minimumScaleFactor(0.7)
                         .lineLimit(1)
-                        .truncationMode(.tail)
-                        .allowsTightening(true)
+                        .frame(maxWidth: 220)
                 }
                 
                 if let trailingContent = trailingContent {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        trailingContent()
+                    if #available(iOS 26.0, *) {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            trailingContent()
+                        }
+                        .sharedBackgroundVisibility(.hidden)
+                    } else {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            trailingContent()
+                        }
                     }
                 }
             }
     }
     
     private var scaledTitleSize: CGFloat {
-        let metrics = UIFontMetrics(forTextStyle: .callout)
-        return metrics.scaledValue(for: 15)
+        let metrics = UIFontMetrics(forTextStyle: .headline)
+        return metrics.scaledValue(for: 20)
     }
 }
 
 struct CardShadow: ViewModifier {
     let isLarge: Bool
     @Environment(\.colorSchemeContrast) var contrast
-    
+
     func body(content: Content) -> some View {
         content
             .shadow(
@@ -174,11 +298,66 @@ struct CardShadow: ViewModifier {
                 y: isLarge ? AppConstants.Shadow.detailOffset.height : AppConstants.Shadow.cardOffset.height
             )
     }
-    
+
     private var shadowColor: Color {
         let baseOpacity = isLarge ? AppConstants.Shadow.detailOpacity : AppConstants.Shadow.cardOpacity
         let adjustedOpacity = contrast == .increased ? baseOpacity * 1.5 : baseOpacity
         return Color.black.opacity(adjustedOpacity)
+    }
+}
+
+// MARK: - Dark Mode Gold Glow
+
+/// Adds a subtle metallic gold glow behind cards in dark mode only.
+/// This is a separate layer from the regular shadow - tighter radius for metallic effect.
+struct DarkModeGoldGlow: ViewModifier {
+    let isLarge: Bool
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorSchemeContrast) var contrast
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(
+                color: glowColor,
+                radius: glowRadius,
+                x: 0,
+                y: isLarge ? 1 : 0.5
+            )
+    }
+
+    private var glowColor: Color {
+        guard colorScheme == .dark else { return .clear }
+        let baseOpacity = isLarge ? AppConstants.DarkModeEffects.glowOpacityLarge : AppConstants.DarkModeEffects.glowOpacitySmall
+        let adjustedOpacity = contrast == .increased ? baseOpacity * 1.3 : baseOpacity
+        return AppTheme.goldAccent.opacity(adjustedOpacity)
+    }
+
+    private var glowRadius: CGFloat {
+        guard colorScheme == .dark else { return 0 }
+        return isLarge ? AppConstants.DarkModeEffects.glowRadiusLarge : AppConstants.DarkModeEffects.glowRadiusSmall
+    }
+}
+
+// MARK: - DarkModeCardEffects
+
+/// Combined modifier that applies all card visual effects:
+/// - Black shadow (always, for depth)
+/// - Gold glow (dark mode only, tight radius for metallic effect)
+/// - Glossy shine effect with 3D tilt (dark mode only)
+struct DarkModeCardEffects: ViewModifier {
+    let isLarge: Bool
+    let glossIntensity: Double
+
+    init(isLarge: Bool = false, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) {
+        self.isLarge = isLarge
+        self.glossIntensity = glossIntensity
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .modifier(DarkModeGoldGlow(isLarge: isLarge))  // Gold glow (dark mode only)
+            .cardShadow(isLarge: isLarge)                   // Black shadow (always)
+            .cardGloss(intensity: glossIntensity)           // Gloss + 3D tilt (dark mode only)
     }
 }
 
@@ -233,6 +412,12 @@ extension View {
     
     func cardShadow(isLarge: Bool = false) -> some View {
         modifier(CardShadow(isLarge: isLarge))
+    }
+
+    /// Applies all dark mode card effects: gold glow shadow + glossy shine with 3D tilt.
+    /// In light mode, only the standard shadow is applied.
+    func darkModeCardEffects(isLarge: Bool = false, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) -> some View {
+        modifier(DarkModeCardEffects(isLarge: isLarge, glossIntensity: glossIntensity))
     }
     
     func errorFallback(message: String, retryAction: (() -> Void)? = nil) -> some View {

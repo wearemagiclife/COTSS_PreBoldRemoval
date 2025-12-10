@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct CardsOfTheSevenSisters: App {
     @State private var showSplash = true
+    @ObservedObject private var appSettings = AppSettings.shared
 
     init() {
         setupGlobalAppearance()
@@ -21,16 +22,15 @@ struct CardsOfTheSevenSisters: App {
                         _ = DataManager.shared
                         showSplash = false
                     })
-                    .preferredColorScheme(.light)
                     .zIndex(1)
                 } else {
                     HomeView()
-                        .preferredColorScheme(.light)
                         .zIndex(0)
                         .environmentObject(AuthenticationManager.shared)
                         .environmentObject(DataManager.shared)
                 }
             }
+            .preferredColorScheme(appSettings.colorScheme)
             .onAppear {
                 // Defer non-critical work
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -45,32 +45,46 @@ struct CardsOfTheSevenSisters: App {
     }
     
     private func setupGlobalAppearance() {
+        // Adaptive background color
+        let adaptiveBackground = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark
+                ? UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)  // true black
+                : UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)  // tan
+        }
+
+        // Adaptive text color
+        let adaptiveText = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark
+                ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream
+                : UIColor.black
+        }
+
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
+        navBarAppearance.backgroundColor = adaptiveBackground
         navBarAppearance.titleTextAttributes = [
-            .foregroundColor: UIColor.black,
+            .foregroundColor: adaptiveText,
             .font: UIFont(name: "Iowan Old Style", size: 24) ?? UIFont.systemFont(ofSize: 24)
         ]
         navBarAppearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor.black,
+            .foregroundColor: adaptiveText,
             .font: UIFont(name: "Iowan Old Style", size: 24) ?? UIFont.systemFont(ofSize: 24)
         ]
-        
+
         UINavigationBar.appearance().standardAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
         UINavigationBar.appearance().compactAppearance = navBarAppearance
         UINavigationBar.appearance().prefersLargeTitles = false
-        
-        UIView.appearance().tintColor = UIColor.black
-        
-        UITabBar.appearance().backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
-        UITabBar.appearance().barTintColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
-        
-        UITableView.appearance().backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
-        UITableViewCell.appearance().backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
-        
-        UIScrollView.appearance().backgroundColor = UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)
+
+        UIView.appearance().tintColor = adaptiveText
+
+        UITabBar.appearance().backgroundColor = adaptiveBackground
+        UITabBar.appearance().barTintColor = adaptiveBackground
+
+        UITableView.appearance().backgroundColor = adaptiveBackground
+        UITableViewCell.appearance().backgroundColor = adaptiveBackground
+
+        UIScrollView.appearance().backgroundColor = adaptiveBackground
     }
 }
 

@@ -1,23 +1,74 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "joker@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "joker@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "joker@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "jokerdark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "joker@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "joker@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "jokerdark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "joker@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "jokerdark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

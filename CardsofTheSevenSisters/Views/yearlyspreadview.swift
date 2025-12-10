@@ -73,22 +73,22 @@ struct YearlySpreadView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 0.86, green: 0.77, blue: 0.57)
+            AppTheme.backgroundColor
                 .ignoresSafeArea(.all)
                 
             ScrollView {
-                VStack(spacing: AppConstants.Spacing.sectionSpacing) {
+                VStack(spacing: AppConstants.Spacing.ornament) {
                     headerSection
                     mainCardSection
-                    
+
                     LineBreak()
-                    
+
                     yearlyCardsSection
-                    
+
                     LineBreak("linedesignd")
                 }
-                .padding(.horizontal, AppConstants.Spacing.medium)
-                .padding(.vertical, AppConstants.Spacing.large)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
+                .padding(.vertical, AppConstants.Spacing.section)
             }
             
             if showCardDetail, let card = selectedCard {
@@ -115,7 +115,7 @@ struct YearlySpreadView: View {
             },
             trailingContent: {
                 AnyView(
-                    HStack(spacing: 12) {
+                    HStack(spacing: AppConstants.Spacing.tight) {
                         Group {
                             if showCardDetail, let card = selectedCard {
                                 let spread = spreadType(for: card)
@@ -145,7 +145,9 @@ struct YearlySpreadView: View {
                                 DataManager.shared.explorationDate = nil
                             }
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
+                            .accessibilityLabel("Reset to current year")
+                            .accessibilityHint("Returns to this year's card")
                         }
                     }
                 )
@@ -155,24 +157,18 @@ struct YearlySpreadView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: AppConstants.Spacing.titleSpacing) {
-            // "THE PRESENT | THIS YEAR'S CARD" as main title
-            Text("THE PRESENT YEAR")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.large))
-                .fontWeight(.heavy)
-                .foregroundColor(.black)
+        VStack(spacing: AppConstants.Spacing.tight) {
+            SectionHeader(
+                "THIS YEAR'S CARD",
+                fontSize: AppConstants.FontSizes.large
+            )
+
+            Text("your birthday offers a new card each year")
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
-                .lineLimit(1)
-            
-            // "each birthday begins with a fresh start and a new card" as subtitle
-            Text("each birthday offers a fresh start & a new card")
-                .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
-                .fontWeight(.bold)
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.6)
         }
-        .padding(.top, AppConstants.Spacing.small)
+        .padding(.top, AppConstants.Spacing.tight)
     }
     
     private var mainCardSection: some View {
@@ -186,16 +182,16 @@ struct YearlySpreadView: View {
     }
     
     private var yearlyCardsSection: some View {
-        HStack(spacing: AppConstants.Spacing.cardSpacing) {
+        HStack(spacing: AppConstants.Spacing.page) {
             // Last Cycle Card with Date
-            VStack(spacing: AppConstants.Spacing.small) {
+            VStack(spacing: AppConstants.Spacing.tight) {
                 Text("Last Year's Card")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
                     .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.8)
-                
+
                 TappableCard(
                     card: viewModel.lastYearCard,
                     size: AppConstants.CardSizes.medium,
@@ -204,16 +200,16 @@ struct YearlySpreadView: View {
                     }
                 )
             }
-            
+
             // Next Cycle Card with Date
-            VStack(spacing: AppConstants.Spacing.small) {
+            VStack(spacing: AppConstants.Spacing.tight) {
                 Text("Next Year's Card")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
                     .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.8)
-                              
+
                 TappableCard(
                     card: viewModel.nextYearCard,
                     size: AppConstants.CardSizes.medium,

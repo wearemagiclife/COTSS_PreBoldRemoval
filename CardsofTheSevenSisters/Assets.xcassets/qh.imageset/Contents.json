@@ -1,23 +1,74 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "qh@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "qh@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "qh@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "qhdark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "qh@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "qh@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "qhdark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "qh@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "qhdark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

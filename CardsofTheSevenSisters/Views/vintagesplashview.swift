@@ -3,9 +3,12 @@ import SwiftUI
 struct VintageSplashView: View {
     let onStart: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showCards = false
     @State private var showButton = false
     @State private var isTransitioning = false
+    @State private var showCardSheen = false
+    @State private var buttonSheenPosition: CGFloat = -2.0
     @State private var cardScales: [CGFloat] = Array(repeating: 0.0, count: 7)
     @State private var cardOffsets: [CGSize] = Array(repeating: .zero, count: 7)
     @State private var cardRotations: [Double] = Array(repeating: 0, count: 7)
@@ -27,12 +30,12 @@ struct VintageSplashView: View {
                         .padding(.bottom, 21)
 
                     cardAnimationArea(for: geometry.size)
-                    
+
                     Spacer()
-                    
+
                     startButton
-                        .padding(.bottom, geometry.size.height * 0.1) // 10% from bottom
-                    
+                        .padding(.bottom, geometry.size.height * 0.1)
+
                     Spacer(minLength: 20)
                 }
                 .padding(.horizontal, 20)
@@ -85,10 +88,14 @@ struct VintageSplashView: View {
         let ellipseWidth = isIPad ? min(size.width * 0.45, 400) : min(size.width * 0.75, 320)
         let ellipseHeight = ellipseWidth * 0.75 // Maintain aspect ratio
         let scaleFactor = min(size.width / 390, 1.3) // Cap at 1.3 for iPad
-        
+
         return ZStack {
             Ellipse()
-                .fill(AppTheme.darkAccent)
+                .fill(Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor(red: 0.49, green: 0.396, blue: 0.267, alpha: 0.70)  // #7D6544 dusky gold at 70% opacity in dark mode
+                        : UIColor.black  // black in light mode (original)
+                }))
                 .frame(width: ellipseWidth, height: ellipseHeight)
                 .scaleEffect(showCards ? 1.0 : 0.3)
                 .animation(.easeOut(duration: 0.8).delay(0.5), value: showCards)
@@ -100,7 +107,9 @@ struct VintageSplashView: View {
                     VintageCardImageView(
                         imageName: cardImageNames[index],
                         isCenter: false,
-                        scaleFactor: scaleFactor
+                        scaleFactor: scaleFactor,
+                        showSheen: showCardSheen,
+                        sheenDelay: Double(index) * 0.15
                     )
                     .scaleEffect(cardScales[index])
                     .offset(cardOffsets[index])
@@ -119,11 +128,13 @@ struct VintageSplashView: View {
                     .accessibilityHidden(true)
                 }
             }
-            
+
             VintageCardImageView(
                 imageName: cardImageNames[3],
                 isCenter: true,
-                scaleFactor: scaleFactor
+                scaleFactor: scaleFactor,
+                showSheen: showCardSheen,
+                sheenDelay: 0.3
             )
             .scaleEffect(cardScales[3])
             .offset(cardOffsets[3])
@@ -145,11 +156,31 @@ struct VintageSplashView: View {
         }) {
             Text("Let's Begin")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
+                .fontWeight(.regular)
                 .tracking(0.5)
-                .foregroundColor(.white)
+                .foregroundColor(Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor(red: 0.855, green: 0.745, blue: 0.565, alpha: 1.0)  // #DABE90 matches app title gold
+                        : UIColor.white  // White text on black button in light mode
+                }))
                 .padding(.horizontal, 50)
                 .padding(.vertical, AppConstants.Spacing.medium)
-                .background(AppTheme.darkAccent.opacity(0.7))
+                .background(Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor.black  // black background in dark mode
+                        : UIColor.black.withAlphaComponent(0.7)  // black in light mode
+                }))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.button)
+                        .stroke(Color(UIColor { traitCollection in
+                            traitCollection.userInterfaceStyle == .dark
+                                ? UIColor(red: 0.855, green: 0.745, blue: 0.565, alpha: 1.0)  // #DABE90 matches app title gold
+                                : UIColor.clear  // no border in light mode
+                        }), lineWidth: 1)
+                )
+                .overlay(
+                    buttonSheenOverlay
+                )
                 .cornerRadius(AppConstants.CornerRadius.button)
                 .multilineTextAlignment(.center)
         }
@@ -158,18 +189,53 @@ struct VintageSplashView: View {
         .opacity(showButton && !isTransitioning ? 1 : 0)
         .animation(.easeInOut(duration: 1.0).delay(2.5), value: showButton)
         .animation(.easeOut(duration: 0.3), value: isTransitioning)
+        .accessibilityLabel("Let's Begin")
+        .accessibilityHint("Start using the app")
+        .accessibilityAddTraits(.isButton)
+    }
+
+    @ViewBuilder
+    private var buttonSheenOverlay: some View {
+        if colorScheme == .dark {
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .clear, location: 0.0),
+                                .init(color: .clear, location: 0.35),
+                                .init(color: .white.opacity(0.25), location: 0.48),
+                                .init(color: .white.opacity(0.4), location: 0.5),
+                                .init(color: .white.opacity(0.25), location: 0.52),
+                                .init(color: .clear, location: 0.65),
+                                .init(color: .clear, location: 1.0)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: geometry.size.width * 2.5, height: geometry.size.height * 3)
+                    .rotationEffect(.degrees(25))
+                    .offset(x: buttonSheenPosition * geometry.size.width * 1.5)
+            }
+            .clipped()
+            .allowsHitTesting(false)
+        }
     }
     
     private func startAnimation(for size: CGSize) {
         let scaleFactor = min(size.width / 390, 1.3) // Cap at 1.3 for iPad
-        
-        cardScales[3] = 1.0
-        cardOffsets[3] = .zero
-        cardRotations[3] = 0
-        
+
+        // Center card animates in first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            cardScales[3] = 1.0
+            cardOffsets[3] = .zero
+            cardRotations[3] = 0
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             showCards = true
-            
+
             // Responsive card positions based on screen width
             let positions: [CGSize] = [
                 CGSize(width: -120 * scaleFactor, height: -30 * scaleFactor),
@@ -180,9 +246,9 @@ struct VintageSplashView: View {
                 CGSize(width: 80 * scaleFactor, height: 40 * scaleFactor),
                 CGSize(width: 120 * scaleFactor, height: -30 * scaleFactor)
             ]
-            
+
             let rotations: [Double] = [-25, -15, -10, 0, 10, 15, 25]
-            
+
             for index in 0..<cardNames.count {
                 if index != 3 {
                     cardScales[index] = 1.0
@@ -191,9 +257,23 @@ struct VintageSplashView: View {
                 }
             }
         }
-        
+
+        // Button appears after cards settle
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             showButton = true
+        }
+
+        // Trigger card sheen after button fully visible (dark mode only)
+        // Button: showButton at 1.2s + 2.5s delay + 1.0s fade = 4.7s
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            showCardSheen = true
+        }
+
+        // Trigger button sheen after card sheen completes (dark mode only)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6.5) {
+            withAnimation(.easeInOut(duration: 3.5)) {
+                buttonSheenPosition = 1.0
+            }
         }
     }
     
@@ -207,6 +287,11 @@ struct VintageCardImageView: View {
     let imageName: String
     let isCenter: Bool
     let scaleFactor: CGFloat
+    var showSheen: Bool = false
+    var sheenDelay: Double = 0
+
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var sheenPosition: CGFloat = -1.0
 
     private var cappedScale: CGFloat {
         min(scaleFactor, 1.3)
@@ -221,37 +306,90 @@ struct VintageCardImageView: View {
         let baseHeight: CGFloat = isCenter ? 170 : 128
         return baseHeight * cappedScale
     }
-    
+
     var body: some View {
         Group {
             if let image = ImageManager.shared.loadCardImage(named: imageName) {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: cardWidth, height: cardHeight)
-                    .scaleEffect(1.05)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
-                    .cardShadow()
-                    .accessibilityHidden(true)
+                if colorScheme == .dark {
+                    // Dark mode style with sheen
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .scaleEffect(1.00)
+                        .frame(width: cardWidth, height: cardHeight)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
+                        .overlay(
+                            cardSheenOverlay
+                        )
+                        .scaleEffect(0.95)
+                        .cardShadow()
+                        .accessibilityHidden(true)
+                } else {
+                    // Light mode style (from Documents version)
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: cardWidth, height: cardHeight)
+                        .scaleEffect(1.08)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
+                        .cardShadow()
+                        .accessibilityHidden(true)
+                }
             } else {
                 ZStack {
                     RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small)
                         .fill(Color.white)
                         .frame(width: cardWidth, height: cardHeight)
                         .cardShadow()
-                    
+
                     VStack {
                         Text(AppConstants.Strings.missingImage)
                             .font(.system(size: AppConstants.FontSizes.caption * scaleFactor))
                             .foregroundColor(.red)
                         Text(imageName)
                             .font(.system(size: AppConstants.FontSizes.caption * scaleFactor, weight: .heavy))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
             }
         }
+        .onChange(of: showSheen) { _, newValue in
+            if newValue && colorScheme == .dark {
+                DispatchQueue.main.asyncAfter(deadline: .now() + sheenDelay) {
+                    withAnimation(.easeInOut(duration: 1.5)) {
+                        sheenPosition = 1.0
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var cardSheenOverlay: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: .clear, location: 0.0),
+                            .init(color: .clear, location: 0.42),
+                            .init(color: .white.opacity(0.2), location: 0.48),
+                            .init(color: .white.opacity(0.35), location: 0.5),
+                            .init(color: .white.opacity(0.2), location: 0.52),
+                            .init(color: .clear, location: 0.58),
+                            .init(color: .clear, location: 1.0)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: geometry.size.width * 3)
+                .rotationEffect(.degrees(25))
+                .offset(x: sheenPosition * geometry.size.width * 2)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
+        .allowsHitTesting(false)
     }
 }
 #Preview {

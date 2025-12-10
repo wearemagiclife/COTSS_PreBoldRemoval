@@ -164,23 +164,23 @@ struct DailyCardView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 0.86, green: 0.77, blue: 0.57)
+            AppTheme.backgroundColor
                 .ignoresSafeArea(.all)
             
             ScrollView {
-                VStack(spacing: AppConstants.Spacing.sectionSpacing) {
-                    
+                VStack(spacing: AppConstants.Spacing.ornament) {
+
                     mainTitleSection
                     todayCardSection
-                    
+
                     LineBreak()
-                    
+
                     lastCycleCardsSection
-                    
+
                     LineBreak("linedesignd")
                 }
-                .padding(.horizontal, AppConstants.Spacing.medium)
-                .padding(.vertical, AppConstants.Spacing.large)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
+                .padding(.vertical, AppConstants.Spacing.section)
             }
             
             if showCardDetail, let card = selectedCard {
@@ -207,7 +207,7 @@ struct DailyCardView: View {
             },
             trailingContent: {
                 AnyView(
-                    HStack(spacing: 12) {
+                    HStack(spacing: AppConstants.Spacing.tight) {
                         let details = shareDetails
                         
                         DailyCardShareLink(
@@ -226,7 +226,7 @@ struct DailyCardView: View {
                                 DataManager.shared.explorationDate = nil
                             }
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                             .accessibilityLabel("Reset to today")
                             .accessibilityHint("Returns to today's daily card")
                         }
@@ -244,26 +244,25 @@ struct DailyCardView: View {
     }
     
     private var mainTitleSection: some View {
-        VStack(spacing: AppConstants.Spacing.titleSpacing) {
+        VStack(spacing: AppConstants.Spacing.tight) {
             SectionHeader(
                 viewModel.formatCardName(viewModel.todayCard.card.name).uppercased(),
                 fontSize: AppConstants.FontSizes.large
             )
-            
+
             Text("as your \(viewModel.todayCard.planet) day")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                .foregroundColor(.black)
-                
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
         }
-        .padding(.top, AppConstants.Spacing.small)
+        .padding(.top, AppConstants.Spacing.tight)
     }
     
     private var todayCardSection: some View {
         HStack(spacing: AppConstants.Spacing.cardSpacing) {
             TappableCard(
                 card: viewModel.todayCard.card,
-                size: AppConstants.CardSizes.large,
+                size: AppConstants.CardSizes.largePaired,
                 action: {
                     showCardDetail(
                         card: viewModel.todayCard.card,
@@ -272,10 +271,10 @@ struct DailyCardView: View {
                     )
                 }
             )
-            
+
             TappablePlanetCard(
                 planet: viewModel.todayCard.planet,
-                size: AppConstants.CardSizes.large,
+                size: AppConstants.CardSizes.largePaired,
                 action: {
                     showCardDetail(
                         card: viewModel.todayCard.card,

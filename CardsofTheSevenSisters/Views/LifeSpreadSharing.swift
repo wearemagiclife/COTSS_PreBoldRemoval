@@ -49,7 +49,7 @@ struct LifeSpreadShareCardView: View {
                 ZStack {
                     // Border box
                     Rectangle()
-                        .stroke(Color.black, lineWidth: 3)
+                        .stroke(AppTheme.darkAccent, lineWidth: 3)
 
                     VStack(spacing: AppConstants.Spacing.sectionSpacing) {
 
@@ -58,10 +58,6 @@ struct LifeSpreadShareCardView: View {
                             Text("\(userName.isEmpty ? "you" : userName)'s Life Spread")
                                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.dynamicTitle))
                                 .bold()
-                                .multilineTextAlignment(.center)
-
-                            Text(formattedDate)
-                                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                                 .multilineTextAlignment(.center)
                         }
 
@@ -162,7 +158,7 @@ struct BirthCardShareCardView: View {
 
                 ZStack {
                     Rectangle()
-                        .stroke(Color.black, lineWidth: 3)
+                        .stroke(AppTheme.darkAccent, lineWidth: 3)
 
                     VStack(spacing: AppConstants.Spacing.sectionSpacing) {
                         VStack(spacing: AppConstants.Spacing.small) {
@@ -203,7 +199,7 @@ struct BirthCardShareCardView: View {
                         LineBreak("linedesignd", width: 180)
 
                         VStack(spacing: 4) {
-                            Text("Our App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
+                            Text("The Cards of The Seven Sisters App helps to translate the archetypes of each cycle to help you identify rhythms for personal growth and rest across areas of your life. No divination, no prediction.")
                                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
 
                             Text("find yours at sevensisters.cards")
@@ -256,7 +252,13 @@ struct LifeSpreadShareButton: View {
                     .scaleEffect(0.8)
                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
             } else {
-                if let shareIcon = UIImage(named: "share_icon") {
+                if UIScreen.main.bounds.height < 700 {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
+                } else if let shareIcon = UIImage(named: "share_icon") {
                     Image(uiImage: shareIcon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -267,6 +269,7 @@ struct LifeSpreadShareButton: View {
                 }
             }
         }
+        .buttonStyle(.plain)
         .disabled(isLoading)
         .sheet(isPresented: $isShowingShare) {
             if !shareItems.isEmpty {
@@ -309,7 +312,7 @@ struct LifeSpreadShareButton: View {
                 }
 
                 let tempDir = FileManager.default.temporaryDirectory
-                let fileName = "My Life Spread by Cards of The Seven Sisters.jpg"
+                let fileName = "MyLifeSpreadxSevenSisters.jpg"
                 let fileURL = tempDir.appendingPathComponent(fileName)
 
                 try imageData.write(to: fileURL)
@@ -318,7 +321,7 @@ struct LifeSpreadShareButton: View {
                     let activityItemSource = ShareCardActivityItemSource(
                         image: imageWithoutAlpha,
                         fileURL: fileURL,
-                        subject: "My Life Spread by Cards of The Seven Sisters"
+                        subject: "MyLifeSpreadxSevenSisters"
                     )
 
                     self.shareItems = [activityItemSource]
@@ -368,7 +371,13 @@ struct BirthCardShareButton: View {
                     .scaleEffect(0.8)
                     .progressViewStyle(CircularProgressViewStyle(tint: .black))
             } else {
-                if let shareIcon = UIImage(named: "share_icon") {
+                if UIScreen.main.bounds.height < 700 {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: 28, height: 28)
+                        .contentShape(Rectangle())
+                } else if let shareIcon = UIImage(named: "share_icon") {
                     Image(uiImage: shareIcon)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -379,6 +388,7 @@ struct BirthCardShareButton: View {
                 }
             }
         }
+        .buttonStyle(.plain)
         .disabled(isLoading)
         .sheet(isPresented: $isShowingShare) {
             if !shareItems.isEmpty {

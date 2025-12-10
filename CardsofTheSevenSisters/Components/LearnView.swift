@@ -1,9 +1,11 @@
 import SwiftUI
 
 struct LearnView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var showTutorial = false
 
-    private let cardBackground = Color(red: 0.95, green: 0.91, blue: 0.82)
+    // Match SettingsMenuView button color
+    private let cardBackground = AppConstants.Colors.capsuleButton
 
     var body: some View {
         ZStack {
@@ -11,16 +13,16 @@ struct LearnView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: AppConstants.Spacing.ornament) {
                     Text("Get to know The Cards")
                         .font(.custom("Iowan Old Style", size: 28))
                         .foregroundColor(AppTheme.primaryText)
-                        .padding(.bottom, 8)
+                        .padding(.bottom, AppConstants.Spacing.tight)
 
                     Text("Our app starts with your Birth Card, then explore the cards that influence your Yearly Cycle, 52-Day Cycles, and your Daily Card—a clear rhythm you can actually work with.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(AppTheme.secondaryText)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, AppConstants.Spacing.tight)
 
                     // Restart tutorial button
                     Button(action: {
@@ -106,15 +108,32 @@ struct LearnView: View {
                         cardBackground: cardBackground
                     )
 
-                    Spacer(minLength: 20)
+                    Spacer(minLength: AppConstants.Spacing.cardPadding)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 32)
+                .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                .padding(.top, AppConstants.Spacing.pageInset)
+                .padding(.bottom, AppConstants.Spacing.section)
             }
         }
         .navigationTitle("Learn")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: AppConstants.ButtonSizes.backButton, height: AppConstants.ButtonSizes.backButton)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Returns to settings")
+            }
+        }
+        .toolbarBackground(Color.appLaunchBackground, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
 }
 
@@ -134,7 +153,7 @@ private struct LearnSectionCard: View {
                 .font(.custom("Iowan Old Style", size: 14))
                 .foregroundColor(AppTheme.secondaryText)
         }
-        .padding(14)
+        .padding(AppConstants.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)

@@ -55,12 +55,12 @@ struct FiftyTwoDayCycleView: View {
         return DataManager.shared.getCurrentPlanetaryPhase(for: DataManager.shared.userProfile.birthDate)
     }
 
-    // Formats a date as MM-dd (e.g., 03-07)
+    // Formats a date using locale-appropriate format (e.g., 12/31 in US, 31/12 in UK, 31.12 in Germany)
     private func shortDateString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "MM.dd"
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMdd")
         return formatter.string(from: date)
     }
 
@@ -137,11 +137,11 @@ struct FiftyTwoDayCycleView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.86, green: 0.77, blue: 0.57)
+            AppTheme.backgroundColor
                 .ignoresSafeArea(.all)
 
             ScrollView {
-                VStack(spacing: AppConstants.Spacing.sectionSpacing) {
+                VStack(spacing: AppConstants.Spacing.ornament) {
                     headerSection
                     mainCardsSection
 
@@ -151,8 +151,8 @@ struct FiftyTwoDayCycleView: View {
 
                     LineBreak("linedesignd")
                 }
-                .padding(.horizontal, AppConstants.Spacing.medium)
-                .padding(.vertical, AppConstants.Spacing.large)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
+                .padding(.vertical, AppConstants.Spacing.section)
             }
 
             if showCardDetail, let card = selectedCard, let cardType = selectedCardType {
@@ -182,7 +182,7 @@ struct FiftyTwoDayCycleView: View {
             },
             trailingContent: {
                 AnyView(
-                    HStack(spacing: 12) {
+                    HStack(spacing: AppConstants.Spacing.tight) {
                         // 1. When a card detail modal is open
                         if showCardDetail, let card = selectedCard {
                             // Planetary detail share
@@ -300,7 +300,7 @@ struct FiftyTwoDayCycleView: View {
                                 DataManager.shared.explorationDate = nil
                             }
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                             .accessibilityLabel("Reset to current cycle")
                             .accessibilityHint("Returns to current 52-day cycle")
                         }
@@ -312,27 +312,27 @@ struct FiftyTwoDayCycleView: View {
     }
 
     private var headerSection: some View {
-        VStack(spacing: AppConstants.Spacing.titleSpacing) {
+        VStack(spacing: AppConstants.Spacing.tight) {
             SectionHeader(
                 "CURRENT PLANETARY CYCLE",
-                fontSize: AppConstants.FontSizes.large
+                fontSize: AppConstants.FontSizes.headline
             )
 
             if let currentDates = currentCycleDates {
                 Text(shortDateRangeString(start: currentDates.start, end: currentDates.end))
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
             }
         }
-        .padding(.top, AppConstants.Spacing.small)
+        .padding(.top, AppConstants.Spacing.tight)
     }
 
     private var mainCardsSection: some View {
-        HStack(spacing: AppConstants.Spacing.cardSpacing) {
+        HStack(spacing: AppConstants.Spacing.page) {
             TappableCard(
                 card: viewModel.currentPeriodCard,
-                size: AppConstants.CardSizes.large,
+                size: AppConstants.CardSizes.largePaired,
                 action: {
                     showCardDetail(
                         card: viewModel.currentPeriodCard,
@@ -344,7 +344,7 @@ struct FiftyTwoDayCycleView: View {
 
             TappablePlanetCard(
                 planet: currentPlanetaryPhase,
-                size: AppConstants.CardSizes.large,
+                size: AppConstants.CardSizes.largePaired,
                 action: {
                     showCardDetail(
                         card: viewModel.currentPeriodCard,
@@ -357,13 +357,13 @@ struct FiftyTwoDayCycleView: View {
     }
 
     private var periodCardsSection: some View {
-        HStack(spacing: AppConstants.Spacing.cardSpacing) {
+        HStack(spacing: AppConstants.Spacing.page) {
             // Last Cycle Card with Date
-            VStack(spacing: AppConstants.Spacing.small) {
+            VStack(spacing: AppConstants.Spacing.tight) {
                 Text("LAST CYCLE")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .truncationMode(.tail)
                     .background(GeometryReader { geo in
@@ -374,7 +374,7 @@ struct FiftyTwoDayCycleView: View {
                 if let previousDates = previousCycleDates {
                     Text(shortDateRangeString(start: previousDates.start, end: previousDates.end))
                         .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -400,7 +400,7 @@ struct FiftyTwoDayCycleView: View {
                 Text("\(viewModel.previousPlanetaryPhase.localizedUppercase)")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -411,13 +411,13 @@ struct FiftyTwoDayCycleView: View {
             }
             
             .frame(width: AppConstants.CardSizes.large.width)
-            
+
             // Next Cycle Card with Date
-            VStack(spacing: AppConstants.Spacing.small) {
+            VStack(spacing: AppConstants.Spacing.tight) {
                 Text("NEXT CYCLE")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .truncationMode(.tail)
@@ -429,7 +429,7 @@ struct FiftyTwoDayCycleView: View {
                 if let nextDates = nextCycleDates {
                     Text(shortDateRangeString(start: nextDates.start, end: nextDates.end))
                         .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -454,7 +454,7 @@ struct FiftyTwoDayCycleView: View {
                 Text("\(viewModel.nextPlanetaryPhase.localizedUppercase)")
                         .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                         .fontWeight(.heavy)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
                         .lineLimit(1)
                         .truncationMode(.tail)

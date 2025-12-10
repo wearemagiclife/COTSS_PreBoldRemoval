@@ -1,23 +1,74 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "pluto@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "pluto@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "pluto@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "plutodark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "pluto@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "pluto@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "plutodark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "pluto@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "plutodark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

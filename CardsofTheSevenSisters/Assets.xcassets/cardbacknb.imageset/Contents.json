@@ -1,23 +1,74 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "cardbacknb@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "cardbacknb@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "cardbacknb@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "cardbacknbdark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "cardbacknb@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "cardbacknb@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "cardbacknbdark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "cardbacknb@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "cardbacknbdark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

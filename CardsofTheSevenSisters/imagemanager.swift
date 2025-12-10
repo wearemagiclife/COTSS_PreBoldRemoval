@@ -150,7 +150,7 @@ class ImageManager: ObservableObject {
                                 Text(imageName)
                                     .font(.caption)
                                     
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                             }
                         )
                         .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)

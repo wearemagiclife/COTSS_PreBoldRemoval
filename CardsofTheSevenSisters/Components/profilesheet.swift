@@ -12,13 +12,38 @@ struct ProfileSheet: View {
     @State private var errorMessage = ""
     @State private var showDatePicker: Bool = true
     @State private var isSaving = false
-    
-    private let fieldBackgroundColor = Color(red: 0.95, green: 0.90, blue: 0.78)
-    
-    private var formattedDate: String {
+    @State private var dateText = ""
+    @FocusState private var isTextFieldFocused: Bool
+
+    private let fieldBackgroundColor = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.25, green: 0.22, blue: 0.18, alpha: 1.0)  // dark tan (matches AppTheme.cardBackground)
+            : UIColor(red: 0.97, green: 0.95, blue: 0.92, alpha: 1.0)  // soft off-white
+    })
+
+    private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: birthDate)
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMddyyyy")
+        return formatter
+    }
+
+    private var formattedDate: String {
+        return dateFormatter.string(from: birthDate)
+    }
+
+    private var localizedPlaceholder: String {
+        let pattern = dateFormatter.dateFormat ?? "MM/dd/yyyy"
+        return pattern
+            .replacingOccurrences(of: "MM", with: "MM")
+            .replacingOccurrences(of: "dd", with: "DD")
+            .replacingOccurrences(of: "yyyy", with: "YYYY")
+            .replacingOccurrences(of: "M", with: "M")
+            .replacingOccurrences(of: "d", with: "D")
+    }
+
+    private func parseDate(_ text: String) -> Date? {
+        return dateFormatter.date(from: text)
     }
     
     private func isValidBirthdate(_ date: Date) -> Bool {
@@ -50,11 +75,11 @@ struct ProfileSheet: View {
                         VStack(spacing: isSmallScreen ? 15 : 30) {
                         // Guest mode message
                         if dataManager.isGuestMode {
-                            VStack(spacing: 20) {
+                            VStack(spacing: AppConstants.Spacing.cardPadding) {
                                 Image(systemName: "person.crop.circle.badge.questionmark")
                                     .font(.system(size: 50))
                                     .foregroundColor(AppTheme.secondaryText)
-                                    .padding(.top, 40)
+                                    .padding(.top, AppConstants.Spacing.page)
 
                                 Text("Guest Account")
                                     .font(.custom("Iowan Old Style", size: 22))
@@ -64,12 +89,12 @@ struct ProfileSheet: View {
                                     .font(.custom("Iowan Old Style", size: 16))
                                     .foregroundColor(AppTheme.secondaryText)
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 30)
+                                    .padding(.horizontal, AppConstants.Spacing.section)
 
                                 Text("Birthday: \(formattedDate)")
                                     .font(.custom("Iowan Old Style", size: 16))
                                     .foregroundColor(AppTheme.primaryText)
-                                    .padding(.top, 10)
+                                    .padding(.top, AppConstants.Spacing.tight)
 
                                 SignInWithAppleButton(
                                     .signIn,
@@ -90,19 +115,22 @@ struct ProfileSheet: View {
                                 .frame(height: 44)
                                 .frame(width: 240)
                                 .cornerRadius(8)
-                                .padding(.top, 20)
+                                .overlay(
+                                    AnimatedGoldBorder(cornerRadius: 8)
+                                )
+                                .padding(.top, AppConstants.Spacing.cardPadding)
                             }
-                            .padding(.bottom, 40)
+                            .padding(.bottom, AppConstants.Spacing.page)
                         }
 
                         // Apple ID Info Section (if signed in)
                         if !dataManager.isGuestMode && authManager.isSignedIn && (authManager.email != nil || authManager.displayName != "User") {
-                            VStack(alignment: .leading, spacing: 15) {
+                            VStack(alignment: .leading, spacing: AppConstants.Spacing.ornament) {
                                 Text("Apple ID")
                                     .font(.custom("Iowan Old Style", size: 22))
                                     .foregroundColor(AppTheme.primaryText)
-                                
-                                VStack(alignment: .leading, spacing: 10) {
+
+                                VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
                                     if authManager.displayName != "User" {
                                         HStack {
                                             Image(systemName: "person.fill")
@@ -140,15 +168,15 @@ struct ProfileSheet: View {
                                 )
                             }
                             .padding(.horizontal)
-                            .padding(.top, 20)
+                            .padding(.top, AppConstants.Spacing.cardPadding)
                         }
-                        
+
                         if !dataManager.isGuestMode {
-                            VStack(alignment: .center, spacing: 10) {
+                            VStack(alignment: .center, spacing: AppConstants.Spacing.tight) {
                                 Text("Profile Name")
                                     .font(.custom("Iowan Old Style", size: 22))
                                     .foregroundColor(AppTheme.primaryText)
-                                    .padding(.top, authManager.isSignedIn ? 0 : 20)
+                                    .padding(.top, authManager.isSignedIn ? AppConstants.Spacing.section : AppConstants.Spacing.page)
 
                                 TextField("Enter your name", text: $name)
                                     .font(.custom("Iowan Old Style", size: 20))
@@ -167,14 +195,17 @@ struct ProfileSheet: View {
                         }
 
                         if !dataManager.isGuestMode {
-                            VStack(spacing: 15) {
+                            VStack(spacing: AppConstants.Spacing.ornament) {
                                 Text("Birth Date")
                                     .font(.custom("Iowan Old Style", size: 22))
                                     .foregroundColor(AppTheme.primaryText)
 
-                                Text(formattedDate)
+                                TextField(localizedPlaceholder, text: $dateText)
                                     .font(.custom("Iowan Old Style", size: 20))
                                     .foregroundColor(AppTheme.primaryText)
+                                    .multilineTextAlignment(.center)
+                                    .keyboardType(.numbersAndPunctuation)
+                                    .focused($isTextFieldFocused)
                                     .padding()
                                     .frame(maxWidth: .infinity)
                                     .background(
@@ -185,7 +216,12 @@ struct ProfileSheet: View {
                                         RoundedRectangle(cornerRadius: 10)
                                             .stroke(Color.black.opacity(0.1), lineWidth: 1)
                                     )
-                                    .padding(.horizontal, 50)
+                                    .padding(.horizontal, AppConstants.Spacing.page)
+                                    .onChange(of: dateText) { _, newValue in
+                                        if let date = parseDate(newValue) {
+                                            birthDate = date
+                                        }
+                                    }
 
                                 DatePicker("", selection: $birthDate, displayedComponents: .date)
                                     .datePickerStyle(WheelDatePickerStyle())
@@ -197,6 +233,11 @@ struct ProfileSheet: View {
                                     .padding(.horizontal)
                                     .accessibilityLabel("Birth Date")
                                     .accessibilityHint("Select your birth date")
+                                    .onChange(of: birthDate) { _, _ in
+                                        if !isTextFieldFocused {
+                                            dateText = formattedDate
+                                        }
+                                    }
                             }
 
                             Button {
@@ -206,17 +247,26 @@ struct ProfileSheet: View {
                                     if isSaving {
                                         ProgressView()
                                             .scaleEffect(0.8)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(UIColor { traitCollection in
+                                                traitCollection.userInterfaceStyle == .dark
+                                                    ? UIColor.black
+                                                    : UIColor.white
+                                            }))
                                     }
                                     Text(isSaving ? "Saving..." : "Save Changes")
                                         .font(.custom("Iowan Old Style", size: 19))
                                         .tracking(0.5)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(UIColor { traitCollection in
+                                            traitCollection.userInterfaceStyle == .dark
+                                                ? UIColor.black
+                                                : UIColor.white
+                                        }))
                                 }
                                 .padding(.horizontal, 50)
                                 .padding(.vertical, 18)
-                                .background(AppTheme.darkAccent.opacity(0.7))
+                                .background(AppTheme.darkAccent)
                                 .cornerRadius(30)
+                                .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
                                 .multilineTextAlignment(.center)
                             }
                             .disabled(isSaving)
@@ -233,6 +283,7 @@ struct ProfileSheet: View {
             .onAppear {
                 name = dataManager.userProfile.name
                 birthDate = dataManager.userProfile.birthDate
+                dateText = formattedDate
             }
             .alert("Invalid Birth Date", isPresented: $showingError) {
                 Button("OK") { }

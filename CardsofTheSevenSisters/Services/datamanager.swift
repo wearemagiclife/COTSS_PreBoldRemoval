@@ -25,7 +25,8 @@ class DataManager: ObservableObject {
 
     private static let dateFormatter_MMMd: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "MMM d"
+        f.locale = Locale.current
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return f
     }()
 

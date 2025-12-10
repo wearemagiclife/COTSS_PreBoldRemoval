@@ -86,7 +86,7 @@ struct AppConstants {
         private static let detailHeightCollapsedBase: CGFloat = 150
 
         // Maximum sizes to prevent overlap with text (safety constraints)
-        private static let maxDailyCardHeight: CGFloat = 520 // Prevents overlap with "Tap To Reveal"
+        private static let maxDailyCardHeight: CGFloat = 520 // Prevents overlap with "Tap Card to Reveal"
 
         // Scaled sizes for current screen
         static var extraLarge: CGSize {
@@ -107,6 +107,17 @@ struct AppConstants {
 
         static var large: CGSize {
             CGSize(width: largeWidth, height: largeWidth * aspect)
+        }
+
+        // Large paired cards (for daily view side-by-side layout) - 5% smaller than large
+        private static let largePairedWidthBase: CGFloat = 148  // 156 * 0.95
+
+        static var largePairedWidth: CGFloat {
+            Scaling.w(largePairedWidthBase)
+        }
+
+        static var largePaired: CGSize {
+            CGSize(width: largePairedWidth, height: largePairedWidth * aspect)
         }
 
         static var mediumWidth: CGFloat {
@@ -186,7 +197,28 @@ struct AppConstants {
     }
     
     struct Spacing {
-        // Design reference spacing (for iPhone 16)
+        // ==============================================
+        // TYPOGRAPHIC SPACING SCALE (12 / 18 / 28 / 40)
+        // Creates consistent vertical rhythm for book-like layouts
+        // ==============================================
+        private static let tightBase: CGFloat = 12      // title → subtitle, label → field
+        private static let ornamentBase: CGFloat = 18   // around dividers, medium gaps
+        private static let sectionBase: CGFloat = 28    // between major content blocks
+        private static let pageBase: CGFloat = 40       // large gaps, page-level separation
+        private static let pageInsetBase: CGFloat = 24  // outer page margins
+        private static let cardPaddingBase: CGFloat = 20 // inner card/modal padding
+
+        // New typographic scale
+        static var tight: CGFloat { Scaling.spacing(tightBase) }
+        static var ornament: CGFloat { Scaling.spacing(ornamentBase) }
+        static var section: CGFloat { Scaling.spacing(sectionBase) }
+        static var page: CGFloat { Scaling.spacing(pageBase) }
+        static var pageInset: CGFloat { Scaling.spacing(pageInsetBase) }
+        static var cardPadding: CGFloat { Scaling.spacing(cardPaddingBase) }
+
+        // ==============================================
+        // LEGACY VALUES (for backward compatibility)
+        // ==============================================
         private static let tinyBase: CGFloat = 4
         private static let smallBase: CGFloat = 8
         private static let mediumBase: CGFloat = 16
@@ -196,7 +228,6 @@ struct AppConstants {
         private static let sectionSpacingBase: CGFloat = 20
         private static let titleSpacingBase: CGFloat = 8
 
-        // Scaled spacing for current screen
         static var tiny: CGFloat { Scaling.spacing(tinyBase) }
         static var small: CGFloat { Scaling.spacing(smallBase) }
         static var medium: CGFloat { Scaling.spacing(mediumBase) }
@@ -214,6 +245,22 @@ struct AppConstants {
         static let modal: CGFloat = 25
         static let button: CGFloat = 25
         static let small: CGFloat = 10
+    }
+
+    struct Colors {
+        /// Standard capsule button background color (adaptive tan/beige)
+        static let capsuleButton = Color(UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark
+                ? UIColor(red: 0.35, green: 0.30, blue: 0.24, alpha: 1.0)  // dark tan
+                : UIColor(red: 0.90, green: 0.83, blue: 0.67, alpha: 1.0)  // tan
+        })
+    }
+
+    struct ButtonSizes {
+        /// Close button size (X buttons)
+        static let closeButton: CGFloat = 44
+        /// Back button size (chevron buttons)
+        static let backButton: CGFloat = 44
     }
     
     struct FontSizes {
@@ -258,23 +305,56 @@ struct AppConstants {
             dynamicSize(for: .body)
         }
     }
-    
+
+    // MARK: - Typography (Line Spacing & Paragraph Rhythm)
+
+    struct Typography {
+        /// Standard line spacing for body text (~1.35 line height ratio)
+        static let bodyLineSpacing: CGFloat = 5
+
+        /// Increased line spacing for iPad/larger displays
+        static let bodyLineSpacingLarge: CGFloat = 7
+
+        /// Paragraph spacing between text blocks
+        static let paragraphSpacing: CGFloat = 12
+
+        /// Returns appropriate line spacing based on device
+        static var adaptiveLineSpacing: CGFloat {
+            UIDevice.current.userInterfaceIdiom == .pad ? bodyLineSpacingLarge : bodyLineSpacing
+        }
+    }
+
     struct Shadow {
         static let cardOpacity: Double = 0.15
         static let cardRadius: CGFloat = 3
         static let cardOffset = CGSize(width: 0, height: 2)
-        
+
         static let detailOpacity: Double = 0.3
         static let detailRadius: CGFloat = 10
         static let detailOffset = CGSize(width: 0, height: 5)
-        
+
         static let overlayOpacity: Double = 0.5
+    }
+
+    // MARK: - Dark Mode Effects
+
+    /// Constants for dark mode visual effects on cards
+    struct DarkModeEffects {
+        // Gold glow shadow settings - subtle emanation from behind card
+        static let glowOpacitySmall: Double = 0.45
+        static let glowOpacityLarge: Double = 0.5
+        static let glowRadiusSmall: CGFloat = 8
+        static let glowRadiusLarge: CGFloat = 12
+
+        // Gloss effect settings
+        static let glossIntensity: Double = 0.4
+        static let maxRotationDegrees: Double = 3.0
     }
     
     struct Strings {
         static let close = "Close"
         static let reset = "Reset"
-        static let tapToReveal = "Tap To Reveal"
+        static let tapToReveal = "Tap Card to Reveal"
         static let welcome = "Welcome"
         static let yourDailyCard = "TODAY'S CYCLE"
         static let karmaConnections = "Life Connections"
@@ -309,7 +389,7 @@ struct AppConstants {
         
         struct Hints {
             static let doubleTapToView = "Double tap to view details"
-            static let doubleTapToReveal = "Double tap to reveal"
+            static let doubleTapToReveal = "Double Tap Card to Reveal"
             static let doubleTapToShare = "Double tap to share"
             static let doubleTapToClose = "Double tap to close"
             static let doubleTapToOpen = "Double tap to open"
@@ -335,19 +415,19 @@ struct AppConstants {
         static func getDescription(for planet: String) -> (title: String, description: String) {
             switch planet.lowercased() {
             case "mercury":
-                return ("Exploration & Curiosity", "Mercury is the quicksilver of the cosmos—restless, bright, and endlessly adaptable. It sparks beginnings of thought, words, and action, rippling outward into connections, choices, and fresh momentum.\n\nMercury is the force of change and renewal, moving swiftly through both mind and matter.")
+                return ("Exploration & Curiosity", "Mercury is the quicksilver of the cosmos: restless, bright, and endlessly adaptable. As it’s associated with the mind and the early years of life, you may notice this period is full of beginnings and fresh ideas. Ideas can be found all around you and new thoughts waiting at the edge of your consciousness, so keep your ear to the ground. Closest to the Sun, this is always the first planetary period of a new cycle and represents the mind. Treat it like a calibration window. Is your mind at peace?")
             case "venus":
-                return ("Personal Magnetism", "Venus's influence is magnetic, drawing attention to where balance, care, and intentionality can transform both inner and outer worlds.\n\nIt invites us to align our choices with what we truly value, to recognize the worth in ourselves and others, and to allow beauty and harmony to guide how we create, relate, and live.")
+                return ("Personal Magnetism", "Venus is the principle of attraction: what you value, you magnetize. This period invites you to examine alignment between your inner worth and outer choices. Where are you calling in what matters? To take advantage of this cycle: polish the barrier between you and the world, simplify what steals your calm, and make room to receive. Ask: Where would a small act of beauty or clearer boundary change the shape of this year? Who deserves genuine appreciation from you now, and are you allowing yourself to be valued in return?")
             case "mars":
-                return ("Initiate with Passion", "Mars is the principle of drive, courage, and decisive action. It sharpens ambition, fuels competitive spirit, and directs energy toward movement and achievement.\n\nIts influence tests our willingness to take risks, face conflict, and apply determination in pursuit of progress.\n\nIf you're looking for a sign to begin something new, Mars reminds us that momentum is built by acting with clarity and purpose.")
+                return ("Initiate with Passion", "Mars is the planet of bold ignition: stamina, courage, and concentrated will. First, you might feel it in the body—the itch to move, make, or master. Then it strikes the mind, flooding it with sharp ideas. This period marks a stark shift from what came before. While Mars is physical, its influence now strengthens your mental and intuitive circuits. Activates quick thinking, imagination, and the kind of high-voltage clarity that makes strategies and schemes flow like lightning. It’s an excellent window for writing, invention, repairs, business planning, and mental artistry. Think: screenplays, startups, blueprints. This is also the realm of mechanical and technical skills, engineering, competitive sports, defense, and tactical leadership. Precision matters.")
             case "jupiter":
-                return ("Growth Pattern", "Jupiter is the principle of growth, expansion, and possibility. It magnifies opportunities that require vision and courage, encourages optimism, and invites you to step into a broader vision of what life can be.\n\nJupiter reminds us that progress often comes by saying yes to growth, learning, and the courage to aim higher.")
+                return ("Growth Pattern", "Jupiter is the principle of growth, expansion, and possibility. It magnifies opportunities that require vision and courage, encourages optimism, and invites you to step into a broader vision of what life can be. Jupiter reminds us that progress often comes by saying yes to growth, learning, and the courage to aim higher.")
             case "saturn":
-                return ("Structure & Mastery", "Saturn is the principle of accountability, discipline, and structure. It brings focus to responsibility, endurance, and the long-term work of building something lasting.\n\nIts influence can feel heavy at times, yet it clarifies where commitment and persistence yield real strength.\n\nSaturn reminds us that growth often comes through limits, challenges, and the steady practice of integrity.")
+                return ("Structure & Mastery", "Saturn is the principle of accountability, discipline, and structure. It brings focus to responsibility and endurance. It asks us to prioritize the long-term work of building something that lasts.\n\nIts influence can feel heavy at times, yet it clarifies where commitment and persistence yield real strength. Saturn reminds us that growth often comes through limits, challenges, and the steady practice of integrity.")
             case "uranus":
-                return ("Breakthroughs & Innovation", "Uranus is the principle of disruption, innovation, and awakening. It breaks patterns, challenges convention, and sparks sudden shifts that open new possibilities.\n\nIts influence can feel unexpected, but it clears space for originality, independence, and higher truth.\n\nUranus reminds us that breakthroughs often require shaking loose what no longer fits.")
+                return ("Breakthroughs & Innovation", "Uranus is the principle of disruption, innovation, and awakening. It is known to challenge convention, and sparks sudden shifts that open new possibilities.\n\nIts influence can feel unexpected, but it clears space for originality, independence, and higher truth. Uranus reminds us that breakthroughs often require shaking loose what no longer fits.")
             case "neptune":
-                return ("Integration & Transcendence", "Neptune is the principle of vision, intuition, and imagination. It dissolves boundaries, heightens sensitivity, and opens awareness to realms beyond the ordinary.\n\nIts influence can blur lines between clarity and illusion, but also provides access to inspiration, compassion, and deep inner truth.\n\nNeptune reminds us that meaning is often found by looking inward, trusting subtle signals, and creating from a place of openness.")
+                return ("Integration & Transcendence", "Neptune is the principle of vision, intuition, and imagination. It dissolves boundaries, heightens sensitivity, and opens awareness to realms beyond the ordinary. Its influence can blur lines between clarity and illusion, but also provides access to inspiration, compassion, and deep inner truth.Neptune reminds us that meaning is often found by looking inward, trusting subtle signals, and creating from a place of openness.")
             case "pluto":
                 return ("The Transformer", "Pluto represents transformation, power, and rebirth. This planet affects deep psychological changes and your ability to regenerate and evolve.")
             default:

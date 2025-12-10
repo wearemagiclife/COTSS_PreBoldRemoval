@@ -1,17 +1,45 @@
 import SwiftUI
 
 extension Color {
-    static let appLaunchBackground = Color(red: 0.86, green: 0.77, blue: 0.57)
+    static let appLaunchBackground = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)  // true black
+            : UIColor(red: 0.86, green: 0.77, blue: 0.57, alpha: 1.0)  // tan
+    })
 }
 
 struct AppTheme {
-    static let backgroundColor = Color(red: 0.86, green: 0.75, blue: 0.55)
-    static let cardBackground = Color(red: 0.95, green: 0.91, blue: 0.82)
-    static let darkAccent = Color.black
+    static let backgroundColor = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)  // true black
+            : UIColor(red: 0.86, green: 0.75, blue: 0.55, alpha: 1.0)  // tan
+    })
+    static let cardBackground = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.25, green: 0.22, blue: 0.18, alpha: 1.0)  // dark tan
+            : UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream
+    })
+    static let darkAccent = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream for dark mode
+            : UIColor.black
+    })
     static let shadowColor = Color.black.opacity(0.3)
-    static let primaryText = Color.black
-    static let secondaryText = Color.black.opacity(0.7)
-    static let accentColor = Color.black.opacity(0.8)
+    static let primaryText = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream for dark mode
+            : UIColor.black
+    })
+    static let secondaryText = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 0.7)  // cream 70%
+            : UIColor.black.withAlphaComponent(0.7)
+    })
+    static let accentColor = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 0.8)  // cream 80%
+            : UIColor.black.withAlphaComponent(0.8)
+    })
     static let goldAccent = Color(red: 0.83, green: 0.69, blue: 0.22)
     
     static let largeTitle = Font.custom("Iowan Old Style", size: 34)

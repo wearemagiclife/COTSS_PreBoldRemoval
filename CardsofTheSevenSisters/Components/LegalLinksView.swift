@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct LegalLinksView: View {
-    private let cardBackground = Color(red: 0.95, green: 0.91, blue: 0.82)
+    // Match SettingsMenuView button color
+    private let cardBackground = AppConstants.Colors.capsuleButton
 
     var body: some View {
         ZStack {
@@ -9,16 +10,16 @@ struct LegalLinksView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: AppConstants.Spacing.ornament) {
                     Text("We believe in your right to Data Autonomy.")
                         .font(.custom("Iowan Old Style", size: 28))
                         .foregroundColor(AppTheme.primaryText)
-                        .padding(.bottom, 8)
+                        .padding(.bottom, AppConstants.Spacing.tight)
 
                     Text("Out of respect, we designed this app to never receive any of your personally identifying information, or to profit from it. We receive anonymous logs for diagnostics. We tried to make these as human friendly as possible, and are available to answer any questions you may have at support@wearemagic.life.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(AppTheme.secondaryText)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, AppConstants.Spacing.tight)
 
                     LegalLinkCard(
                         title: "Privacy Policy",
@@ -55,11 +56,11 @@ struct LegalLinksView: View {
                         cardBackground: cardBackground
                     )
 
-                    Spacer(minLength: 20)
+                    Spacer(minLength: AppConstants.Spacing.cardPadding)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 32)
+                .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                .padding(.top, AppConstants.Spacing.pageInset)
+                .padding(.bottom, AppConstants.Spacing.section)
             }
         }
         .navigationTitle("Legal")
@@ -81,7 +82,7 @@ private struct LegalSectionCard: View {
                 .font(.custom("Iowan Old Style", size: 14))
                 .foregroundColor(AppTheme.secondaryText)
         }
-        .padding(14)
+        .padding(AppConstants.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)

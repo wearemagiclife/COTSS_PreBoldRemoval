@@ -1,23 +1,74 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "QUEEN OF CLUBS@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "QUEEN OF CLUBS@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "QUEEN OF CLUBS@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "QUEEN OF CLUBSdark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "QUEEN OF CLUBS@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "QUEEN OF CLUBS@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "QUEEN OF CLUBSdark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "light"
+        }
+      ],
+      "filename": "QUEEN OF CLUBS@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "QUEEN OF CLUBSdark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

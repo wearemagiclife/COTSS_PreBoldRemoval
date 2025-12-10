@@ -8,6 +8,8 @@ struct TappableCard: View {
     let cornerRadius: CGFloat
     let action: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+
     init(card: Card, size: CGSize, cornerRadius: CGFloat? = nil, action: @escaping () -> Void) {
         self.card = card
         self.size = size
@@ -17,26 +19,20 @@ struct TappableCard: View {
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        let pageColor = Color(red: 0.86, green: 0.77, blue: 0.57)
-        let insets = FixedInsets.forWidth(size.width)
         let accessibilityLabel = cardAccessibilityLabel
 
         if let image = ImageManager.shared.loadCardImage(for: card) {
-            ZStack {
-                shape.fill(pageColor)
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .padding(insets.edgeInsets)
-                    .frame(width: size.width, height: size.height)
-            }
-            .frame(width: size.width, height: size.height)
-            .mask(shape)
-            .contentShape(shape)
-            .cardShadow(isLarge: size.width >= AppConstants.CardSizes.medium.width)
-            .onTapGesture { action() }
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits([.isButton, .isImage])
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: size.width, height: size.height)
+                .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
+                .clipShape(shape)
+                .contentShape(shape)
+                .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+                .onTapGesture { action() }
+                .accessibilityLabel(accessibilityLabel)
+                .accessibilityAddTraits([.isButton, .isImage])
         } else {
             FallbackCardView(card: card, size: size, cornerRadius: cornerRadius)
                 .onTapGesture { action() }
@@ -61,6 +57,8 @@ struct TappablePlanetCard: View {
     let cornerRadius: CGFloat
     let action: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+
     init(planet: String, size: CGSize, cornerRadius: CGFloat? = nil, action: @escaping () -> Void) {
         self.planet = planet
         self.size = size
@@ -70,26 +68,20 @@ struct TappablePlanetCard: View {
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        let pageColor = Color(red: 0.86, green: 0.77, blue: 0.57)
-        let insets = FixedInsets.forWidth(size.width)
         let accessibilityLabel = "\(planet), tap for details"
 
         if let image = ImageManager.shared.loadPlanetImage(for: planet) {
-            ZStack {
-                shape.fill(pageColor)
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .padding(insets.edgeInsets)
-                    .frame(width: size.width, height: size.height)
-            }
-            .frame(width: size.width, height: size.height)
-            .mask(shape)
-            .contentShape(shape)
-            .cardShadow(isLarge: size.width >= AppConstants.CardSizes.medium.width)
-            .onTapGesture { action() }
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityAddTraits([.isButton, .isImage])
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: size.width, height: size.height)
+                .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
+                .clipShape(shape)
+                .contentShape(shape)
+                .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+                .onTapGesture { action() }
+                .accessibilityLabel(accessibilityLabel)
+                .accessibilityAddTraits([.isButton, .isImage])
         } else {
             FallbackPlanetView(planet: planet, size: size, cornerRadius: cornerRadius)
                 .onTapGesture { action() }
@@ -136,11 +128,11 @@ struct CardWithLabel: View {
     let action: () -> Void
 
     var body: some View {
-        VStack(spacing: AppConstants.Spacing.small) {
+        VStack(spacing: AppConstants.Spacing.tight) {
             Text(label)
                 .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
                 .fontWeight(.heavy)
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
                 .minimumScaleFactor(0.8)
 
@@ -160,9 +152,9 @@ struct FallbackCardView: View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
 
         shape
-            .fill(Color(red: 0.95, green: 0.88, blue: 0.72))
+            .fill(AppTheme.cardBackground)
             .overlay(
-                shape.strokeBorder(Color.black, lineWidth: 2)
+                shape.strokeBorder(AppTheme.darkAccent, lineWidth: 2)
             )
             .frame(width: size.width, height: size.height)
             .overlay(
@@ -175,16 +167,16 @@ struct FallbackCardView: View {
                 .padding(AppConstants.Spacing.small)
             )
             .contentShape(shape)
-            .cardShadow(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+            .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
     }
 
     @ViewBuilder
     private func suitIcon(for suit: CardSuit) -> some View {
         switch suit {
-        case .hearts:   Image(systemName: "heart").font(.title2).foregroundColor(.red).accessibilityHidden(true)
-        case .clubs:    Image(systemName: "suit.club").font(.title2).foregroundColor(.black).accessibilityHidden(true)
-        case .diamonds: Image(systemName: "diamond").font(.title2).foregroundColor(.red).accessibilityHidden(true)
-        case .spades:   Image(systemName: "suit.spade").font(.title2).foregroundColor(.black).accessibilityHidden(true)
+        case .hearts:   Image(systemName: "heart").font(.title2).foregroundColor(AppTheme.primaryText).accessibilityHidden(true)
+        case .clubs:    Image(systemName: "suit.club").font(.title2).foregroundColor(AppTheme.primaryText).accessibilityHidden(true)
+        case .diamonds: Image(systemName: "diamond").font(.title2).foregroundColor(AppTheme.primaryText).accessibilityHidden(true)
+        case .spades:   Image(systemName: "suit.spade").font(.title2).foregroundColor(AppTheme.primaryText).accessibilityHidden(true)
         case .joker:    Text("🃏").font(.title2).accessibilityHidden(true)
         }
     }
@@ -202,23 +194,23 @@ struct FallbackPlanetView: View {
 
         ZStack {
             shape
-                .fill(Color.white)
+                .fill(AppTheme.cardBackground)
                 .overlay(
-                    shape.strokeBorder(Color.black.opacity(0.0), lineWidth: 0)
+                    shape.strokeBorder(AppTheme.darkAccent.opacity(0.0), lineWidth: 0)
                 )
                 .frame(width: size.width, height: size.height)
                 .contentShape(shape)
-                .cardShadow()
+                .darkModeCardEffects()
 
             VStack {
                 Text(planetSymbol(for: planet))
                     .font(.system(size: 64))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .fontWeight(.heavy)
 
                 Text(planet.uppercased())
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .fontWeight(.heavy)
             }
         }
@@ -254,7 +246,7 @@ struct SectionHeader: View {
         Text(title)
             .dynamicType(baseSize: fontSize, textStyle: .headline)
             .fontWeight(.regular)
-            .foregroundColor(.black)
+            .foregroundColor(AppTheme.primaryText)
             .multilineTextAlignment(.center)
             .minimumScaleFactor(0.7)
     }
@@ -314,7 +306,7 @@ struct SimpleDivider: View {
 
     var body: some View {
         Rectangle()
-            .fill(Color.black.opacity(0.3))
+            .fill(AppTheme.primaryText.opacity(0.3))
             .frame(width: dividerWidth, height: 1)
             .accessibilityHidden(true)
     }

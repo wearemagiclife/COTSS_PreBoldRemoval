@@ -14,6 +14,7 @@ struct CardDetailModalView: View {
     let cardType: CardType
     let contentType: DetailContentType?
     @Binding var isPresented: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     // MARK: - Title glyph sizing to visually match (or exceed) 24pt text
     private var titleUIFont: UIFont { UIFont(name: "Iowan Old Style", size: 24) ?? .systemFont(ofSize: 24) }
@@ -80,7 +81,7 @@ struct CardDetailModalView: View {
                 .accessibilityHint("Double tap to close")
 
             ScrollView {
-                VStack(spacing: 25) {
+                VStack(spacing: AppConstants.Spacing.tight) {
                     Group {
                         if case .planetary(let planet) = contentType {
                             if let planetImage = ImageManager.shared.loadPlanetImage(for: planet) {
@@ -88,8 +89,9 @@ struct CardDetailModalView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(height: isIPad ? 320 : 240)
+                                    .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                                    .darkModeCardEffects(isLarge: true)
                                     .accessibilityLabel("The Influence of \(planet).uppercaseFirst")
                                     .accessibilityAddTraits(.isImage)
                             }
@@ -99,22 +101,24 @@ struct CardDetailModalView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(height: isIPad ? 320 : 240)
+                                    .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                                    .darkModeCardEffects(isLarge: true)
                                     .accessibilityLabel("\(card.value) of \(card.suit.rawValue)")
                                     .accessibilityAddTraits(.isImage)
                             }
                         }
                     }
                     .id("cardTop")
+                    .padding(.bottom, AppConstants.Spacing.tight)
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: 6) {
                         Group {
                             if case .planetary(let planet) = contentType {
                                 let planetInfo = AppConstants.PlanetDescriptions.getDescription(for: planet)
                                 Text(planetInfo.title.lowercased())
                                     .font(.custom("Iowan Old Style", size: scaledFont(20)))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                             } else {
                                 if let def = getCardDefinition(by: card.id) {
@@ -148,7 +152,7 @@ struct CardDetailModalView: View {
                                     } else {
                                         Text(def.title.lowercased())
                                             .font(.custom("Iowan Old Style", size: scaledFont(18)))
-                                            .foregroundColor(.black)
+                                            .foregroundColor(AppTheme.primaryText)
                                             .multilineTextAlignment(.center)
                                             .padding(.top, 2)
                                     }
@@ -157,54 +161,51 @@ struct CardDetailModalView: View {
                         }
 
                         LineBreak(width: isIPad ? 260 : 180)
-                            .padding(.vertical, isKarmaContent ? 8 : 12)
+                            .padding(.vertical, AppConstants.Spacing.ornament)
 
                         Text(descriptionText())
                             .font(.custom("Iowan Old Style", size: scaledFont(17)))
-                            .lineSpacing(isIPad ? 7 : 5)
+                            .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
                             .tracking(0.3)
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                             .multilineTextAlignment(.leading)
-                            .padding(.horizontal, isIPad ? 20 : 10)
+                            .padding(.horizontal, isIPad ? 12 : 4)
 
                         // Birth dates for karma cards - below description
                         if case .karma = contentType {
                             VStack(spacing: 6) {
                                 Text("Birthdates with this Card:")
                                     .font(.custom("Iowan Old Style", size: scaledFont(14)))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
 
                                 Text(formatBirthDates(for: card.id))
                                     .font(.custom("Iowan Old Style", size: scaledFont(14)))
                                     .foregroundColor(.black.opacity(0.7))
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 20)
+                                    .padding(.horizontal, AppConstants.Spacing.cardPadding)
                             }
-                            .padding(.top, 16)
+                            .padding(.top, AppConstants.Spacing.ornament)
                         }
 
                         LineBreak("linedesignd", width: isIPad ? 260 : 180)
-                            .padding(.top, 12)
-                            .padding(.bottom, 12)
+                            .padding(.vertical, AppConstants.Spacing.ornament)
                     }
                 }
-                .padding(.vertical, 20)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 12)
-                .padding(.bottom, 12)
+                .padding(.vertical, AppConstants.Spacing.cardPadding)
+                .padding(.horizontal, AppConstants.Spacing.cardPadding)
             }
             .scrollIndicators(.hidden)
             .scrollTargetLayout()
             .scrollPosition(id: .constant("cardTop"))
-            .padding(.vertical, 30) // static top/bottom buffer so content never touches card edges
-            .padding(.horizontal, 12)
+            .padding(.vertical, AppConstants.Spacing.section)
+            .padding(.horizontal, AppConstants.Spacing.tight)
             .background(
                 RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal)
                     .fill(AppTheme.backgroundColor)
             )
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
-            .padding(25)
+            .padding(AppConstants.Spacing.pageInset)
             .scaleEffect(isPresented ? 1 : 1)
             .opacity(isPresented ? 1 : 0)
             .allowsHitTesting(isPresented)

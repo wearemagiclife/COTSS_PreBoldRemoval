@@ -5,6 +5,7 @@ struct PlayingCardView: View {
     let size: CardSize
     @Environment(\.sizeCategory) var sizeCategory
     @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
     
     enum CardSize {
         case small, medium, large
@@ -25,8 +26,9 @@ struct PlayingCardView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: scaledWidth, height: scaledHeight)
+                    .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
+                    .darkModeCardEffects()
                     .accessibilityLabel(cardAccessibilityLabel)
                     .accessibilityAddTraits(.isImage)
             } else {
@@ -91,36 +93,36 @@ struct PlayingCardView: View {
     private var textBasedCardView: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
-                .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
-            
+                .fill(AppTheme.cardBackground)
+                .darkModeCardEffects()
+
             VStack {
                 HStack {
                     Text(card.value)
                         .dynamicType(baseSize: size.fontSize, textStyle: .headline)
-                        
-                        .foregroundColor(card.isRed ? .red : .black)
+
+                        .foregroundColor(AppTheme.primaryText)
                     Spacer()
                 }
-                
+
                 Spacer()
-                
+
                 Text(card.suitSymbol)
                     .font(.system(size: size.suitSize))
-                    .foregroundColor(card.isRed ? .red : .black)
-                    
+                    .foregroundColor(AppTheme.primaryText)
+
                     .accessibilityHidden(true)
-                
+
                 Spacer()
-                
+
                 HStack {
                     Spacer()
                     Text(card.value)
                         .dynamicType(baseSize: size.fontSize, textStyle: .headline)
-                        
-                        .foregroundColor(card.isRed ? .red : .black)
+
+                        .foregroundColor(AppTheme.primaryText)
                         .rotationEffect(.degrees(180))
-                        .accessibilityHidden(true) 
+                        .accessibilityHidden(true)
                 }
             }
             .padding(8)
@@ -155,43 +157,43 @@ struct CardDetailView: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: AppConstants.Spacing.ornament) {
             if let def = getCardDefinition(by: card.id) {
                 Text("THE \(def.name)")
                     .dynamicType(baseSize: 36, textStyle: .largeTitle)
-                    
-                    .foregroundColor(.black)
+
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.7)
                     .accessibilityAddTraits(.isHeader)
             } else {
                 Text(card.name)
                     .dynamicType(baseSize: 36, textStyle: .largeTitle)
-                    
-                    .foregroundColor(.black)
+
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.7)
                     .accessibilityAddTraits(.isHeader)
             }
-            
+
             if let def = getCardDefinition(by: card.id) {
                 Text(def.title)
                     .dynamicType(baseSize: 20, textStyle: .title3)
-                    
+
                     .italic()
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
             }
-            
+
             PlayingCardView(card: card, size: .large)
                 .accessibilityLabel("\(card.value) of \(card.suit.rawValue)")
-            
+
             if showDescription {
                 ScrollView {
                     Text(card.description)
                         .dynamicType(baseSize: 18, textStyle: .body)
-                        
-                        .foregroundColor(.black)
+                        .lineSpacing(AppConstants.Typography.bodyLineSpacing)
+                        .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.leading)
                         .padding(.horizontal)
                         .fixedSize(horizontal: false, vertical: true)
@@ -209,8 +211,8 @@ struct KarmaCardRow: View {
     @Environment(\.sizeCategory) var sizeCategory
     
     var body: some View {
-        VStack(spacing: 12) {
-            LazyVGrid(columns: adaptiveColumns, spacing: 10) {
+        VStack(spacing: AppConstants.Spacing.tight) {
+            LazyVGrid(columns: adaptiveColumns, spacing: AppConstants.Spacing.tight) {
                 ForEach(cards) { (card: Card) in
                     VStack(spacing: 8) {
                         PlayingCardView(card: card, size: .small)
@@ -218,8 +220,8 @@ struct KarmaCardRow: View {
                         
                         Text(card.name)
                             .dynamicType(baseSize: 18, textStyle: .caption1)
-                            .foregroundColor(.black)
-                            
+                            .foregroundColor(AppTheme.primaryText)
+
                             .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.8)
                     }
@@ -227,12 +229,12 @@ struct KarmaCardRow: View {
                     .accessibilityLabel("\(card.value) of \(card.suit.rawValue), \(card.name)")
                 }
             }
-            
+
             Text(description)
                 .dynamicType(baseSize: 18, textStyle: .body)
-                
+                .lineSpacing(AppConstants.Typography.bodyLineSpacing)
                 .italic()
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal)
                 .fixedSize(horizontal: false, vertical: true)

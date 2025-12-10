@@ -38,6 +38,11 @@ struct OnboardingTutorialView: View {
     // Button visibility state (fades in after card settles)
     @State private var showButtons: Bool = false
 
+    // Prevents multiple timer starts
+    @State private var hasStarted: Bool = false
+
+    @Environment(\.colorScheme) private var colorScheme
+
     let birthCard: Card
     let solarCard: Card
     let fiftytwoCard: Card
@@ -102,16 +107,16 @@ struct OnboardingTutorialView: View {
                     Spacer()
                     Image(systemName: "gearshape")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                 }
-                .padding(.horizontal, AppConstants.Spacing.medium)
-                .padding(.vertical, AppConstants.Spacing.medium)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
+                .padding(.vertical, AppConstants.Spacing.ornament)
 
                 // Welcome text
                 Text("Welcome, \(userName.isEmpty ? "Guest" : userName)")
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge + 2))
-                    .foregroundColor(.black)
-                    .padding(.bottom, AppConstants.Spacing.medium)
+                    .foregroundColor(AppTheme.primaryText)
+                    .padding(.bottom, AppConstants.Spacing.tight)
                     .opacity(showOverlay ? 0 : 1)
                     .animation(.easeOut(duration: 0.3), value: showOverlay)
 
@@ -119,9 +124,8 @@ struct OnboardingTutorialView: View {
                     Image(uiImage: lineImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: AppConstants.Scaling.w(180))
-                        .padding(.top, AppConstants.Spacing.small)
-                        .padding(.bottom, AppConstants.Spacing.small)
+                        .frame(width: 260)
+                        .padding(.vertical, AppConstants.Spacing.ornament)
                 }
 
                 // Cards section
@@ -130,10 +134,10 @@ struct OnboardingTutorialView: View {
                         Spacer()
                         Text("YOUR DAILY CARD")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                         Spacer()
                     }
-                    .padding(.bottom, AppConstants.Spacing.small)
+                    .padding(.bottom, AppConstants.Spacing.tight)
                     .opacity(showOverlay ? 0 : 1)
                     .animation(.easeOut(duration: 0.3), value: showOverlay)
 
@@ -147,6 +151,7 @@ struct OnboardingTutorialView: View {
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: AppConstants.CardSizes.extraLarge.width, height: AppConstants.CardSizes.extraLarge.height)
                                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
+                                .modifier(DarkModeGoldGlow(isLarge: true))
                                 .cardShadow(isLarge: true)
                                 .scaleEffect(highlightedCardStep == 4 ? 1.15 : 1.0)
                                 .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
@@ -164,9 +169,9 @@ struct OnboardingTutorialView: View {
 
                         Spacer(minLength: AppConstants.Spacing.small)
 
-                        Text("Tap to Reveal")
+                        Text("Tap Card to Reveal")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                            .foregroundColor(.black)
+                            .foregroundColor(AppTheme.primaryText)
                             .multilineTextAlignment(.center)
                             .padding(.bottom, AppConstants.Spacing.titleSpacing)
                             .opacity((showFloatingCard && currentStep >= 1 && currentStep <= 3) ? 0 : 1)
@@ -177,12 +182,12 @@ struct OnboardingTutorialView: View {
                         Image(uiImage: lineImageD)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: AppConstants.Scaling.w(180))
-                            .padding(.bottom, AppConstants.Spacing.sectionSpacing)
+                            .frame(width: 260)
+                            .padding(.bottom, AppConstants.Spacing.section)
                     }
 
                     // Three small cards row
-                    HStack(alignment: .top, spacing: AppConstants.Spacing.small) {
+                    HStack(alignment: .top, spacing: AppConstants.Spacing.tight) {
                         // Birth card
                         VStack(spacing: AppConstants.Spacing.small) {
                             if let cardImage = ImageManager.shared.loadCardImage(for: birthCard) {
@@ -191,7 +196,8 @@ struct OnboardingTutorialView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                                    .cardShadow(isLarge: true)
+                                    .modifier(DarkModeGoldGlow(isLarge: true))
+                                .cardShadow(isLarge: true)
                                     .scaleEffect(highlightedCardStep == 1 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 1 && showFloatingCard) ? 0 : 1)
@@ -207,7 +213,7 @@ struct OnboardingTutorialView: View {
                             }
                             Text("Birth Card")
                                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
-                                .foregroundColor(.black)
+                                .foregroundColor(AppTheme.primaryText)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                         }
@@ -221,7 +227,8 @@ struct OnboardingTutorialView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                                    .cardShadow(isLarge: true)
+                                    .modifier(DarkModeGoldGlow(isLarge: true))
+                                .cardShadow(isLarge: true)
                                     .scaleEffect(highlightedCardStep == 2 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 2 && showFloatingCard) ? 0 : 1)
@@ -237,7 +244,7 @@ struct OnboardingTutorialView: View {
                             }
                             Text("Yearly Spread")
                                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
-                                .foregroundColor(.black)
+                                .foregroundColor(AppTheme.primaryText)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                         }
@@ -251,7 +258,8 @@ struct OnboardingTutorialView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                                    .cardShadow(isLarge: true)
+                                    .modifier(DarkModeGoldGlow(isLarge: true))
+                                .cardShadow(isLarge: true)
                                     .scaleEffect(highlightedCardStep == 3 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 3 && showFloatingCard) ? 0 : 1)
@@ -267,13 +275,13 @@ struct OnboardingTutorialView: View {
                             }
                             Text("52-Day Cycle")
                                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
-                                .foregroundColor(.black)
+                                .foregroundColor(AppTheme.primaryText)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(2)
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal, AppConstants.Spacing.medium)
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
                     .opacity(showOverlay ? 0.65 : 1.0)
                     .blur(radius: showOverlay ? 2 : 0)
                     .animation(.easeInOut(duration: 0.3), value: showOverlay)
@@ -282,10 +290,10 @@ struct OnboardingTutorialView: View {
                 Spacer()
             }
         }
-        .background(Color(red: 0.91, green: 0.82, blue: 0.63))
+        .background(AppTheme.backgroundColor)
         .ignoresSafeArea(edges: .bottom)
     }
-    
+
     // MARK: - Floating Card
     private var floatingCard: some View {
         Group {
@@ -295,8 +303,10 @@ struct OnboardingTutorialView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 240 * cardScale)
+                        .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                        .shadow(color: .black.opacity(cardShadowOpacity), radius: cardShadowRadius, x: 0, y: cardShadowRadius / 2)
+                        .modifier(DarkModeGoldGlow(isLarge: true))
+                                .cardShadow(isLarge: true)
                 }
             } else {
                 if let uiImage = ImageManager.shared.loadCardImage(for: currentCard) {
@@ -304,8 +314,10 @@ struct OnboardingTutorialView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 240 * cardScale)
+                        .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                        .shadow(color: .black.opacity(cardShadowOpacity), radius: cardShadowRadius, x: 0, y: cardShadowRadius / 2)
+                        .modifier(DarkModeGoldGlow(isLarge: true))
+                                .cardShadow(isLarge: true)
                 }
             }
         }
@@ -316,21 +328,21 @@ struct OnboardingTutorialView: View {
     // MARK: - Tutorial Modal Content
     private var tutorialModalContent: some View {
         ScrollView {
-            VStack(spacing: 25) {
+            VStack(spacing: AppConstants.Spacing.cardPadding) {
                 if currentStep == 0 {
                     welcomeScreenContent
                 } else {
                     cardTutorialContent
                 }
             }
-            .padding(.vertical, 20)
-            .padding(.horizontal, 20)
+            .padding(.vertical, AppConstants.Spacing.ornament)
+            .padding(.horizontal, AppConstants.Spacing.cardPadding)
         }
         .scrollIndicators(.hidden)
         .background(
             GeometryReader { geo in
                 RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal)
-                    .fill(Color(red: 0.86, green: 0.77, blue: 0.57).opacity(0.95))
+                    .fill(AppTheme.backgroundColor.opacity(0.95))
                     .onAppear {
                         // Modal card position - center in placeholder area
                         let frame = geo.frame(in: .global)
@@ -342,25 +354,35 @@ struct OnboardingTutorialView: View {
             }
         )
         .cornerRadius(AppConstants.CornerRadius.modal)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal)
+                .stroke(Color(UIColor { traitCollection in
+                    traitCollection.userInterfaceStyle == .dark
+                        ? UIColor(red: 0.855, green: 0.745, blue: 0.565, alpha: 1.0)  // #DABE90 gold
+                        : UIColor.clear
+                }), lineWidth: 1.5)
+        )
         .overlay(alignment: .topTrailing) {
-            Button(action: skipTutorial) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(AppTheme.primaryText)
-                    .frame(width: 32, height: 28)
-                    .background(
-                        Capsule()
-                            .fill(Color(red: 0.90, green: 0.83, blue: 0.67))
-                    )
+            if currentStep > 0 {
+                Button(action: skipTutorial) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 12)
+                .padding(.trailing, 12)
+                .accessibilityLabel("Skip tutorial")
+                .accessibilityHint("Close tutorial and go to app")
             }
-            .buttonStyle(PlainButtonStyle())
-            .padding(.top, 12)
-            .padding(.trailing, 12)
         }
         .frame(maxWidth: 500)
-        .padding(.horizontal, 25)
-        .padding(.top, 44)
-        .padding(.bottom, 20)
+        .frame(height: currentStep == 0 ? UIScreen.main.bounds.height * 0.88 : nil)
+        .padding(.horizontal, AppConstants.Spacing.pageInset)
+        .padding(.top, currentStep == 0 ? AppConstants.Spacing.ornament : AppConstants.Spacing.page)
+        .padding(.bottom, AppConstants.Spacing.ornament)
         .gesture(
             DragGesture(minimumDistance: 50)
                 .onEnded { value in
@@ -383,81 +405,88 @@ struct OnboardingTutorialView: View {
 
     // MARK: - Welcome Screen Content
     private var welcomeScreenContent: some View {
-        VStack(spacing: 10) {
-            Spacer()
-
-            if let appLogo = UIImage(named: "apptitle") {
-                Image(uiImage: appLogo)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 218)
-                    .opacity(showWelcomeTitle ? 1 : 0)
-                    .animation(.easeInOut(duration: 0.9), value: showWelcomeTitle)
+        VStack(spacing: 0) {
+            if let appLogo = UIImage(named: "sevensisters") {
+                HStack {
+                    Spacer()
+                    Image(uiImage: appLogo)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 280)
+                        .opacity(showWelcomeTitle ? 0.9 : 0)
+                        .animation(.easeInOut(duration: 0.9), value: showWelcomeTitle)
+                    Spacer()
+                }
+                .padding(.vertical, AppConstants.Spacing.ornament)
             }
 
-            Spacer()
+            VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
+                (Text("For centuries, ") + Text("The Deck of Cards").bold() + Text(" was used to chart planetary movements. Long before Carl Jung, or even the Tarot, each card was given a universal archetype."))
+                    .font(.custom("Iowan Old Style", size: 17))
+                    .tracking(0.3)
+                    .foregroundColor(AppTheme.primaryText)
+                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
 
-            VStack(spacing: 6) {
-                if let lineImage = UIImage(named: "linedesign") {
-                    Image(uiImage: lineImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 180)
-                        .opacity(showWelcomeLineDesign ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.7), value: showWelcomeLineDesign)
+                (Text("The Seven Sisters").bold() + Text(", or the Pleiades, have guided our ancestors home for millennia. ") + Text("The Cards").bold() + Text(" also offer a fixed reference that, when met by your inner compass, can illuminate deep insight."))
+                    .font(.custom("Iowan Old Style", size: 17))
+                    .tracking(0.3)
+                    .foregroundColor(AppTheme.primaryText)
+                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+
+                Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are historical reference and for entertainment only. Never advice.")
+                    .font(.custom("Iowan Old Style", size: 17))
+                    .tracking(0.3)
+                    .foregroundColor(AppTheme.primaryText)
+                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+
+                HStack {
+                    Spacer()
+                    SimpleDivider(width: 180)
+                    Spacer()
                 }
+                .padding(.top, 10)
+                .padding(.bottom, 6)
 
-                VStack(alignment: .leading, spacing: 14) {
-                Text("For centuries, The Deck of Cards was used to chart planetary movements. Long before Carl Jung or even the Tarot, each card was given a universal archetype. They can be used as a map to chart hidden universal currents, or like a constellation, they can help us navigate personal insights.")
-                    .font(.custom("Iowan Old Style", size: 16))
-                    .tracking(0.1)
-                    .foregroundColor(.black)
-                    .multilineTextAlignment(.leading)
-
-                Text("This system is not designed to predict futures or outcomes. Any meanings you find here are the echoes of your own self-discovery. Interpretations are here for historical reference and entertainment only. Never advice.")
-                    .font(.custom("Iowan Old Style", size: 16))
-                    .tracking(0.1)
-                    .foregroundColor(.black)
-                    .multilineTextAlignment(.leading)
-
-                    Text("The tutorial will introduce The Cards and help you find your way around the app. Go to the Settings Menu anytime to revisit this tutorial & learn more.")
-                        .font(.custom("Iowan Old Style", size: 16))
-                        .tracking(0.1)
-                        .foregroundColor(.black)
-                        .multilineTextAlignment(.leading)
-                }
-                .padding(.horizontal, 30)
-                .padding(.vertical, 4)
-                .opacity(showWelcomeText ? 1 : 0)
-                .animation(.easeInOut(duration: 0.7), value: showWelcomeText)
-
-                if let lineImageD = UIImage(named: "linedesignd") {
-                    Image(uiImage: lineImageD)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 180)
-                        .opacity(showWelcomeText ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.7), value: showWelcomeText)
-                }
+                Text("Next, the tutorial will show you around the app. You can view it again, and find more resources in the Settings Menu.")
+                    .font(.custom("Iowan Old Style", size: 17))
+                    .tracking(0.3)
+                    .foregroundColor(AppTheme.primaryText)
+                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
             }
+            .frame(maxWidth: 340)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, AppConstants.Spacing.pageInset)
+            .opacity(showWelcomeText ? 1 : 0)
+            .animation(.easeInOut(duration: 0.7), value: showWelcomeText)
+
+            Spacer()
+                .frame(height: 20)
 
             Spacer()
 
             Button(action: advanceStep) {
                 Text("Continue")
-                    .font(.custom("Iowan Old Style", size: 15))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 35)
-                    .padding(.vertical, 8)
-                    .background(AppTheme.darkAccent.opacity(0.7))
+                    .font(.custom("Iowan Old Style", size: 17))
+                    .tracking(0.5)
+                    .foregroundColor(Color(UIColor { traitCollection in
+                        traitCollection.userInterfaceStyle == .dark
+                            ? UIColor.black
+                            : UIColor.white
+                    }))
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.darkAccent)
                     .cornerRadius(AppConstants.CornerRadius.button)
-                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             }
+            .modifier(DarkModeGoldGlow(isLarge: false))
+            .accessibilityLabel("Continue")
+            .accessibilityHint("Proceed to tutorial")
             .opacity(showWelcomeBody ? 1 : 0)
             .animation(.easeInOut(duration: 0.6), value: showWelcomeBody)
 
             Spacer()
-                .frame(height: 10)
+                .frame(height: 30)
         }
     }
 
@@ -467,16 +496,16 @@ struct OnboardingTutorialView: View {
             // Invisible placeholder for card (actual card is floating)
             Color.clear
                 .frame(height: 240)
-                .padding(.top, 20)
-                .padding(.bottom, 10)
+                .padding(.top, 16)
+                .padding(.bottom, 20)
 
             Text(tutorialSteps[currentStep].cardTypeHeader)
                 .font(.custom("Iowan Old Style", size: 22))
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
                 .opacity(showContent ? 1 : 0)
                 .animation(.easeInOut(duration: 0.4), value: showContent)
-                .padding(.top, 20)
+                .padding(.top, colorScheme == .dark ? 16 : 8)
 
             Spacer(minLength: 8)
                 .layoutPriority(-1)
@@ -487,13 +516,15 @@ struct OnboardingTutorialView: View {
                     Image(uiImage: lineImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 120)
+                        .frame(width: 260)
+                        .padding(.vertical, AppConstants.Spacing.ornament)
                 }
 
                 Text(tutorialSteps[currentStep].description)
-                    .font(.custom("Iowan Old Style", size: 16))
+                    .font(.custom("Iowan Old Style", size: colorScheme == .dark ? 18 : 16))
+                    .lineSpacing(AppConstants.Typography.bodyLineSpacing)
                     .tracking(0.8)
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal, 25)
                     .padding(.vertical, 4)
@@ -503,8 +534,8 @@ struct OnboardingTutorialView: View {
                     Image(uiImage: lineImageD)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 120)
-                        .padding(.bottom, 20)
+                        .frame(width: 260)
+                        .padding(.vertical, AppConstants.Spacing.ornament)
                 }
             }
             .opacity(showContent ? 1 : 0)
@@ -518,7 +549,7 @@ struct OnboardingTutorialView: View {
             if currentStep == 4 {
                 Text("To learn more about the Cards, or to revisit this tutorial, go to Settings.")
                     .font(.custom("Iowan Old Style", size: 15))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal, 30)
                     .padding(.bottom, 20)
@@ -533,23 +564,29 @@ struct OnboardingTutorialView: View {
                 Button(action: advanceStep) {
                     Text(currentStep < 4 ? "Continue" : "Begin")
                         .font(.custom("Iowan Old Style", size: 18))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(UIColor { traitCollection in
+                            traitCollection.userInterfaceStyle == .dark
+                                ? UIColor.black
+                                : UIColor.white
+                        }))
                         .padding(.horizontal, 50)
                         .padding(.vertical, 12)
-                        .background(currentStep == 4 ? AppTheme.darkAccent : AppTheme.darkAccent.opacity(0.7))
+                        .background(AppTheme.darkAccent)
                         .cornerRadius(AppConstants.CornerRadius.button)
-                        .shadow(color: .black.opacity(currentStep == 4 ? 0.2 : 0.15), radius: currentStep == 4 ? 6 : 4, x: 0, y: 2)
+                        .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
                 }
+                .accessibilityLabel(currentStep < 4 ? "Continue" : "Begin using the app")
+                .accessibilityHint(currentStep < 4 ? "Go to next tutorial step" : "Close tutorial and start using the app")
 
                 // Progress dots (tappable)
-                HStack(spacing: 16) {
+                HStack(spacing: 6) {
                     ForEach(1..<5, id: \.self) { index in
                         Circle()
-                            .fill(index == currentStep ? Color.black : Color.black.opacity(0.15))
-                            .frame(width: 12, height: 12)
-                            .scaleEffect(index == currentStep ? 1.3 : 1.0)
+                            .fill(index == currentStep ? AppTheme.primaryText : AppTheme.primaryText.opacity(0.15))
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(index == currentStep ? 1.2 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
-                            .frame(width: 44, height: 44)
+                            .frame(width: 28, height: 44)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 guard !isTransitioning else { return }
@@ -559,6 +596,8 @@ struct OnboardingTutorialView: View {
                                     goBack()
                                 }
                             }
+                            .accessibilityLabel("Step \(index) of 4")
+                            .accessibilityHint(index == currentStep ? "Current step" : "Tap to go to step \(index)")
                     }
                 }
                 .padding(.top, 12)
@@ -572,6 +611,9 @@ struct OnboardingTutorialView: View {
 
     // MARK: - Helper Functions
     private func startTutorial() {
+        guard !hasStarted else { return }
+        hasStarted = true
+
         if currentStep == 0 {
             // Wait 2 seconds to let users absorb the background cards, then show modal with dimming
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -675,10 +717,7 @@ struct OnboardingTutorialView: View {
         let sourceFrame = sourceCardFrame(for: nextStep)
 
         // Ensure we have a valid frame
-        guard sourceFrame != .zero else {
-            print("⚠️ Warning: Card frame is zero for step \(nextStep)")
-            return
-        }
+        guard sourceFrame != .zero else { return }
 
         // Skip pulse for daily card (step 4), use pulse for small cards (1-3)
         if nextStep == 4 {
@@ -693,11 +732,6 @@ struct OnboardingTutorialView: View {
             cardShadowRadius = 5  // Small shadow to match background cards
             cardShadowOpacity = 0.2
             showFloatingCard = true
-
-            print("🎴 Starting animation for step \(nextStep)")
-            print("   Source: \(sourceFrame)")
-            print("   Target: \(modalCardPosition)")
-            print("   Scale: \(sourceHeight / targetHeight) -> 1.0")
 
             // Start card movement and overlay fade in simultaneously
             withAnimation(.easeOut(duration: 0.5)) {
@@ -771,11 +805,6 @@ struct OnboardingTutorialView: View {
                 cardShadowRadius = 5  // Small shadow to match background cards
                 cardShadowOpacity = 0.2
                 showFloatingCard = true
-
-                print("🎴 Starting animation for step \(nextStep)")
-                print("   Source: \(sourceFrame)")
-                print("   Target: \(modalCardPosition)")
-                print("   Scale: \(sourceHeight / targetHeight) -> 1.0")
 
                 // Slower, more gradual animation for first slide
                 let animationDuration: Double = nextStep == 1 ? 1.0 : 0.7
@@ -852,7 +881,6 @@ struct OnboardingTutorialView: View {
                         currentStep = 1
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            // Overlay will be shown inside animateCardTransition after pulse
                             animateCardTransition(to: 1)
                         }
                     }

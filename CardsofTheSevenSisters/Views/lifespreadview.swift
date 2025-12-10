@@ -170,11 +170,11 @@ struct LifeSpreadView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.86, green: 0.77, blue: 0.57)
+            AppTheme.backgroundColor
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: AppConstants.Spacing.sectionSpacing) {
+                VStack(spacing: AppConstants.Spacing.ornament) {
                     mainTitleSection
                     birthCardSection
 
@@ -184,12 +184,10 @@ struct LifeSpreadView: View {
 
                     if !allKarmaCards.isEmpty {
                         LineBreak("linedesignd", width: UIScreen.main.bounds.width * 0.65)
-                            .padding(.top, AppConstants.Spacing.sectionSpacing / 2)
-                            .padding(.bottom, AppConstants.Spacing.large)
                     }
                 }
-                .padding(.horizontal, AppConstants.Spacing.medium)
-                .padding(.vertical, AppConstants.Spacing.large)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
+                .padding(.vertical, AppConstants.Spacing.section)
             }
 
             if showCardDetail, let card = detailCard {
@@ -266,7 +264,7 @@ struct LifeSpreadView: View {
     // MARK: - Main Section (Page Header)
     
     private var mainTitleSection: some View {
-        VStack(spacing: AppConstants.Spacing.titleSpacing) {
+        VStack(spacing: AppConstants.Spacing.tight) {
             SectionHeader(
                 "YOUR BIRTH CARD",
                 fontSize: AppConstants.FontSizes.large
@@ -274,10 +272,10 @@ struct LifeSpreadView: View {
 
             Text("your main archetypal influence")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                .foregroundColor(.black)
+                .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
         }
-        .padding(.top, AppConstants.Spacing.small)
+        .padding(.top, AppConstants.Spacing.tight)
     }
 
     private var birthCardSection: some View {
@@ -299,7 +297,6 @@ struct LifeSpreadView: View {
 
     private var karmaConnectionsSection: some View {
         let width = UIScreen.main.bounds.width
-        let innerSpacing: CGFloat = 10
 
         let firstCards = karma1Cards
         let secondCards = karma2Cards
@@ -307,22 +304,22 @@ struct LifeSpreadView: View {
         let hasFirst = !firstCards.isEmpty
         let hasSecond = !secondCards.isEmpty
 
-        return VStack(spacing: AppConstants.Spacing.sectionSpacing) {
+        return VStack(spacing: AppConstants.Spacing.ornament) {
             // Top decorative line
             LineBreak("linedesign", width: width * 0.7)
 
             // First Karma Section
             if hasFirst {
-                VStack(spacing: innerSpacing) {
+                VStack(spacing: AppConstants.Spacing.tight) {
                     Text("First Karmic Connections")
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.dynamicHeadline))
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
 
                     karmaCardsLayout(
                         cards: firstCards,
                         interCardSpacing: width * 0.04,
-                        verticalSpacing: AppConstants.Spacing.sectionSpacing
+                        verticalSpacing: AppConstants.Spacing.section
                     )
                 }
             }
@@ -330,21 +327,21 @@ struct LifeSpreadView: View {
             // Divider between sections (if both exist)
             if hasFirst && hasSecond {
                 SimpleDivider(width: width * 0.7)
-                    .padding(.vertical, AppConstants.Spacing.small)
+                    .padding(.vertical, AppConstants.Spacing.tight)
             }
 
             // Second Karma Section
             if hasSecond {
-                VStack(spacing: innerSpacing) {
+                VStack(spacing: AppConstants.Spacing.tight) {
                     Text("Second Karmic Connections")
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.dynamicHeadline))
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
 
                     karmaCardsLayout(
                         cards: secondCards,
                         interCardSpacing: width * 0.04,
-                        verticalSpacing: AppConstants.Spacing.sectionSpacing
+                        verticalSpacing: AppConstants.Spacing.section
                     )
                 }
             }

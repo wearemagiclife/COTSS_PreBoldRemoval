@@ -7,8 +7,8 @@ struct SettingsMenuView: View {
 
     @State private var showingDeleteAccountAlert = false
 
-    // Subtle parchment tone closer to background but still contrasted
-    private let cardBackground = Color(red: 0.90, green: 0.83, blue: 0.67)
+    // Adaptive card background for light/dark mode
+    private let cardBackground = AppConstants.Colors.capsuleButton
 
     var body: some View {
         NavigationStack {
@@ -18,14 +18,14 @@ struct SettingsMenuView: View {
                     .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: AppConstants.Spacing.cardPadding) {
                         Text("Settings")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
                             .foregroundColor(AppTheme.primaryText)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 8)
+                            .padding(.top, AppConstants.Spacing.tight)
 
-                        VStack(spacing: 14) {
+                        VStack(spacing: AppConstants.Spacing.tight) {
                             NavigationLink {
                                 ProfileSheet()
                             } label: {
@@ -46,6 +46,17 @@ struct SettingsMenuView: View {
                                        subtitle: "Tips & Tutorials",
                                        cardBackground: cardBackground
                                    )
+                            }
+
+                            NavigationLink {
+                                AppearanceSettingsView()
+                            } label: {
+                                SettingsRow(
+                                    systemImage: "moon.fill",
+                                    title: "Appearance",
+                                    subtitle: "Light, Dark, or System",
+                                    cardBackground: cardBackground
+                                )
                             }
 
                             NavigationLink {
@@ -114,27 +125,34 @@ struct SettingsMenuView: View {
 
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 32)
+                    .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                    .padding(.bottom, AppConstants.Spacing.section)
                 }
             }
             .navigationTitle("") // we'll style our own header
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(AppTheme.primaryText)
-                            .frame(width: 32, height: 28)
-                            .background(
-                                Capsule()
-                                    .fill(cardBackground)
-                            )
+                    Button(action: { dismiss() }) {
+                        if UIScreen.main.bounds.height < 700 {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(width: 28, height: 28)
+                                .background(AppConstants.Colors.capsuleButton)
+                                .clipShape(Circle())
+                                .contentShape(Circle())
+                        } else {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
+                                .contentShape(Rectangle())
+                        }
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Close settings")
+                    .accessibilityHint("Returns to home screen")
                 }
             }
             // Match nav bar to background so it doesn't show as a gray bar
@@ -167,7 +185,7 @@ private struct SettingsRow: View {
     let cardBackground: Color
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: AppConstants.Spacing.ornament) {
             ZStack {
                 Circle()
                     .strokeBorder(AppTheme.primaryText.opacity(0.25), lineWidth: 1)
@@ -193,7 +211,7 @@ private struct SettingsRow: View {
 
             Spacer()
         }
-        .padding(14)
+        .padding(AppConstants.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)

@@ -25,10 +25,10 @@ struct HomeView: View {
                                 cardsGrid
                             }
                             .padding(.top, isSmallScreen ? 10 : 0)
-                            .padding(.bottom, AppConstants.Spacing.sectionSpacing)
+                            .padding(.bottom, 62)
                         }
                     }
-                    .background(Color(red: 0.86, green: 0.75, blue: 0.55))
+                    .background(AppTheme.backgroundColor)
                     .ignoresSafeArea(edges: .bottom)
                     .navigationBarHidden(true)
                     .onAppear {
@@ -99,13 +99,13 @@ struct HomeView: View {
                 Button(action: { showingSettings = true }) {
                     Image(systemName: "gearshape")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                 }
                 .accessibilityLabel("Settings")
                 .accessibilityHint("Opens settings menu")
             }
-            .padding(.horizontal, AppConstants.Spacing.medium)
-            .padding(.vertical, AppConstants.Spacing.medium)
+            .padding(.horizontal, AppConstants.Spacing.pageInset)
+            .padding(.vertical, AppConstants.Spacing.ornament)
         }
     }
     
@@ -113,28 +113,28 @@ struct HomeView: View {
         VStack(spacing: 0) {
             Text("\(AppConstants.Strings.welcome), \(dataManager.userProfile.name.isEmpty ? "Guest" : dataManager.userProfile.name)")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge + 2))
-                .foregroundColor(.black)
-                .padding(.bottom, AppConstants.Spacing.medium)
+                .foregroundColor(AppTheme.primaryText)
+                .padding(.bottom, AppConstants.Spacing.tight)
                 .opacity(showWelcome ? 1 : 0)
 
             LineBreak(width: 320)
-                .padding(.top, AppConstants.Spacing.small)
-                .padding(.bottom, AppConstants.Spacing.small)
+                .padding(.vertical, AppConstants.Spacing.ornament)
                 .opacity(showContent ? 1 : 0)
         }
     }
     
     private var cardsGrid: some View {
-        VStack(spacing: 0) {
+        let isSmallScreen = UIScreen.main.bounds.height < 700
+
+        return VStack(spacing: 0) {
             HStack {
                 Spacer()
                 SectionHeader(AppConstants.Strings.yourDailyCard, fontSize: AppConstants.FontSizes.title)
                 Spacer()
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, AppConstants.Spacing.tight)
 
             VStack(spacing: 0) {
-                let isSmallScreen = UIScreen.main.bounds.height < 700
                 let showTapText = !dataManager.isDailyCardRevealed && viewModel.showTapToReveal
 
                 Spacer(minLength: isSmallScreen ? 2 : 4)
@@ -142,25 +142,22 @@ struct HomeView: View {
                 DailyCardLarge(dailyCard: viewModel.userDailyCard)
 
                 if showTapText {
-                    Spacer(minLength: isSmallScreen ? 8 : 16)
+                    Spacer(minLength: isSmallScreen ? 8 : AppConstants.Spacing.ornament)
 
                     Text(AppConstants.Strings.tapToReveal)
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                        .foregroundColor(.black)
+                        .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
-                        .padding(.bottom, isSmallScreen ? 2 : 8)
                         .scaleEffect(viewModel.pulseScale)
-
-                    Spacer(minLength: isSmallScreen ? 4 : 12)
                 } else {
                     Spacer(minLength: isSmallScreen ? 2 : 4)
                 }
 
                 LineBreak("linedesignd", width: 320)
-                    .padding(.bottom, isSmallScreen ? 4 : 8)
+                    .padding(.vertical, AppConstants.Spacing.ornament)
             }
 
-            HStack(spacing: AppConstants.Spacing.small) {
+            HStack(spacing: AppConstants.Spacing.ornament) {
                 ActualCardTileSmall(
                     card: viewModel.userBirthCard,
                     title: AppConstants.Strings.birthCard,
@@ -179,8 +176,8 @@ struct HomeView: View {
                     destination: FiftyTwoDayCycleView()
                 )
             }
-            .padding(.horizontal, AppConstants.Spacing.medium)
-            .padding(.top, UIScreen.main.bounds.height < 700 ? AppConstants.Spacing.small : AppConstants.Spacing.large)
+            .padding(.horizontal, AppConstants.Spacing.pageInset)
+            .padding(.top, isSmallScreen ? AppConstants.Spacing.tight : AppConstants.Spacing.ornament)
         }
         .opacity(showContent ? 1 : 0)
     }
@@ -213,19 +210,19 @@ struct ProfileSetupBlockingView: View {
                     }
 
                     titleSection(for: geometry.size)
-                        .padding(.bottom, 24)
 
                     // Subtitle
                     Text("Cardology for Self-Discovery")
+                        .padding(.top, AppConstants.Spacing.ornament)
                         .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 20)))
                         .foregroundColor(AppTheme.primaryText)
                         .fixedSize(horizontal: false, vertical: true)
                         .opacity(showSubtitle ? 1 : 0)
                         .animation(.easeInOut(duration: 1.0).delay(0.5), value: showSubtitle)
-                        .padding(.bottom, 16)
+                        .padding(.bottom, AppConstants.Spacing.section)
 
                     if !authManager.isSignedIn {
-                        VStack(spacing: 16) {
+                        VStack(spacing: AppConstants.Spacing.ornament) {
                             // 1. Top linedesign above button
                             if let lineImage = UIImage(named: "linedesign") {
                                 Image(uiImage: lineImage)
@@ -250,24 +247,26 @@ struct ProfileSetupBlockingView: View {
                             .frame(height: 45)
                             .frame(width: min(geometry.size.width * 0.63, 270))
                             .cornerRadius(AppConstants.CornerRadius.button)
+                            .overlay(
+                                AnimatedGoldBorder(cornerRadius: AppConstants.CornerRadius.button)
+                            )
                             .opacity(showContent ? 1 : 0)
                             .animation(.easeInOut(duration: 1.0).delay(0.9), value: showContent)
-                            .padding(.top, 8)
 
                             // 3. Supporting text below button
                             Text("Sign in with Apple to access all features.")
-                                .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 17)))
+                                .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 16)))
                                 .foregroundColor(AppTheme.primaryText)
                                 .multilineTextAlignment(.center)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .padding(.horizontal, 40)
+                                .padding(.horizontal, AppConstants.Spacing.page)
                                 .opacity(showContent ? 1 : 0)
                                 .animation(.easeInOut(duration: 1.0).delay(1.0), value: showContent)
 
                             // 4. Privacy section
                             VStack(alignment: .center, spacing: 4) {
                                 Text("We do not collect your data.")
-                                    .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 16)))
+                                    .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 14)))
                                     .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -278,15 +277,16 @@ struct ProfileSetupBlockingView: View {
                                     }
                                 }) {
                                     Text("View Privacy Policy")
-                                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 16)))
+                                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 14)))
                                         .underline()
                                         .foregroundColor(AppTheme.primaryText)
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .accessibilityLabel("View Privacy Policy")
+                                .accessibilityHint("Opens privacy policy in browser")
                             }
-                            .padding(.horizontal, 40)
-                            .padding(.top, 4)
+                            .padding(.horizontal, AppConstants.Spacing.page)
                             .opacity(showContent ? 1 : 0)
                             .animation(.easeInOut(duration: 1.0).delay(1.1), value: showContent)
 
@@ -298,34 +298,34 @@ struct ProfileSetupBlockingView: View {
                                     .frame(width: 260, height: 26)
                                     .opacity(showContent ? 1 : 0)
                                     .animation(.easeInOut(duration: 1.0).delay(1.2), value: showContent)
+                                    .accessibilityHidden(true)
                             }
 
-                            // 6. Guest option
-                            Button(action: {
-                                showingGuestBirthdaySheet = true
-                            }) {
-                                Text("Continue as a Guest")
-                                    .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 17)))
+                            // 6. Guest option with disclaimer
+                            VStack(spacing: 6) {
+                                Button(action: {
+                                    showingGuestBirthdaySheet = true
+                                }) {
+                                    Text("Continue as a Guest")
+                                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 19)))
+                                        .underline()
+                                        .foregroundColor(AppTheme.primaryText)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .frame(minHeight: AppConstants.Accessibility.minimumTouchTarget)
+                                        .contentShape(Rectangle())
+                                }
+                                .accessibilityLabel("Continue as a Guest")
+                                .accessibilityHint("Use app without signing in, some features limited")
+
+                                Text("Guest accounts require re-entering your birth date each session. Some features may be limited.")
+                                    .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 13)))
                                     .foregroundColor(AppTheme.primaryText)
-                                    .underline()
+                                    .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)
-                                    .frame(minHeight: AppConstants.Accessibility.minimumTouchTarget)
-                                    .contentShape(Rectangle())
+                                    .padding(.horizontal, AppConstants.Spacing.page)
                             }
-                            .padding(.top, -8)
                             .opacity(showContent ? 1 : 0)
                             .animation(.easeInOut(duration: 1.0).delay(1.3), value: showContent)
-
-                            // 7. Guest disclaimer
-                            Text("Guest accounts require re-entering your birth date each session. Some features may be limited.")
-                                .font(.custom("Iowan Old Style", size: dynamicFontSize(for: geometry.size, base: 14)))
-                                .foregroundColor(AppTheme.primaryText)
-                                .multilineTextAlignment(.center)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(.horizontal, 40)
-                                .padding(.top, -12)
-                                .opacity(showContent ? 1 : 0)
-                                .animation(.easeInOut(duration: 1.0).delay(1.4), value: showContent)
                         }
                     } else {
                         // When signed in, keep title/subtitle visible while sheet opens
@@ -335,7 +335,7 @@ struct ProfileSetupBlockingView: View {
 
                     Spacer()
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, AppConstants.Spacing.pageInset)
             }
             .sheet(isPresented: $showingProfileSheet) {
                 ProfileSheet()
@@ -409,6 +409,7 @@ struct ProfileSetupBlockingView: View {
 struct DailyCardLarge: View {
     let dailyCard: Card
     @ObservedObject private var dataManager: DataManager = DataManager.shared
+    @Environment(\.colorScheme) private var colorScheme
 
     // Smaller card size for SE and other small screens
     private var cardSize: CGSize {
@@ -429,10 +430,11 @@ struct DailyCardLarge: View {
                     if let cardImage = ImageManager.shared.loadCardImage(named: cardImageName) {
                         Image(uiImage: cardImage)
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
+                            .aspectRatio(contentMode: .fill)
                             .frame(width: cardSize.width, height: cardSize.height)
+                            .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                            .cardShadow(isLarge: true)
+                            .darkModeCardEffects(isLarge: true)
                             .accessibilityLabel("\(dailyCard.value) of \(dailyCard.suit.rawValue), your daily card")
                             .accessibilityAddTraits(.isImage)
                     } else {
@@ -442,20 +444,21 @@ struct DailyCardLarge: View {
                             .overlay(
                                 Text("Card Image\nNot Found")
                                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                             )
-                            .cardShadow(isLarge: true)
+                            .darkModeCardEffects(isLarge: true)
                     }
                 } else {
                     if let cardBackImage = UIImage(named: "cardback") {
                         Image(uiImage: cardBackImage)
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
+                            .aspectRatio(contentMode: .fill)
                             .frame(width: cardSize.width, height: cardSize.height)
+                            .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                            .cardShadow(isLarge: true)
-                            .accessibilityLabel("Daily card, tap to reveal")
+                            .darkModeCardEffects(isLarge: true)
+                            .accessibilityLabel("Daily card, Tap Card to Reveal")
                             .accessibilityAddTraits(.isImage)
                             .accessibilityAddTraits(.isButton)
                     } else {
@@ -465,10 +468,10 @@ struct DailyCardLarge: View {
                             .overlay(
                                 Text("Card Back\nNot Found")
                                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                             )
-                            .cardShadow(isLarge: true)
+                            .darkModeCardEffects(isLarge: true)
                     }
                 }
             }
@@ -481,6 +484,8 @@ struct ActualCardTileSmall<Destination: View>: View {
     let card: Card
     let title: String
     let destination: Destination
+
+    @Environment(\.colorScheme) private var colorScheme
 
     // Smaller size for SE screens
     private var cardSize: CGSize {
@@ -497,32 +502,33 @@ struct ActualCardTileSmall<Destination: View>: View {
                 if let cardImage = ImageManager.shared.loadCardImage(for: card) {
                     Image(uiImage: cardImage)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .aspectRatio(contentMode: .fill)
                         .frame(width: cardSize.width, height: cardSize.height)
+                        .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                        .cardShadow(isLarge: true)
+                        .darkModeCardEffects(isLarge: false)
                         .accessibilityLabel("\(card.value) of \(card.suit.rawValue), \(title)")
                         .accessibilityAddTraits(.isImage)
                 } else {
                     RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: cardSize.width, height: cardSize.height)
-                        .cardShadow(isLarge: true)
+                        .darkModeCardEffects(isLarge: false)
                         .overlay(
                             VStack {
                                 Text(AppConstants.Strings.missingImage)
                                     .font(.custom("Iowan Old Style", size: 8))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                                 Text(card.name)
                                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(AppTheme.primaryText)
                             }
                         )
                 }
 
                 Text(title)
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
-                    .foregroundColor(.black)
+                    .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
             }
@@ -537,13 +543,39 @@ struct GuestBirthdaySheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var dataManager = DataManager.shared
     @State private var birthDate = Calendar.current.date(byAdding: .year, value: -30, to: Date()) ?? Date()
+    @State private var dateText = ""
+    @FocusState private var isTextFieldFocused: Bool
 
-    private let fieldBackgroundColor = Color(red: 0.95, green: 0.90, blue: 0.78)
+    private let fieldBackgroundColor = Color(red: 0.92, green: 0.87, blue: 0.78) // Soft tan
+
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("MMddyyyy")
+        return formatter
+    }
 
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: birthDate)
+        return dateFormatter.string(from: birthDate)
+    }
+
+    private var localizedPlaceholder: String {
+        // Create a sample date to show format pattern
+        let sampleFormatter = DateFormatter()
+        sampleFormatter.locale = Locale.current
+        sampleFormatter.setLocalizedDateFormatFromTemplate("MMddyyyy")
+        // Get the format pattern and convert to placeholder
+        let pattern = sampleFormatter.dateFormat ?? "MM/dd/yyyy"
+        return pattern
+            .replacingOccurrences(of: "MM", with: "MM")
+            .replacingOccurrences(of: "dd", with: "DD")
+            .replacingOccurrences(of: "yyyy", with: "YYYY")
+            .replacingOccurrences(of: "M", with: "M")
+            .replacingOccurrences(of: "d", with: "D")
+    }
+
+    private func parseDate(_ text: String) -> Date? {
+        return dateFormatter.date(from: text)
     }
 
     var body: some View {
@@ -553,8 +585,8 @@ struct GuestBirthdaySheet: View {
                     .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 18) {
-                        Text("Birth Date")
+                    VStack(spacing: AppConstants.Spacing.ornament) {
+                        Text("Enter Your Birthdate")
                             .font(.custom("Iowan Old Style", size: 22))
                             .foregroundColor(AppTheme.primaryText)
 
@@ -563,9 +595,12 @@ struct GuestBirthdaySheet: View {
                             .foregroundColor(AppTheme.secondaryText)
                             .multilineTextAlignment(.center)
 
-                        Text(formattedDate)
+                        TextField(localizedPlaceholder, text: $dateText)
                             .font(.custom("Iowan Old Style", size: 20))
                             .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                            .keyboardType(.numbersAndPunctuation)
+                            .focused($isTextFieldFocused)
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(
@@ -576,7 +611,15 @@ struct GuestBirthdaySheet: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.black.opacity(0.1), lineWidth: 1)
                             )
-                            .padding(.horizontal, 30)
+                            .padding(.horizontal, AppConstants.Spacing.section)
+                            .onChange(of: dateText) { _, newValue in
+                                if let date = parseDate(newValue) {
+                                    birthDate = date
+                                }
+                            }
+                            .onAppear {
+                                dateText = formattedDate
+                            }
 
                         DatePicker("", selection: $birthDate, displayedComponents: .date)
                             .datePickerStyle(WheelDatePickerStyle())
@@ -585,46 +628,60 @@ struct GuestBirthdaySheet: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(fieldBackgroundColor)
                             )
+                            .onChange(of: birthDate) { _, _ in
+                                if !isTextFieldFocused {
+                                    dateText = formattedDate
+                                }
+                            }
 
                         Button(action: {
                             dataManager.signInAsGuest(birthDate: birthDate)
                             dismiss()
                         }) {
-                            Text("Continue as Guest")
+                            Text("Continue")
                                 .font(.custom("Iowan Old Style", size: 19))
                                 .tracking(0.5)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(UIColor { traitCollection in
+                                    traitCollection.userInterfaceStyle == .dark
+                                        ? UIColor.black
+                                        : UIColor.white
+                                }))
                                 .padding(.horizontal, 50)
                                 .padding(.vertical, 18)
-                                .background(AppTheme.darkAccent.opacity(0.7))
+                                .background(AppTheme.darkAccent)
                                 .cornerRadius(30)
+                                .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
                         }
-
-                        Text("Note: Guest accounts have limited features. Some sharing features are not available.")
-                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
-                            .foregroundColor(AppTheme.secondaryText)
-                            .multilineTextAlignment(.center)
+                        .accessibilityLabel("Continue")
+                        .accessibilityHint("Save birth date and continue as guest")
                     }
-                    .padding(.top, 24)
-                    .padding(.bottom, 30)
-                    .padding(.horizontal, 25)
+                    .padding(.top, AppConstants.Spacing.pageInset)
+                    .padding(.bottom, AppConstants.Spacing.section)
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(AppTheme.primaryText)
-                            .frame(width: 32, height: 28)
-                            .background(
-                                Capsule()
-                                    .fill(Color(red: 0.90, green: 0.83, blue: 0.67))
-                            )
+                    Button(action: { dismiss() }) {
+                        if UIScreen.main.bounds.height < 700 {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(width: 28, height: 28)
+                                .background(AppConstants.Colors.capsuleButton)
+                                .clipShape(Circle())
+                                .contentShape(Circle())
+                        } else {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
+                                .contentShape(Rectangle())
+                        }
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Close")
+                    .accessibilityHint("Returns to home screen")
                 }
             }
         }
