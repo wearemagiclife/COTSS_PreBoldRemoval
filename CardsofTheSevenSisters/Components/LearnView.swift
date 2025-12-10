@@ -33,6 +33,8 @@ struct LearnView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Restart Tutorial")
+                    .accessibilityHint("Replay the welcome tutorial")
                     .sheet(isPresented: $showTutorial) {
                         OnboardingTutorialViewWrapper(
                             isPresented: $showTutorial,
@@ -163,6 +165,8 @@ private struct LearnLinkCard: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Learn about \(title)")
+        .accessibilityHint("Opens article in browser")
     }
 
     private func openURL() {

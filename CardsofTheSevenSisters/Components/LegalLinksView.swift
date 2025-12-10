@@ -110,6 +110,8 @@ private struct LegalLinkCard: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("View \(title)")
+        .accessibilityHint("Opens document in browser")
     }
 
     private func openURL() {

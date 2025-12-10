@@ -114,10 +114,10 @@ struct FiftyTwoDayCycleView: View {
                 return "Last 52-Day Cycle"
             }
             if card.id == viewModel.nextPeriodCard.id {
-                return "Your Next 52-Day Card"
+                return "Next 52-Day Card"
             }
             if card.id == viewModel.currentPeriodCard.id {
-                return "Your Current 52-Day Card"
+                return "Current 52-Day Card"
             }
             
             switch contentType {
@@ -244,7 +244,7 @@ struct FiftyTwoDayCycleView: View {
                                         planetTitle: sharePlanetInfo.title,
                                         planetDescription: sharePlanetInfo.description,
                                         cycleInfo: shareCycleInfoText,
-                                        headerTitle: "Your Last 52-Day Cycle"
+                                        headerTitle: "Last 52-Day Cycle"
                                     )
                                 } else if card.id == viewModel.nextPeriodCard.id {
                                     fiftytwoCycleShareLink(
@@ -255,7 +255,7 @@ struct FiftyTwoDayCycleView: View {
                                         planetTitle: sharePlanetInfo.title,
                                         planetDescription: sharePlanetInfo.description,
                                         cycleInfo: shareCycleInfoText,
-                                        headerTitle: "Your Next 52-Day Card"
+                                        headerTitle: "Next 52-Day Card"
                                     )
                                 } else if card.id == viewModel.currentPeriodCard.id {
                                     fiftytwoCycleShareLink(
@@ -266,7 +266,7 @@ struct FiftyTwoDayCycleView: View {
                                         planetTitle: sharePlanetInfo.title,
                                         planetDescription: sharePlanetInfo.description,
                                         cycleInfo: shareCycleInfoText,
-                                        headerTitle: "Your Current 52-Day Card"
+                                        headerTitle: "Current 52-Day Card"
                                     )
                                 } else {
                                     fiftytwoCycleShareLink(
@@ -301,6 +301,8 @@ struct FiftyTwoDayCycleView: View {
                             }
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                             .foregroundColor(.black)
+                            .accessibilityLabel("Reset to current cycle")
+                            .accessibilityHint("Returns to current 52-day cycle")
                         }
                     }
                 )
@@ -311,22 +313,16 @@ struct FiftyTwoDayCycleView: View {
 
     private var headerSection: some View {
         VStack(spacing: AppConstants.Spacing.titleSpacing) {
-            // "YOUR CURRENT CYCLE" as main title
-            Text("CURRENT PLANETARY CYCLE")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
-                .fontWeight(.heavy)
-                .foregroundColor(.black)
-                .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            
+            SectionHeader(
+                "CURRENT PLANETARY CYCLE",
+                fontSize: AppConstants.FontSizes.large
+            )
+
             if let currentDates = currentCycleDates {
                 Text(shortDateRangeString(start: currentDates.start, end: currentDates.end))
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .foregroundColor(.black)
                     .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
             }
         }
         .padding(.top, AppConstants.Spacing.small)
