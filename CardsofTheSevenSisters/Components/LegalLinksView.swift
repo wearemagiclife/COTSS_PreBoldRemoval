@@ -16,7 +16,7 @@ struct LegalLinksView: View {
                         .foregroundColor(AppTheme.primaryText)
                         .padding(.bottom, AppConstants.Spacing.tight)
 
-                    Text("Out of respect, we designed this app to never receive any of your personally identifying information, or to profit from it. We receive anonymous logs for diagnostics. We tried to make these as human friendly as possible, and are available to answer any questions you may have at support@wearemagic.life.")
+                    Text("Out of respect, we designed this app to never receive any of your personally identifying information or profit from your data. We may receive anonymous logs regarding this app only for diagnostics (only if you have agree to this). We tried to make all of our agreements and policies as human friendly as possible. Feel free to contact us at support@wearemagic.life.")
                         .font(.custom("Iowan Old Style", size: 16))
                         .foregroundColor(AppTheme.secondaryText)
                         .padding(.bottom, AppConstants.Spacing.tight)

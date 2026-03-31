@@ -59,11 +59,11 @@ struct YearlySpreadView: View {
     private var navigationTitle: String {
         if showCardDetail, let card = selectedCard {
             if card.id == viewModel.currentYearCard.id {
-                return "This Year's Card"
+                return "CURRENT YEARLY CARD"
             } else if card.id == viewModel.lastYearCard.id {
-                return "Last Year's Card"
+                return "LAST YEAR"
             } else if card.id == viewModel.nextYearCard.id {
-                return "Next Year's Card"
+                return "NEXT YEAR"
             } else {
                 return "Yearly Card"
             }
