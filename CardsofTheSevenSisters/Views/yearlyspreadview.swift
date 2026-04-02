@@ -59,11 +59,11 @@ struct YearlySpreadView: View {
     private var navigationTitle: String {
         if showCardDetail, let card = selectedCard {
             if card.id == viewModel.currentYearCard.id {
-                return "CURRENT YEARLY CARD"
+                return "This Year's Card"
             } else if card.id == viewModel.lastYearCard.id {
-                return "LAST YEAR"
+                return "Last Year's Card"
             } else if card.id == viewModel.nextYearCard.id {
-                return "NEXT YEAR"
+                return "Next Year's Card"
             } else {
                 return "Yearly Card"
             }
@@ -185,7 +185,7 @@ struct YearlySpreadView: View {
         HStack(spacing: AppConstants.Spacing.page) {
             // Last Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("Last Year's Card")
+                Text("LAST YEAR")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
@@ -203,7 +203,7 @@ struct YearlySpreadView: View {
 
             // Next Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("Next Year's Card")
+                Text("NEXT YEAR")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
@@ -239,8 +239,8 @@ struct YearlySpreadView: View {
     
     private func spreadType(for card: Card) -> String {
         if card.id == viewModel.currentYearCard.id { return "This Year's Card" }
-        if card.id == viewModel.lastYearCard.id { return "Last Year's Card" }
-        if card.id == viewModel.nextYearCard.id { return "Next Year's Card" }
+        if card.id == viewModel.lastYearCard.id { return "Last Year" }
+        if card.id == viewModel.nextYearCard.id { return "Next Year" }
         return "Yearly Card"
     }
 
