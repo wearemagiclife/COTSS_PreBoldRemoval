@@ -4,6 +4,7 @@ struct SettingsMenuView: View {
     @Environment(\.dismiss) private var dismiss
 
     @ObservedObject private var authManager = AuthenticationManager.shared
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
     @State private var showingDeleteAccountAlert = false
 
@@ -34,6 +35,19 @@ struct SettingsMenuView: View {
                                     title: "Profile",
                                     subtitle: "Need to change your details?",
                                     cardBackground: cardBackground
+                                )
+                            }
+
+                            NavigationLink {
+                                SubscriptionView()
+                                    .environmentObject(subscriptionManager)
+                            } label: {
+                                SettingsRow(
+                                    systemImage: "star.fill",
+                                    title: "Subscription",
+                                    subtitle: subscriptionManager.isSubscribed ? "Active — thank you!" : "Support Seven Sisters",
+                                    cardBackground: cardBackground,
+                                    subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
                                 )
                             }
 
@@ -183,6 +197,7 @@ private struct SettingsRow: View {
     let title: String
     let subtitle: String?
     let cardBackground: Color
+    var subtitleColor: Color? = nil
 
     var body: some View {
         HStack(spacing: AppConstants.Spacing.ornament) {
@@ -205,7 +220,7 @@ private struct SettingsRow: View {
                 if let subtitle = subtitle {
                     Text(subtitle)
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                        .foregroundColor(AppTheme.secondaryText)
+                        .foregroundColor(subtitleColor ?? AppTheme.secondaryText)
                 }
             }
 

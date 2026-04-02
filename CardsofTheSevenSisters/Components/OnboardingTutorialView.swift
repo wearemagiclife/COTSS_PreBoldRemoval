@@ -421,19 +421,19 @@ struct OnboardingTutorialView: View {
             }
 
             VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
-                (Text("For centuries, ") + Text("The Deck of Cards").bold() + Text(" was used to chart planetary movements. Long before Carl Jung, or even the Tarot, each card was given a universal archetype."))
+                (Text("Long before").bold() + Text(" Carl Jung or the Tarot, the 52 cards, representing universal archetypes, could be used for charting the seasons and planetary movements."))
                     .font(.custom("Iowan Old Style", size: 17))
                     .tracking(0.3)
                     .foregroundColor(AppTheme.primaryText)
                     .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
 
-                (Text("The Seven Sisters").bold() + Text(", or the Pleiades, have guided our ancestors home for millennia. ") + Text("The Cards").bold() + Text(" also offer a fixed reference that, when met by your inner compass, can illuminate deep insight."))
+                (Text("The Seven Sisters,").bold() + Text(" or the Pleiades, were also these same ancestor's guide from above. The Cards offer themes that can to shed light on  navigate."))
                     .font(.custom("Iowan Old Style", size: 17))
                     .tracking(0.3)
                     .foregroundColor(AppTheme.primaryText)
                     .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
 
-                Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are historical reference and for entertainment only. Never advice.")
+                Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are for historical reference and entertainment only. Never advice.")
                     .font(.custom("Iowan Old Style", size: 17))
                     .tracking(0.3)
                     .foregroundColor(AppTheme.primaryText)
