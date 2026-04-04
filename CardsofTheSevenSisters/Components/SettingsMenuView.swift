@@ -7,6 +7,7 @@ struct SettingsMenuView: View {
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
     @State private var showingDeleteAccountAlert = false
+    @State private var showingRateApp = false
 
     // Adaptive card background for light/dark mode
     private let cardBackground = AppConstants.Colors.capsuleButton
@@ -96,6 +97,17 @@ struct SettingsMenuView: View {
                             }
 
                             Button {
+                                showingRateApp = true
+                            } label: {
+                                SettingsRow(
+                                    systemImage: "star.bubble",
+                                    title: "Rate the App",
+                                    subtitle: "Share your experience",
+                                    cardBackground: cardBackground
+                                )
+                            }
+
+                            Button {
                                 openWebsite()
                             } label: {
                                 SettingsRow(
@@ -172,6 +184,13 @@ struct SettingsMenuView: View {
             // Match nav bar to background so it doesn't show as a gray bar
             .toolbarBackground(Color.appLaunchBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .sheet(isPresented: $showingRateApp) {
+                NavigationStack {
+                    RateAppView()
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
             .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
                 Button("Cancel", role: .cancel) { }
                 Button("Delete", role: .destructive) {
