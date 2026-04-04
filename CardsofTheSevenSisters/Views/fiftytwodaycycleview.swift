@@ -8,11 +8,6 @@ struct FiftyTwoDayCycleView: View {
     @State private var selectedCardType: CardType? = nil
     @State private var selectedContentType: DetailContentType? = nil
 
-    @State private var lastCycleTitleWidth: CGFloat = 0
-    @State private var nextCycleTitleWidth: CGFloat = 0
-    @State private var lastCycleDateWidth: CGFloat = 0
-    @State private var nextCycleDateWidth: CGFloat = 0
-
     private var cycleCardDescription: String {
         let repo = DescriptionRepository.shared
         return repo.fiftyTwoDescriptions[String(viewModel.currentPeriodCard.id)] ?? "No description available."
@@ -66,44 +61,7 @@ struct FiftyTwoDayCycleView: View {
 
     // Formats a date range as MM-dd | MM-dd
     private func shortDateRangeString(start: Date, end: Date) -> String {
-        return "\(shortDateString(start)) - \(shortDateString(end))"
-    }
-
-    // Available width for titles/dates (match the column width)
-    private var titleAvailableWidth: CGFloat { AppConstants.CardSizes.large.width }
-    private var dateAvailableWidth: CGFloat { AppConstants.CardSizes.large.width }
-
-    // Unified scales so both sides match exactly and never truncate with ellipses
-    private var unifiedTitleScale: CGFloat {
-        let maxWidth = max(lastCycleTitleWidth, nextCycleTitleWidth)
-        guard maxWidth > 0 else { return 1 }
-        return min(1, titleAvailableWidth / maxWidth)
-    }
-
-    private var unifiedDateScale: CGFloat {
-        let maxWidth = max(lastCycleDateWidth, nextCycleDateWidth)
-        guard maxWidth > 0 else { return 1 }
-        return min(1, dateAvailableWidth / maxWidth)
-    }
-
-    private struct LastCycleTitleWidthKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
-    }
-
-    private struct NextCycleTitleWidthKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
-    }
-
-    private struct LastCycleDateWidthKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
-    }
-
-    private struct NextCycleDateWidthKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
+        return "\(shortDateString(start)). \(shortDateString(end))"
     }
 
     private var navigationTitle: String {
@@ -315,7 +273,7 @@ struct FiftyTwoDayCycleView: View {
         VStack(spacing: AppConstants.Spacing.tight) {
             SectionHeader(
                 "CURRENT PLANETARY CYCLE",
-                fontSize: AppConstants.FontSizes.headline
+                fontSize: AppConstants.FontSizes.large
             )
 
             if let currentDates = currentCycleDates {
@@ -358,32 +316,20 @@ struct FiftyTwoDayCycleView: View {
 
     private var periodCardsSection: some View {
         HStack(spacing: AppConstants.Spacing.page) {
-            // Last Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
                 Text("LAST CYCLE")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
-                    .truncationMode(.tail)
-                    .background(GeometryReader { geo in
-                        Color.clear.preference(key: NextCycleTitleWidthKey.self, value: geo.size.width)
-                    })
-                    .scaleEffect(unifiedTitleScale, anchor: .center)
-                
+
                 if let previousDates = previousCycleDates {
                     Text(shortDateRangeString(start: previousDates.start, end: previousDates.end))
                         .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
                         .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: LastCycleDateWidthKey.self, value: geo.size.width)
-                        })
-                        .scaleEffect(unifiedDateScale, anchor: .center)
                 }
-                
+
                 TappableCard(
                     card: viewModel.lastPeriodCard,
                     size: AppConstants.CardSizes.medium,
@@ -395,50 +341,28 @@ struct FiftyTwoDayCycleView: View {
                         )
                     }
                 )
-                
-                
-                Text("\(viewModel.previousPlanetaryPhase.localizedUppercase)")
+
+                Text(viewModel.previousPlanetaryPhase.localizedUppercase)
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .background(GeometryReader { geo in
-                        Color.clear.preference(key: LastCycleTitleWidthKey.self, value: geo.size.width)
-                    })
-                    .scaleEffect(unifiedTitleScale, anchor: .center)
             }
-            
-            .frame(width: AppConstants.CardSizes.large.width)
 
-            // Next Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
                 Text("NEXT CYCLE")
                     .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .truncationMode(.tail)
-                    .background(GeometryReader { geo in
-                        Color.clear.preference(key: NextCycleTitleWidthKey.self, value: geo.size.width)
-                    })
-                    .scaleEffect(unifiedTitleScale, anchor: .center)
-                
+
                 if let nextDates = nextCycleDates {
                     Text(shortDateRangeString(start: nextDates.start, end: nextDates.end))
                         .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
                         .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: NextCycleDateWidthKey.self, value: geo.size.width)
-                        })
-                        .scaleEffect(unifiedDateScale, anchor: .center)
                 }
-                
+
                 TappableCard(
                     card: viewModel.nextPeriodCard,
                     size: AppConstants.CardSizes.medium,
@@ -450,25 +374,14 @@ struct FiftyTwoDayCycleView: View {
                         )
                     }
                 )
-                
-                Text("\(viewModel.nextPlanetaryPhase.localizedUppercase)")
-                        .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
-                        .fontWeight(.heavy)
-                        .foregroundColor(AppTheme.primaryText)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: LastCycleTitleWidthKey.self, value: geo.size.width)
-                        })
-                        .scaleEffect(unifiedTitleScale, anchor: .center)
+
+                Text(viewModel.nextPlanetaryPhase.localizedUppercase)
+                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
+                    .fontWeight(.heavy)
+                    .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.center)
             }
-            .frame(width: AppConstants.CardSizes.large.width)
         }
-        .onPreferenceChange(LastCycleTitleWidthKey.self) { lastCycleTitleWidth = $0 }
-        .onPreferenceChange(NextCycleTitleWidthKey.self) { nextCycleTitleWidth = $0 }
-        .onPreferenceChange(LastCycleDateWidthKey.self) { lastCycleDateWidth = $0 }
-        .onPreferenceChange(NextCycleDateWidthKey.self) { nextCycleDateWidth = $0 }
     }
 
     private func showCardDetail(card: Card, cardType: CardType, contentType: DetailContentType?) {

@@ -183,14 +183,17 @@ struct YearlySpreadView: View {
     
     private var yearlyCardsSection: some View {
         HStack(spacing: AppConstants.Spacing.page) {
-            // Last Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("Last Year's Card")
-                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
+                Text("LAST YEAR")
+                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.8)
+
+                Text(String(currentYearNumber - 1))
+                    .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                    .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.center)
 
                 TappableCard(
                     card: viewModel.lastYearCard,
@@ -201,14 +204,17 @@ struct YearlySpreadView: View {
                 )
             }
 
-            // Next Cycle Card with Date
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("Next Year's Card")
-                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .body)
+                Text("NEXT YEAR")
+                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
                     .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.8)
+
+                Text(String(currentYearNumber + 1))
+                    .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                    .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.center)
 
                 TappableCard(
                     card: viewModel.nextYearCard,
