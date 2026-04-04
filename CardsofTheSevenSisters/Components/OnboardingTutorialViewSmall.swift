@@ -430,19 +430,19 @@ struct OnboardingTutorialViewSmall: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                (Text("For centuries, ") + Text("The Deck of Cards").bold() + Text(" was used to chart planetary movements. Long before Carl Jung, or even the Tarot, each card was given a universal archetype."))
+                (Text("Long before").bold() + Text(" Carl Jung or the Tarot, the 52 cards represented universal archetypes that as a deck, could be used to chart the seasons and planetary movements."))
                     .font(.custom("Iowan Old Style", size: 13))
                     .tracking(0.1)
                     .foregroundColor(AppTheme.primaryText)
                     .lineSpacing(5)
 
-                (Text("The Seven Sisters").bold() + Text(", or the Pleiades, have guided our ancestors home for millennia. ") + Text("The Cards").bold() + Text(" also offer a fixed reference that, when met by your inner compass, can illuminate deep insight."))
+                (Text("The Seven Sisters,").bold() + Text(" or the Pleiades, have guided our ancestors home for millennia. The Cards can offer a fixed reference to reflect, and when met by your own inner compass, can illuminate deep insight."))
                     .font(.custom("Iowan Old Style", size: 13))
                     .tracking(0.1)
                     .foregroundColor(AppTheme.primaryText)
                     .lineSpacing(5)
 
-                Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are historical reference and for entertainment only. Never advice.")
+                Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are for historical reference and entertainment only. Never advice.")
                     .font(.custom("Iowan Old Style", size: 13))
                     .tracking(0.1)
                     .foregroundColor(AppTheme.primaryText)

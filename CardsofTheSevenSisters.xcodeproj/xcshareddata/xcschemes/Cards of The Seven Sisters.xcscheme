@@ -50,6 +50,9 @@
             ReferencedContainer = "container:CardsofTheSevenSisters.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <StoreKitConfigurationFileReference
+         identifier = "../../CardsofTheSevenSisters/Resources/StoreKit_Config.storekit">
+      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

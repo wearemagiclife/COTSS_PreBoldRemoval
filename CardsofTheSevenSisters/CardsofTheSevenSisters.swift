@@ -28,6 +28,7 @@ struct CardsOfTheSevenSisters: App {
                         .zIndex(0)
                         .environmentObject(AuthenticationManager.shared)
                         .environmentObject(DataManager.shared)
+                        .environmentObject(SubscriptionManager.shared)
                 }
             }
             .preferredColorScheme(appSettings.colorScheme)

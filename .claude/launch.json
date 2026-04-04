@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Cards of The Seven Sisters (Xcode Simulator)",
+      "runtimeExecutable": "xcodebuild",
+      "runtimeArgs": [
+        "-project", "CardsofTheSevenSisters.xcodeproj",
+        "-scheme", "Cards of The Seven Sisters",
+        "-destination", "platform=iOS Simulator,name=iPhone 16",
+        "-configuration", "Debug",
+        "build"
+      ],
+      "port": null
+    }
+  ]
+}
