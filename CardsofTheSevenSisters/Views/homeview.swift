@@ -4,6 +4,7 @@ import AuthenticationServices
 struct HomeView: View {
     @ObservedObject private var dataManager: DataManager = DataManager.shared
     @StateObject private var viewModel = HomeViewModel()
+    @ObservedObject private var ratingService = RatingService.shared
 
     @State private var showingSettings = false
     
@@ -55,6 +56,13 @@ struct HomeView: View {
                     }
                     .sheet(isPresented: $showingSettings) {
                         SettingsMenuView()
+                    }
+                    .sheet(isPresented: $ratingService.shouldShowRatingPrompt) {
+                        NavigationStack {
+                            RateAppView()
+                        }
+                        .presentationDetents([.medium])
+                        .presentationDragIndicator(.visible)
                     }
                     .fullScreenCover(isPresented: $showTutorial) {
                         OnboardingTutorialViewWrapper(

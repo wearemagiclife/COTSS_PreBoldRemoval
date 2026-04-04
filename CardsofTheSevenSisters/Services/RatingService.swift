@@ -2,8 +2,11 @@ import StoreKit
 import SwiftUI
 
 /// Service to handle App Store rating requests at optimal moments
-class RatingService {
+class RatingService: ObservableObject {
     static let shared = RatingService()
+
+    /// Set to true to present the custom rating prompt. HomeView observes this.
+    @Published var shouldShowRatingPrompt = false
 
     private let defaults = UserDefaults.standard
 
@@ -29,7 +32,6 @@ class RatingService {
     func trackAppOpen() {
         let count = defaults.integer(forKey: appOpenCountKey) + 1
         defaults.set(count, forKey: appOpenCountKey)
-
         updateConsecutiveDays()
     }
 
@@ -37,8 +39,6 @@ class RatingService {
     func trackBirthCardView() {
         let count = defaults.integer(forKey: birthCardViewCountKey) + 1
         defaults.set(count, forKey: birthCardViewCountKey)
-
-        // Good moment to ask after 3+ views
         if count >= minimumBirthCardViews {
             considerRequestingRating()
         }
@@ -48,8 +48,6 @@ class RatingService {
     func trackDailyCardReveal() {
         let count = defaults.integer(forKey: dailyCardRevealCountKey) + 1
         defaults.set(count, forKey: dailyCardRevealCountKey)
-
-        // Good moment to ask after 5+ reveals
         if count >= minimumDailyReveals {
             considerRequestingRating()
         }
@@ -58,7 +56,6 @@ class RatingService {
     /// Call when user completes onboarding
     func trackOnboardingComplete() {
         // Don't ask immediately after onboarding - too early
-        // Just log it for future reference
     }
 
     // MARK: - Consecutive Days Tracking
@@ -119,12 +116,10 @@ class RatingService {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         defaults.set(currentVersion, forKey: lastRatingRequestVersionKey)
 
-        // Request rating using StoreKit
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            if let scene = UIApplication.shared.connectedScenes
-                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-                SKStoreReviewController.requestReview(in: scene)
-            }
+        // Show our custom prompt after a brief delay so it doesn't interrupt
+        // whatever interaction triggered the rating check
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.shouldShowRatingPrompt = true
         }
     }
 

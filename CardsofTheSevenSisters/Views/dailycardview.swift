@@ -287,32 +287,46 @@ struct DailyCardView: View {
     }
     
     private var lastCycleCardsSection: some View {
-        HStack(spacing: AppConstants.Spacing.cardSpacing) {
-            CardWithLabel(
-                card: viewModel.yesterdayCard.card,
-                label: "Yesterday",
-                size: AppConstants.CardSizes.medium,
-                action: {
-                    showCardDetail(
-                        card: viewModel.yesterdayCard.card,
-                        cardType: .daily,
-                        contentType: .standard
-                    )
-                }
-            )
+        HStack(spacing: AppConstants.Spacing.page) {
+            VStack(spacing: AppConstants.Spacing.tight) {
+                Text("YESTERDAY")
+                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
+                    .fontWeight(.heavy)
+                    .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.center)
 
-            CardWithLabel(
-                card: viewModel.tomorrowCard.card,
-                label: "Tomorrow",
-                size: AppConstants.CardSizes.medium,
-                action: {
-                    showCardDetail(
-                        card: viewModel.tomorrowCard.card,
-                        cardType: .daily,
-                        contentType: .standard
-                    )
-                }
-            )
+                TappableCard(
+                    card: viewModel.yesterdayCard.card,
+                    size: AppConstants.CardSizes.medium,
+                    action: {
+                        showCardDetail(
+                            card: viewModel.yesterdayCard.card,
+                            cardType: .daily,
+                            contentType: .standard
+                        )
+                    }
+                )
+            }
+
+            VStack(spacing: AppConstants.Spacing.tight) {
+                Text("TOMORROW")
+                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
+                    .fontWeight(.heavy)
+                    .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.center)
+
+                TappableCard(
+                    card: viewModel.tomorrowCard.card,
+                    size: AppConstants.CardSizes.medium,
+                    action: {
+                        showCardDetail(
+                            card: viewModel.tomorrowCard.card,
+                            cardType: .daily,
+                            contentType: .standard
+                        )
+                    }
+                )
+            }
         }
     }
     
