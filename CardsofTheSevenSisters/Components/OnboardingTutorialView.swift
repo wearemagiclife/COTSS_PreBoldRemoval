@@ -195,9 +195,9 @@ struct OnboardingTutorialView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
-                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.small)))
-                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.small))
-                                .cardShadow(size: AppConstants.CardSizes.small)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
+                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
+                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 1 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 1 && showFloatingCard) ? 0 : 1)
@@ -226,9 +226,9 @@ struct OnboardingTutorialView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
-                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.small)))
-                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.small))
-                                .cardShadow(size: AppConstants.CardSizes.small)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
+                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
+                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 2 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 2 && showFloatingCard) ? 0 : 1)
@@ -257,9 +257,9 @@ struct OnboardingTutorialView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
-                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.small)))
-                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.small))
-                                .cardShadow(size: AppConstants.CardSizes.small)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
+                                    .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
+                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 3 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 3 && showFloatingCard) ? 0 : 1)
@@ -304,9 +304,9 @@ struct OnboardingTutorialView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 240 * cardScale)
                         .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.large)))
-                        .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.large))
-                                .cardShadow(size: AppConstants.CardSizes.large)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
+                        .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
+                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
                 }
             } else {
                 if let uiImage = ImageManager.shared.loadCardImage(for: currentCard) {
@@ -315,9 +315,9 @@ struct OnboardingTutorialView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 240 * cardScale)
                         .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.large)))
-                        .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.large))
-                                .cardShadow(size: AppConstants.CardSizes.large)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
+                        .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
+                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
                 }
             }
         }
@@ -379,7 +379,7 @@ struct OnboardingTutorialView: View {
             }
         }
         .frame(maxWidth: 500)
-        .frame(height: currentStep == 0 ? UIScreen.main.bounds.height * 0.88 : nil)
+        .frame(height: UIScreen.main.bounds.height * 0.88)
         .padding(.horizontal, AppConstants.Spacing.pageInset)
         .padding(.top, currentStep == 0 ? AppConstants.Spacing.ornament : AppConstants.Spacing.page)
         .padding(.bottom, AppConstants.Spacing.ornament)
@@ -479,7 +479,7 @@ struct OnboardingTutorialView: View {
                     .cornerRadius(AppConstants.CornerRadius.button)
                     .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
             }
-            .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.small))
+            .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
             .accessibilityLabel("Continue")
             .accessibilityHint("Proceed to tutorial")
             .opacity(showWelcomeBody ? 1 : 0)
@@ -528,7 +528,7 @@ struct OnboardingTutorialView: View {
                     .multilineTextAlignment(.leading)
                     .padding(.horizontal, 25)
                     .padding(.vertical, 4)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .fixedSize(horizontal: false, vertical: false)
 
                 if let lineImageD = UIImage(named: "linedesignd") {
                     Image(uiImage: lineImageD)
