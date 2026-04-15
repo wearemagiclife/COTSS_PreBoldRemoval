@@ -205,6 +205,7 @@ struct CardDetailModalView: View {
                     .fill(AppTheme.backgroundColor)
             )
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
+            .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
             .padding(AppConstants.Spacing.pageInset)
             .scaleEffect(isPresented ? 1 : 1)
             .opacity(isPresented ? 1 : 0)
