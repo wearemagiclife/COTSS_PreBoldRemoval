@@ -126,10 +126,7 @@ struct VintageButtonStyle: ButtonStyle {
             .background(AppTheme.darkAccent)
             .cornerRadius(25)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .shadow(color: AppTheme.deepShadow.color,
-                   radius: AppTheme.deepShadow.radius,
-                   x: AppTheme.deepShadow.x,
-                   y: AppTheme.deepShadow.y)
+            .shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 3)
     }
 }
 
@@ -147,10 +144,7 @@ struct GoldButtonStyle: ButtonStyle {
                     .stroke(AppTheme.darkAccent, lineWidth: 1)
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .shadow(color: AppTheme.cardShadow.color,
-                   radius: AppTheme.cardShadow.radius,
-                   x: AppTheme.cardShadow.x,
-                   y: AppTheme.cardShadow.y)
+            .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
     }
 }
 

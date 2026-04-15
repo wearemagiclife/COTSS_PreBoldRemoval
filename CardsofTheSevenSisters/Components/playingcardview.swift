@@ -27,8 +27,8 @@ struct PlayingCardView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: scaledWidth, height: scaledHeight)
                     .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .darkModeCardEffects()
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: CGSize(width: scaledWidth, height: scaledHeight))))
+                    .darkModeCardEffects(size: CGSize(width: scaledWidth, height: scaledHeight))
                     .accessibilityLabel(cardAccessibilityLabel)
                     .accessibilityAddTraits(.isImage)
             } else {
@@ -92,9 +92,9 @@ struct PlayingCardView: View {
     
     private var textBasedCardView: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: CGSize(width: scaledWidth, height: scaledHeight)))
                 .fill(AppTheme.cardBackground)
-                .darkModeCardEffects()
+                .darkModeCardEffects(size: CGSize(width: scaledWidth, height: scaledHeight))
 
             VStack {
                 HStack {

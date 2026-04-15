@@ -190,8 +190,8 @@ struct CardGlossEffect: ViewModifier {
                 .blendMode(.overlay)
             }
             .allowsHitTesting(false)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: geometry.size), style: .continuous))
         }
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: geometry.size), style: .continuous))
     }
 }
 

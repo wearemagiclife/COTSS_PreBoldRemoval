@@ -185,7 +185,7 @@ struct VintageSplashView: View {
                 .multilineTextAlignment(.center)
         }
         .scaleEffect(1.0)
-        .cardShadow(isLarge: true)
+        .cardShadow(size: AppConstants.CardSizes.large)
         .opacity(showButton && !isTransitioning ? 1 : 0)
         .animation(.easeInOut(duration: 1.0).delay(2.5), value: showButton)
         .animation(.easeOut(duration: 0.3), value: isTransitioning)
@@ -322,7 +322,7 @@ struct VintageCardImageView: View {
                             cardSheenOverlay
                         )
                         .scaleEffect(0.95)
-                        .cardShadow()
+                        .cardShadow(size: CGSize(width: cardWidth, height: cardHeight))
                         .accessibilityHidden(true)
                 } else {
                     // Light mode style (from Documents version)
@@ -332,7 +332,7 @@ struct VintageCardImageView: View {
                         .frame(width: cardWidth, height: cardHeight)
                         .scaleEffect(1.08)
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small))
-                        .cardShadow()
+                        .cardShadow(size: CGSize(width: cardWidth, height: cardHeight))
                         .accessibilityHidden(true)
                 }
             } else {
@@ -340,7 +340,7 @@ struct VintageCardImageView: View {
                     RoundedRectangle(cornerRadius: AppConstants.CornerRadius.small)
                         .fill(Color.white)
                         .frame(width: cardWidth, height: cardHeight)
-                        .cardShadow()
+                        .cardShadow(size: CGSize(width: cardWidth, height: cardHeight))
 
                     VStack {
                         Text(AppConstants.Strings.missingImage)
