@@ -286,20 +286,22 @@ struct StandardNavigation: ViewModifier {
 }
 
 struct CardShadow: ViewModifier {
-    let isLarge: Bool
+    let size: CGSize
     @Environment(\.colorSchemeContrast) var contrast
 
     func body(content: Content) -> some View {
+        let offset = AppConstants.CardStyle.shadowOffset(for: size)
         content
             .shadow(
                 color: shadowColor,
-                radius: isLarge ? AppConstants.Shadow.detailRadius : AppConstants.Shadow.cardRadius,
-                x: isLarge ? AppConstants.Shadow.detailOffset.width : AppConstants.Shadow.cardOffset.width,
-                y: isLarge ? AppConstants.Shadow.detailOffset.height : AppConstants.Shadow.cardOffset.height
+                radius: AppConstants.CardStyle.shadowRadius(for: size),
+                x: offset.width,
+                y: offset.height
             )
     }
 
     private var shadowColor: Color {
+        let isLarge = size.width >= AppConstants.CardSizes.medium.width
         let baseOpacity = isLarge ? AppConstants.Shadow.detailOpacity : AppConstants.Shadow.cardOpacity
         let adjustedOpacity = contrast == .increased ? baseOpacity * 1.5 : baseOpacity
         return Color.black.opacity(adjustedOpacity)
@@ -309,9 +311,9 @@ struct CardShadow: ViewModifier {
 // MARK: - Dark Mode Gold Glow
 
 /// Adds a subtle metallic gold glow behind cards in dark mode only.
-/// This is a separate layer from the regular shadow - tighter radius for metallic effect.
+/// Radius scales proportionally with card size via CardStyle.glowRadius(for:).
 struct DarkModeGoldGlow: ViewModifier {
-    let isLarge: Bool
+    let size: CGSize
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.colorSchemeContrast) var contrast
 
@@ -321,12 +323,13 @@ struct DarkModeGoldGlow: ViewModifier {
                 color: glowColor,
                 radius: glowRadius,
                 x: 0,
-                y: isLarge ? 1 : 0.5
+                y: AppConstants.CardStyle.shadowOffset(for: size).height
             )
     }
 
     private var glowColor: Color {
         guard colorScheme == .dark else { return .clear }
+        let isLarge = size.width >= AppConstants.CardSizes.medium.width
         let baseOpacity = isLarge ? AppConstants.DarkModeEffects.glowOpacityLarge : AppConstants.DarkModeEffects.glowOpacitySmall
         let adjustedOpacity = contrast == .increased ? baseOpacity * 1.3 : baseOpacity
         return AppTheme.goldAccent.opacity(adjustedOpacity)
@@ -334,7 +337,7 @@ struct DarkModeGoldGlow: ViewModifier {
 
     private var glowRadius: CGFloat {
         guard colorScheme == .dark else { return 0 }
-        return isLarge ? AppConstants.DarkModeEffects.glowRadiusLarge : AppConstants.DarkModeEffects.glowRadiusSmall
+        return AppConstants.CardStyle.glowRadius(for: size)
     }
 }
 
@@ -342,22 +345,22 @@ struct DarkModeGoldGlow: ViewModifier {
 
 /// Combined modifier that applies all card visual effects:
 /// - Black shadow (always, for depth)
-/// - Gold glow (dark mode only, tight radius for metallic effect)
+/// - Gold glow (dark mode only, radius scales with card size)
 /// - Glossy shine effect with 3D tilt (dark mode only)
 struct DarkModeCardEffects: ViewModifier {
-    let isLarge: Bool
+    let size: CGSize
     let glossIntensity: Double
 
-    init(isLarge: Bool = false, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) {
-        self.isLarge = isLarge
+    init(size: CGSize, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) {
+        self.size = size
         self.glossIntensity = glossIntensity
     }
 
     func body(content: Content) -> some View {
         content
-            .modifier(DarkModeGoldGlow(isLarge: isLarge))  // Gold glow (dark mode only)
-            .cardShadow(isLarge: isLarge)                   // Black shadow (always)
-            .cardGloss(intensity: glossIntensity)           // Gloss + 3D tilt (dark mode only)
+            .modifier(DarkModeGoldGlow(size: size))  // Gold glow (dark mode only)
+            .cardShadow(size: size)                   // Black shadow (always)
+            .cardGloss(intensity: glossIntensity)     // Gloss + 3D tilt (dark mode only)
     }
 }
 
@@ -410,14 +413,14 @@ extension View {
         ))
     }
     
-    func cardShadow(isLarge: Bool = false) -> some View {
-        modifier(CardShadow(isLarge: isLarge))
+    func cardShadow(size: CGSize) -> some View {
+        modifier(CardShadow(size: size))
     }
 
     /// Applies all dark mode card effects: gold glow shadow + glossy shine with 3D tilt.
-    /// In light mode, only the standard shadow is applied.
-    func darkModeCardEffects(isLarge: Bool = false, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) -> some View {
-        modifier(DarkModeCardEffects(isLarge: isLarge, glossIntensity: glossIntensity))
+    /// Shadow and glow radii scale proportionally with card size. In light mode, only the standard shadow is applied.
+    func darkModeCardEffects(size: CGSize, glossIntensity: Double = AppConstants.DarkModeEffects.glossIntensity) -> some View {
+        modifier(DarkModeCardEffects(size: size, glossIntensity: glossIntensity))
     }
     
     func errorFallback(message: String, retryAction: (() -> Void)? = nil) -> some View {

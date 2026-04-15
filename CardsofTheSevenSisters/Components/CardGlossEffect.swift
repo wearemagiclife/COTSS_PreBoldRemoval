@@ -191,7 +191,7 @@ struct CardGlossEffect: ViewModifier {
             }
             .allowsHitTesting(false)
         }
-        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: geometry.size), style: .continuous))
     }
 }
 

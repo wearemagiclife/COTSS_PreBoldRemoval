@@ -160,23 +160,19 @@ struct AppConstants {
     }
     
     struct CardStyle {
-        /// Returns the recommended corner radius constant for a given card size.
-        /// Uses width comparisons with a small tolerance to avoid floating errors.
+        /// All card visual properties scale proportionally from card width.
+        /// 6% matches physical playing card corner-to-width ratio.
         static func cornerRadius(for size: CGSize) -> CGFloat {
-            let w = size.width
-            // Large silhouettes
-            if abs(w - AppConstants.CardSizes.extraLarge.width) < 0.5 ||
-                abs(w - AppConstants.CardSizes.large.width) < 0.5 {
-                return AppConstants.CornerRadius.cardLarge
-            }
-            // Medium/small silhouettes
-            if abs(w - AppConstants.CardSizes.medium.width) < 0.5 ||
-                abs(w - AppConstants.CardSizes.small.width) < 0.5 ||
-                abs(w - AppConstants.CardSizes.tiny.width) < 0.5 {
-                return AppConstants.CornerRadius.card
-            }
-            // Default to small radius if unknown
-            return AppConstants.CornerRadius.card
+            (size.width * 0.06).rounded()
+        }
+        static func shadowRadius(for size: CGSize) -> CGFloat {
+            max(2, (size.width * 0.025).rounded())
+        }
+        static func shadowOffset(for size: CGSize) -> CGSize {
+            CGSize(width: 0, height: max(1, (size.width * 0.015).rounded()))
+        }
+        static func glowRadius(for size: CGSize) -> CGFloat {
+            (size.width * 0.06).rounded()
         }
     }
     
@@ -239,9 +235,6 @@ struct AppConstants {
     }
     
     struct CornerRadius {
-        static let card: CGFloat = 12
-        static let cardLarge: CGFloat = 12
-        static let cardDetail: CGFloat = 16
         static let modal: CGFloat = 25
         static let button: CGFloat = 25
         static let small: CGFloat = 10
@@ -326,13 +319,7 @@ struct AppConstants {
 
     struct Shadow {
         static let cardOpacity: Double = 0.15
-        static let cardRadius: CGFloat = 3
-        static let cardOffset = CGSize(width: 0, height: 2)
-
         static let detailOpacity: Double = 0.3
-        static let detailRadius: CGFloat = 10
-        static let detailOffset = CGSize(width: 0, height: 5)
-
         static let overlayOpacity: Double = 0.5
     }
 
@@ -340,11 +327,9 @@ struct AppConstants {
 
     /// Constants for dark mode visual effects on cards
     struct DarkModeEffects {
-        // Gold glow shadow settings - subtle emanation from behind card
+        // Gold glow opacity — radius is derived via CardStyle.glowRadius(for:)
         static let glowOpacitySmall: Double = 0.45
         static let glowOpacityLarge: Double = 0.5
-        static let glowRadiusSmall: CGFloat = 8
-        static let glowRadiusLarge: CGFloat = 12
 
         // Gloss effect settings
         static let glossIntensity: Double = 0.4

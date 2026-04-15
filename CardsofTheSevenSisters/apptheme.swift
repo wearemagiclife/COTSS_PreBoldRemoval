@@ -24,7 +24,6 @@ struct AppTheme {
             ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream for dark mode
             : UIColor.black
     })
-    static let shadowColor = Color.black.opacity(0.3)
     static let primaryText = Color(UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
             ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 1.0)  // cream for dark mode
@@ -54,55 +53,11 @@ struct AppTheme {
     static let paddingLarge: CGFloat = 24
     static let cornerRadius: CGFloat = 8
     
-    static let cardShadow = Shadow(color: shadowColor, radius: 4, x: 0, y: 2)
-    static let lightShadow = Shadow(color: shadowColor, radius: 2, x: 0, y: 1)
-    static let deepShadow = Shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 3)
-}
-
-struct Shadow {
-    let color: Color
-    let radius: CGFloat
-    let x: CGFloat
-    let y: CGFloat
 }
 
 extension View {
     func appBackground() -> some View {
         self.background(AppTheme.backgroundColor)
-    }
-    
-    func cardBackground() -> some View {
-        self
-            .background(AppTheme.cardBackground)
-            .cornerRadius(AppTheme.cornerRadius)
-            .shadow(color: AppTheme.cardShadow.color,
-                   radius: AppTheme.cardShadow.radius,
-                   x: AppTheme.cardShadow.x,
-                   y: AppTheme.cardShadow.y)
-    }
-    
-    func lightCardBackground() -> some View {
-        self
-            .background(AppTheme.cardBackground)
-            .cornerRadius(AppTheme.cornerRadius)
-            .shadow(color: AppTheme.lightShadow.color,
-                   radius: AppTheme.lightShadow.radius,
-                   x: AppTheme.lightShadow.x,
-                   y: AppTheme.lightShadow.y)
-    }
-    
-    func vintageCardBackground() -> some View {
-        self
-            .background(AppTheme.cardBackground)
-            .cornerRadius(AppTheme.cornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                    .stroke(AppTheme.darkAccent.opacity(0.2), lineWidth: 1)
-            )
-            .shadow(color: AppTheme.deepShadow.color,
-                   radius: AppTheme.deepShadow.radius,
-                   x: AppTheme.deepShadow.x,
-                   y: AppTheme.deepShadow.y)
     }
     
     func bookTitleStyle() -> some View {

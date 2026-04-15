@@ -441,12 +441,12 @@ struct DailyCardLarge: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: cardSize.width, height: cardSize.height)
                             .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                            .darkModeCardEffects(isLarge: true)
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
+                            .darkModeCardEffects(size: cardSize)
                             .accessibilityLabel("\(dailyCard.value) of \(dailyCard.suit.rawValue), your daily card")
                             .accessibilityAddTraits(.isImage)
                     } else {
-                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge)
+                        RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: cardSize.width, height: cardSize.height)
                             .overlay(
@@ -455,7 +455,7 @@ struct DailyCardLarge: View {
                                     .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                             )
-                            .darkModeCardEffects(isLarge: true)
+                            .darkModeCardEffects(size: cardSize)
                     }
                 } else {
                     if let cardBackImage = UIImage(named: "cardback") {
@@ -464,13 +464,13 @@ struct DailyCardLarge: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: cardSize.width, height: cardSize.height)
                             .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge))
-                            .darkModeCardEffects(isLarge: true)
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
+                            .darkModeCardEffects(size: cardSize)
                             .accessibilityLabel("Daily card, Tap Card to Reveal")
                             .accessibilityAddTraits(.isImage)
                             .accessibilityAddTraits(.isButton)
                     } else {
-                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.cardLarge)
+                        RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: cardSize.width, height: cardSize.height)
                             .overlay(
@@ -479,7 +479,7 @@ struct DailyCardLarge: View {
                                     .foregroundColor(AppTheme.primaryText)
                                     .multilineTextAlignment(.center)
                             )
-                            .darkModeCardEffects(isLarge: true)
+                            .darkModeCardEffects(size: cardSize)
                     }
                 }
             }
@@ -513,15 +513,15 @@ struct ActualCardTileSmall<Destination: View>: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: cardSize.width, height: cardSize.height)
                         .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                        .darkModeCardEffects(isLarge: false)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
+                        .darkModeCardEffects(size: cardSize)
                         .accessibilityLabel("\(card.value) of \(card.suit.rawValue), \(title)")
                         .accessibilityAddTraits(.isImage)
                 } else {
-                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                    RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: cardSize.width, height: cardSize.height)
-                        .darkModeCardEffects(isLarge: false)
+                        .darkModeCardEffects(size: cardSize)
                         .overlay(
                             VStack {
                                 Text(AppConstants.Strings.missingImage)

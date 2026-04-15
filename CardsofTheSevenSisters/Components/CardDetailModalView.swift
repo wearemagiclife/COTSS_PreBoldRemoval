@@ -32,6 +32,11 @@ struct CardDetailModalView: View {
         UIScreen.main.bounds.width > 500
     }
 
+    private var modalCardSize: CGSize {
+        let height: CGFloat = isIPad ? 320 : 240
+        return CGSize(width: height / AppConstants.CardSizes.aspect, height: height)
+    }
+
     private func scaledFont(_ baseSize: CGFloat) -> CGFloat {
         isIPad ? baseSize * 1.4 : baseSize
     }
@@ -90,8 +95,8 @@ struct CardDetailModalView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(height: isIPad ? 320 : 240)
                                     .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .darkModeCardEffects(isLarge: true)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: modalCardSize)))
+                                    .darkModeCardEffects(size: modalCardSize)
                                     .accessibilityLabel("The Influence of \(planet).uppercaseFirst")
                                     .accessibilityAddTraits(.isImage)
                             }
@@ -102,8 +107,8 @@ struct CardDetailModalView: View {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(height: isIPad ? 320 : 240)
                                     .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .darkModeCardEffects(isLarge: true)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: modalCardSize)))
+                                    .darkModeCardEffects(size: modalCardSize)
                                     .accessibilityLabel("\(card.value) of \(card.suit.rawValue)")
                                     .accessibilityAddTraits(.isImage)
                             }

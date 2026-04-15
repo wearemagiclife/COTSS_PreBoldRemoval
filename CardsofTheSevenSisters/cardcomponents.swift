@@ -13,7 +13,7 @@ struct TappableCard: View {
     init(card: Card, size: CGSize, cornerRadius: CGFloat? = nil, action: @escaping () -> Void) {
         self.card = card
         self.size = size
-        self.cornerRadius = cornerRadius ?? AppConstants.CornerRadius.cardLarge
+        self.cornerRadius = cornerRadius ?? AppConstants.CardStyle.cornerRadius(for: size)
         self.action = action
     }
 
@@ -29,7 +29,7 @@ struct TappableCard: View {
                 .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                 .clipShape(shape)
                 .contentShape(shape)
-                .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+                .darkModeCardEffects(size: size)
                 .onTapGesture { action() }
                 .accessibilityLabel(accessibilityLabel)
                 .accessibilityAddTraits([.isButton, .isImage])
@@ -62,7 +62,7 @@ struct TappablePlanetCard: View {
     init(planet: String, size: CGSize, cornerRadius: CGFloat? = nil, action: @escaping () -> Void) {
         self.planet = planet
         self.size = size
-        self.cornerRadius = cornerRadius ?? AppConstants.CornerRadius.cardLarge
+        self.cornerRadius = cornerRadius ?? AppConstants.CardStyle.cornerRadius(for: size)
         self.action = action
     }
 
@@ -78,7 +78,7 @@ struct TappablePlanetCard: View {
                 .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
                 .clipShape(shape)
                 .contentShape(shape)
-                .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+                .darkModeCardEffects(size: size)
                 .onTapGesture { action() }
                 .accessibilityLabel(accessibilityLabel)
                 .accessibilityAddTraits([.isButton, .isImage])
@@ -167,7 +167,7 @@ struct FallbackCardView: View {
                 .padding(AppConstants.Spacing.small)
             )
             .contentShape(shape)
-            .darkModeCardEffects(isLarge: size.width >= AppConstants.CardSizes.medium.width)
+            .darkModeCardEffects(size: size)
     }
 
     @ViewBuilder
@@ -200,7 +200,7 @@ struct FallbackPlanetView: View {
                 )
                 .frame(width: size.width, height: size.height)
                 .contentShape(shape)
-                .darkModeCardEffects()
+                .darkModeCardEffects(size: size)
 
             VStack {
                 Text(planetSymbol(for: planet))
