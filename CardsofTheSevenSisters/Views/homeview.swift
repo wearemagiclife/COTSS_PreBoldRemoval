@@ -54,9 +54,6 @@ struct HomeView: View {
                             }
                         }
                     }
-                    .sheet(isPresented: $showingSettings) {
-                        SettingsMenuView()
-                    }
                     .sheet(isPresented: $ratingService.shouldShowRatingPrompt) {
                         NavigationStack {
                             RateAppView()
@@ -97,6 +94,13 @@ struct HomeView: View {
             }
         }
         .errorFallback(message: viewModel.errorMessage)
+        .overlay {
+            if showingSettings {
+                SettingsMenuView(isPresented: $showingSettings)
+                    .zIndex(20)
+            }
+        }
+        .ignoresSafeArea()
     }
     
     private var headerView: some View {

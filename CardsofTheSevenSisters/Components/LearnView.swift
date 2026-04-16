@@ -37,7 +37,7 @@ struct LearnView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel("Restart Tutorial")
                     .accessibilityHint("Replay the welcome tutorial")
-                    .sheet(isPresented: $showTutorial) {
+                    .fullScreenCover(isPresented: $showTutorial) {
                         OnboardingTutorialViewWrapper(
                             isPresented: $showTutorial,
                             birthCard: DataManager.shared.getCard(by: 1),

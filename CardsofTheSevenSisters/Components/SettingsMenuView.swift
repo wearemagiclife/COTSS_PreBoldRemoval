@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsMenuView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Binding var isPresented: Bool
 
     @ObservedObject private var authManager = AuthenticationManager.shared
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
@@ -13,19 +13,24 @@ struct SettingsMenuView: View {
     private let cardBackground = AppConstants.Colors.capsuleButton
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Full-screen app background
-                Color.appLaunchBackground
-                    .ignoresSafeArea()
+        ZStack {
+            // Dimmed backdrop — tap to dismiss
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+                .onTapGesture { isPresented = false }
 
-                ScrollView {
-                    VStack(spacing: AppConstants.Spacing.cardPadding) {
-                        Text("Settings")
-                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
-                            .foregroundColor(AppTheme.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, AppConstants.Spacing.tight)
+            // Settings panel — inset on all 4 sides, same as CardDetailModalView
+            NavigationStack {
+                ZStack {
+                    AppTheme.backgroundColor.ignoresSafeArea()
+
+                    ScrollView {
+                        VStack(spacing: AppConstants.Spacing.cardPadding) {
+                            Text("Settings")
+                                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.dynamicBody))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, AppConstants.Spacing.tight)
 
                         VStack(spacing: AppConstants.Spacing.tight) {
                             NavigationLink {
@@ -34,7 +39,7 @@ struct SettingsMenuView: View {
                                 SettingsRow(
                                     systemImage: "person.crop.circle",
                                     title: "Profile",
-                                    subtitle: "Need to change your details?",
+                                    subtitle: "Make Changes",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -46,7 +51,7 @@ struct SettingsMenuView: View {
                                 SettingsRow(
                                     systemImage: "star.fill",
                                     title: "Subscription",
-                                    subtitle: subscriptionManager.isSubscribed ? "Active — thank you!" : "Support Seven Sisters",
+                                    subtitle: subscriptionManager.isSubscribed ? "Active — thank you!" : "Support the Seven Sisters",
                                     cardBackground: cardBackground,
                                     subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
                                 )
@@ -80,7 +85,7 @@ struct SettingsMenuView: View {
                                 SettingsRow(
                                     systemImage: "bell.badge",
                                     title: "Notifications",
-                                    subtitle: "Never miss your Daily Card",
+                                    subtitle: "Never miss a Daily Card",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -91,7 +96,7 @@ struct SettingsMenuView: View {
                                 SettingsRow(
                                     systemImage: "doc.text.magnifyingglass",
                                     title: "Legal",
-                                    subtitle: "Privacy, Terms, & Data Deletion",
+                                    subtitle: "Our Policies & Terms",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -113,7 +118,7 @@ struct SettingsMenuView: View {
                                 SettingsRow(
                                     systemImage: "globe",
                                     title: "Need Support?",
-                                    subtitle: "www.wearemagic.life/support",
+                                    subtitle: "wearemagic.life/support",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -125,7 +130,7 @@ struct SettingsMenuView: View {
                                 } else {
                                     authManager.signOut()
                                 }
-                                dismiss()
+                                isPresented = false
                             } label: {
                                 SettingsRow(
                                     systemImage: "rectangle.portrait.and.arrow.right",
@@ -149,58 +154,63 @@ struct SettingsMenuView: View {
                                 }
                             }
 
+                        }  // inner VStack (settings rows)
+                        .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                        .padding(.bottom, AppConstants.Spacing.section)
+                        }  // outer VStack
+                    }  // ScrollView
+                }  // ZStack (background + ScrollView)
+                .navigationTitle("")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: { isPresented = false }) {
+                            if UIScreen.main.bounds.height < 700 {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(AppTheme.primaryText)
+                                    .frame(width: 28, height: 28)
+                                    .background(AppConstants.Colors.capsuleButton)
+                                    .clipShape(Circle())
+                                    .contentShape(Circle())
+                            } else {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(AppTheme.primaryText)
+                                    .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
+                                    .contentShape(Rectangle())
+                            }
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Close settings")
+                        .accessibilityHint("Returns to home screen")
                     }
-                    .padding(.horizontal, AppConstants.Spacing.cardPadding)
-                    .padding(.bottom, AppConstants.Spacing.section)
                 }
-            }
-            .navigationTitle("") // we'll style our own header
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { dismiss() }) {
-                        if UIScreen.main.bounds.height < 700 {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(AppTheme.primaryText)
-                                .frame(width: 28, height: 28)
-                                .background(AppConstants.Colors.capsuleButton)
-                                .clipShape(Circle())
-                                .contentShape(Circle())
-                        } else {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 20))
-                                .foregroundColor(AppTheme.primaryText)
-                                .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
-                                .contentShape(Rectangle())
-                        }
+                .toolbarBackground(AppTheme.backgroundColor, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .sheet(isPresented: $showingRateApp) {
+                    NavigationStack {
+                        RateAppView()
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close settings")
-                    .accessibilityHint("Returns to home screen")
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
                 }
-            }
-            // Match nav bar to background so it doesn't show as a gray bar
-            .toolbarBackground(Color.appLaunchBackground, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .sheet(isPresented: $showingRateApp) {
-                NavigationStack {
-                    RateAppView()
+                .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
+                    Button("Cancel", role: .cancel) { }
+                    Button("Delete", role: .destructive) {
+                        authManager.deleteAccount()
+                        isPresented = false
+                    }
+                } message: {
+                    Text("This will permanently delete all your data including your profile, preferences, and card history. This action cannot be undone.")
                 }
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-            }
-            .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Delete", role: .destructive) {
-                    authManager.deleteAccount()
-                    dismiss()
-                }
-            } message: {
-                Text("This will permanently delete all your data including your profile, preferences, and card history. This action cannot be undone.")
-            }
-        }
+            }  // NavigationStack
+            .background(AppTheme.backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
+            .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
+            .padding(AppConstants.Spacing.pageInset)
+        }  // ZStack (backdrop + panel)
+        .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
     }
 
     private func openWebsite() {
