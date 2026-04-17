@@ -153,32 +153,27 @@ struct HomeView: View {
 
                 DailyCardLarge(dailyCard: viewModel.userDailyCard)
 
-                // Reserve space for the status line to prevent push-down, with glide transition
-                Group {
-                    if showTapText {
-                        Text(AppConstants.Strings.tapToReveal)
-                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                            .foregroundColor(AppTheme.primaryText)
-                            .multilineTextAlignment(.center)
-                            .scaleEffect(viewModel.pulseScale)
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .move(edge: .top)),
-                                removal: .opacity.combined(with: .move(edge: .top))
-                            ))
-                    } else {
-                        // Invisible placeholder with the same font and line height
-                        Text(AppConstants.Strings.tapToReveal)
-                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                            .opacity(0)
-                    }
+                // Status area below the daily card: show hint before reveal, line design after reveal
+                if showTapText {
+                    Text(AppConstants.Strings.tapToReveal)
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
+                        .foregroundColor(AppTheme.primaryText)
+                        .multilineTextAlignment(.center)
+                        .scaleEffect(viewModel.pulseScale)
+                        .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .move(edge: .top)),
+                            removal: .opacity.combined(with: .move(edge: .top))
+                        ))
+                        .animation(.easeInOut(duration: 0.35), value: showTapText)
+                } else if dataManager.isDailyCardRevealed {
+                    LineBreak("linedesignd", width: 320)
+                        .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
+                        .padding(.bottom, AppConstants.Spacing.ornament)
+                        .opacity(showContent ? 1 : 0)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .animation(.easeInOut(duration: 0.35), value: dataManager.isDailyCardRevealed)
                 }
-                .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
-                .animation(.easeInOut(duration: 0.35), value: showTapText)
-
-                LineBreak("linedesignd", width: 320)
-                    .padding(.vertical, AppConstants.Spacing.ornament)
-                    .opacity(showContent ? 1 : 0)
-                    .animation(.easeInOut(duration: 0.35), value: showContent)
             }
 
             HStack(spacing: AppConstants.Spacing.ornament) {
