@@ -40,11 +40,11 @@ struct HomeView: View {
                             showTutorial = true
                         } else {
                             // Stagger the fade-in animations only if not showing tutorial
-                            withAnimation(.easeInOut(duration: 0.3)) {
+                            withAnimation(.easeInOut(duration: 0.4)) {
                                 showWelcome = true
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                withAnimation(.easeInOut(duration: 1.0)) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                withAnimation(.easeInOut(duration: 1.1)) {
                                     showContent = true
                                 }
                             }
@@ -77,11 +77,11 @@ struct HomeView: View {
                     .onChange(of: showTutorial) { oldValue, newValue in
                         if !newValue {
                             // Tutorial was dismissed, show home content
-                            withAnimation(.easeInOut(duration: 0.3)) {
+                            withAnimation(.easeInOut(duration: 0.4)) {
                                 showWelcome = true
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                withAnimation(.easeInOut(duration: 1.0)) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                withAnimation(.easeInOut(duration: 1.1)) {
                                     showContent = true
                                 }
                             }
@@ -124,13 +124,13 @@ struct HomeView: View {
     private var welcomeSection: some View {
         VStack(spacing: 0) {
             Text("\(AppConstants.Strings.welcome), \(dataManager.userProfile.name.isEmpty ? "Guest" : dataManager.userProfile.name)")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge + 2))
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge))
                 .foregroundColor(AppTheme.primaryText)
                 .padding(.bottom, AppConstants.Spacing.tight)
                 .opacity(showWelcome ? 1 : 0)
 
             LineBreak(width: 320)
-                .padding(.vertical, AppConstants.Spacing.ornament)
+                .padding(.top, AppConstants.Spacing.tight)
                 .opacity(showContent ? 1 : 0)
         }
     }
@@ -149,24 +149,36 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 let showTapText = !dataManager.isDailyCardRevealed && viewModel.showTapToReveal
 
-                Spacer(minLength: isSmallScreen ? 2 : 4)
+                Spacer(minLength: isSmallScreen ? 4 : 6)
 
                 DailyCardLarge(dailyCard: viewModel.userDailyCard)
 
-                if showTapText {
-                    Spacer(minLength: isSmallScreen ? 8 : AppConstants.Spacing.ornament)
-
-                    Text(AppConstants.Strings.tapToReveal)
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                        .foregroundColor(AppTheme.primaryText)
-                        .multilineTextAlignment(.center)
-                        .scaleEffect(viewModel.pulseScale)
-                } else {
-                    Spacer(minLength: isSmallScreen ? 2 : 4)
+                // Reserve space for the status line to prevent push-down, with glide transition
+                Group {
+                    if showTapText {
+                        Text(AppConstants.Strings.tapToReveal)
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
+                            .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                            .scaleEffect(viewModel.pulseScale)
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .move(edge: .top)),
+                                removal: .opacity.combined(with: .move(edge: .top))
+                            ))
+                    } else {
+                        // Invisible placeholder with the same font and line height
+                        Text(AppConstants.Strings.tapToReveal)
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
+                            .opacity(0)
+                    }
                 }
+                .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
+                .animation(.easeInOut(duration: 0.35), value: showTapText)
 
                 LineBreak("linedesignd", width: 320)
                     .padding(.vertical, AppConstants.Spacing.ornament)
+                    .opacity(showContent ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.35), value: showContent)
             }
 
             HStack(spacing: AppConstants.Spacing.ornament) {
@@ -703,3 +715,4 @@ struct GuestBirthdaySheet: View {
 #Preview {
     HomeView()
 }
+

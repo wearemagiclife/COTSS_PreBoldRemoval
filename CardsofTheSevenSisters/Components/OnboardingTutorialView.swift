@@ -128,7 +128,7 @@ struct OnboardingTutorialView: View {
 
                 // Welcome text
                 Text("Welcome, \(userName.isEmpty ? "Guest" : userName)")
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge + 2))
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.extraLarge))
                     .foregroundColor(AppTheme.primaryText)
                     .padding(.bottom, AppConstants.Spacing.tight)
                     .opacity(showOverlay ? 0 : 1)
@@ -139,7 +139,7 @@ struct OnboardingTutorialView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 260)
-                        .padding(.vertical, AppConstants.Spacing.ornament)
+                        .padding(.top, AppConstants.Spacing.tight)
                 }
 
                 // Cards section
@@ -211,7 +211,7 @@ struct OnboardingTutorialView: View {
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
                                     .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
-                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
+                                    .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 1 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 1 && showFloatingCard) ? 0 : 1)
@@ -242,7 +242,7 @@ struct OnboardingTutorialView: View {
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
                                     .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
-                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
+                                    .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 2 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 2 && showFloatingCard) ? 0 : 1)
@@ -273,7 +273,7 @@ struct OnboardingTutorialView: View {
                                     .frame(width: AppConstants.CardSizes.small.width, height: AppConstants.CardSizes.small.height)
                                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: AppConstants.CardSizes.extraLarge)))
                                     .modifier(DarkModeGoldGlow(size: AppConstants.CardSizes.extraLarge))
-                                .cardShadow(size: AppConstants.CardSizes.extraLarge)
+                                    .cardShadow(size: AppConstants.CardSizes.extraLarge)
                                     .scaleEffect(highlightedCardStep == 3 ? 1.15 : 1.0)
                                     .animation(.spring(response: 0.5, dampingFraction: 0.65), value: highlightedCardStep)
                                     .opacity((currentStep == 3 && showFloatingCard) ? 0 : 1)
