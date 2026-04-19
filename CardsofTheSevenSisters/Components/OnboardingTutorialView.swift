@@ -44,6 +44,10 @@ struct OnboardingTutorialView: View {
     // Prevents multiple timer starts
     @State private var hasStarted: Bool = false
 
+    // Opening animation states
+    @State private var homeBackgroundOpacity: Double = 0
+    @State private var starSplashOpacity: Double = 0
+
     @Environment(\.colorScheme) private var colorScheme
 
     let birthCard: Card
@@ -79,8 +83,22 @@ struct OnboardingTutorialView: View {
     var body: some View {
         GeometryReader { screenGeo in
             ZStack {
-                // Static background image of home view
+                // Always-visible background color so the screen is never transparent
+                AppTheme.backgroundColor
+                    .ignoresSafeArea()
+
+                // Static background image of home view (fades in after star splash)
                 staticHomeViewBackground
+                    .opacity(homeBackgroundOpacity)
+
+                // Star splash — sevensisters image fades in then out at startup
+                if let starImage = UIImage(named: "sevensisters") {
+                    Image(uiImage: starImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 280)
+                        .opacity(starSplashOpacity)
+                }
 
                 // Dark overlay that fades in/out
                 Color.black.opacity(backgroundOpacity)
@@ -378,7 +396,7 @@ struct OnboardingTutorialView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal)
-                .fill(AppTheme.backgroundColor.opacity(0.95))
+                .fill(AppTheme.backgroundColor)
         )
         .cornerRadius(AppConstants.CornerRadius.modal)
         .overlay(
@@ -449,24 +467,26 @@ struct OnboardingTutorialView: View {
                 .padding(.vertical, AppConstants.Spacing.ornament)
             }
 
-            VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
+            VStack(alignment: .leading, spacing: AppConstants.Spacing.small) {
                 (Text("Long before").bold() + Text(" Carl Jung or the Tarot, the 52 cards, representing universal archetypes, could be used for charting the seasons and planetary movements."))
-                    .font(.custom("Iowan Old Style", size: 17))
-                    .tracking(0.3)
+                    .font(.custom("Iowan Old Style", size: 16))
+                    .tracking(0.8)
                     .foregroundColor(AppTheme.primaryText)
-                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+                    .lineSpacing(AppConstants.Typography.bodyLineSpacing)
+                    .padding(.bottom, 12)
 
                 (Text("The Seven Sisters,").bold() + Text(" or the Pleiades, were also these same ancestor's guide from above. The Cards offer themes that can to shed light on  navigate."))
-                    .font(.custom("Iowan Old Style", size: 17))
-                    .tracking(0.3)
+                    .font(.custom("Iowan Old Style", size: 16))
+                    .tracking(0.8)
                     .foregroundColor(AppTheme.primaryText)
-                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+                    .lineSpacing(AppConstants.Typography.bodyLineSpacing)
+                    .padding(.bottom, 12)
 
                 Text("This system is not designed to predict outcomes: any meanings you find here are the echoes of your own self-discovery. Interpretations are for historical reference and entertainment only. Never advice.")
-                    .font(.custom("Iowan Old Style", size: 17))
-                    .tracking(0.3)
+                    .font(.custom("Iowan Old Style", size: 16))
+                    .tracking(0.8)
                     .foregroundColor(AppTheme.primaryText)
-                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+                    .lineSpacing(AppConstants.Typography.bodyLineSpacing)
 
                 HStack {
                     Spacer()
@@ -477,12 +497,12 @@ struct OnboardingTutorialView: View {
                 .padding(.bottom, 6)
 
                 Text("Next, the tutorial will show you around the app. You can view it again, and find more resources in the Settings Menu.")
-                    .font(.custom("Iowan Old Style", size: 17))
-                    .tracking(0.3)
+                    .font(.custom("Iowan Old Style", size: 16))
+                    .tracking(0.8)
                     .foregroundColor(AppTheme.primaryText)
-                    .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+                    .lineSpacing(AppConstants.Typography.bodyLineSpacing)
             }
-            .frame(maxWidth: 340)
+            .frame(maxWidth: 310)
             .frame(maxWidth: .infinity)
             .padding(.horizontal, AppConstants.Spacing.pageInset)
             .opacity(showWelcomeText ? 1 : 0)
@@ -644,38 +664,52 @@ struct OnboardingTutorialView: View {
         hasStarted = true
 
         if currentStep == 0 {
-            // Wait 2 seconds to let users absorb the background cards, then show modal with dimming
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                withAnimation(.easeInOut(duration: 0.6)) {
-                    showOverlay = true
-                    backgroundOpacity = 0.65
+            // Hold on background color, then star image fades in slowly
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                withAnimation(.easeInOut(duration: 0.8)) {
+                    starSplashOpacity = 1.0
                 }
 
-                // 1. App Logo fades in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    withAnimation(.easeInOut(duration: 0.9)) {
-                        showWelcomeTitle = true
+                // Hold, then fade out slowly
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                    withAnimation(.easeInOut(duration: 0.8)) {
+                        starSplashOpacity = 0
                     }
-                }
 
-                // 2. Line design fades in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
-                    withAnimation(.easeInOut(duration: 0.7)) {
-                        showWelcomeLineDesign = true
-                    }
-                }
+                    // Modal opens directly after star fades — homeview comes later
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation(.easeInOut(duration: 0.6)) {
+                            showOverlay = true
+                            backgroundOpacity = 0.65
+                        }
 
-                // 3. Text fades in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                    withAnimation(.easeInOut(duration: 0.7)) {
-                        showWelcomeText = true
-                    }
-                }
+                        // 1. App Logo fades in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            withAnimation(.easeInOut(duration: 0.9)) {
+                                showWelcomeTitle = true
+                            }
+                        }
 
-                // 4. Buttons fade in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.1) {
-                    withAnimation(.easeInOut(duration: 0.6)) {
-                        showWelcomeBody = true
+                        // 2. Line design fades in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                            withAnimation(.easeInOut(duration: 0.7)) {
+                                showWelcomeLineDesign = true
+                            }
+                        }
+
+                        // 3. Text fades in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
+                            withAnimation(.easeInOut(duration: 0.7)) {
+                                showWelcomeText = true
+                            }
+                        }
+
+                        // 4. Buttons fade in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.3) {
+                            withAnimation(.easeInOut(duration: 0.6)) {
+                                showWelcomeBody = true
+                            }
+                        }
                     }
                 }
             }
@@ -736,28 +770,29 @@ struct OnboardingTutorialView: View {
     }
 
     private func yOffsetForStep(_ step: Int) -> CGFloat {
-        switch step {
-        case 4: return 0 // Daily card - no offset needed
-        default: return -62  // Small cards (1-3) - 62 pixels above natural position
-        }
+        return 0
     }
     
     // MARK: - Unified animation constants
     // All card transitions use these values so every step feels identical.
-    private let cardFlyDuration: Double = 0.55   // spring response for card travel
-    private let cardFlyDamping: Double  = 0.82   // slight bounce, not overdamped
-    private let bgFadeDuration: Double  = 0.35   // dim/undim backdrop
-    private let contentFadeDuration: Double = 0.30  // text/buttons fade
-    // Card lands → short pause → content appears
-    private let contentFadeDelay: Double = 0.45
-    // Content appears → buttons appear
-    private let buttonFadeDelay: Double  = 0.15
+    private let cardFlyDuration: Double = 0.70      // gentle easeInOut card travel
+    private let bgFadeDuration: Double  = 0.50      // dim/undim backdrop
+    private let contentFadeDuration: Double = 0.35  // text/buttons fade
+    // Pre-flight pause (0.4) + fly (0.70) + 0.15s hold before content appears
+    private let contentFadeDelay: Double = 0.85
+    private let buttonFadeDelay: Double  = 0.20
+
+    // Return animation — smooth easeInOut, no spring
+    private let cardReturnDuration: Double = 0.80
+
+    // Overlay hide speed when leaving the welcome step
+    private let overlayHideDuration: Double = 0.80
 
     private func animateCardTransition(to nextStep: Int) {
         let sourceFrame = sourceCardFrame(for: nextStep)
         guard sourceFrame != .zero else { return }
 
-        let yOffset: CGFloat = nextStep == 4 ? -62 : -62
+        let yOffset = yOffsetForStep(nextStep)
         cardPosition = CGPoint(x: sourceFrame.midX, y: sourceFrame.midY + yOffset)
         cardScale    = sourceFrame.height / floatingCardHeight
         cardOpacity  = 1
@@ -765,38 +800,42 @@ struct OnboardingTutorialView: View {
         cardShadowOpacity = 0.2
         showFloatingCard  = true
 
-        // Overlay fades in as card starts moving
-        withAnimation(.easeOut(duration: bgFadeDuration)) {
-            showOverlay = true
-        }
-
-        // Card flies to modal position
-        withAnimation(.spring(response: cardFlyDuration, dampingFraction: cardFlyDamping)) {
-            cardPosition      = modalCardPosition
-            cardScale         = 1.0
-            cardShadowRadius  = 12
-            cardShadowOpacity = 0.3
-        }
-
-        // Background dims while card is in flight
-        withAnimation(.easeInOut(duration: bgFadeDuration).delay(0.1)) {
+        // Dim the homeview while card is in flight — modal stays hidden until card lands
+        withAnimation(.easeInOut(duration: bgFadeDuration)) {
             backgroundOpacity = 0.65
         }
 
-        // Content fades in after card lands
-        DispatchQueue.main.asyncAfter(deadline: .now() + contentFadeDelay) {
-            withAnimation(.easeInOut(duration: self.contentFadeDuration)) {
-                showContent = true
+        // Brief pause before card lifts, then flows gently across the visible homeview
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            withAnimation(.easeInOut(duration: cardFlyDuration)) {
+                cardPosition      = modalCardPosition
+                cardScale         = 1.0
+                cardShadowRadius  = 12
+                cardShadowOpacity = 0.3
             }
-        }
 
-        // Buttons appear just after content
-        DispatchQueue.main.asyncAfter(deadline: .now() + contentFadeDelay + buttonFadeDelay) {
-            withAnimation(.easeInOut(duration: self.contentFadeDuration)) {
-                showButtons = true
-                if nextStep == 4 { showSettingsText = true }
+            // Card lands + hold, then modal fades in 100% opaque
+            DispatchQueue.main.asyncAfter(deadline: .now() + contentFadeDelay) {
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    showOverlay = true
+                }
+
+                // Content fades in just after modal is fully opaque
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    withAnimation(.easeInOut(duration: self.contentFadeDuration)) {
+                        showContent = true
+                    }
+                }
             }
-            isTransitioning = false
+
+            // Buttons appear just after content
+            DispatchQueue.main.asyncAfter(deadline: .now() + contentFadeDelay + 0.2 + buttonFadeDelay) {
+                withAnimation(.easeInOut(duration: self.contentFadeDuration)) {
+                    showButtons = true
+                    if nextStep == 4 { showSettingsText = true }
+                }
+                isTransitioning = false
+            }
         }
     }
 
@@ -805,7 +844,6 @@ struct OnboardingTutorialView: View {
         isTransitioning = true
 
         if currentStep == 0 {
-            // Slower transition for first slide
             // Phase 1: Fade out welcome content
             withAnimation(.easeOut(duration: 0.4)) {
                 showWelcomeTitle = false
@@ -814,24 +852,31 @@ struct OnboardingTutorialView: View {
                 showWelcomeBody = false
             }
 
-            // Phase 2: Fade out background (overlap with content fade for smooth transition)
+            // Phase 2: Fade out background dim
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     backgroundOpacity = 0
                 }
 
-                // Phase 3: Hide overlay - give user time to see home view
+                // Phase 3: Hide modal
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.spring(response: 0.8, dampingFraction: 1.0)) {
+                    withAnimation(.easeInOut(duration: overlayHideDuration)) {
                         showOverlay = false
                     }
 
-                    // Phase 4: Wait longer before showing first card
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        currentStep = 1
+                    // Phase 4: Home view fades in gently
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.easeInOut(duration: 0.9)) {
+                            homeBackgroundOpacity = 1.0
+                        }
 
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            animateCardTransition(to: 1)
+                        // Phase 5: Start first card after home settles
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+                            currentStep = 1
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                animateCardTransition(to: 1)
+                            }
                         }
                     }
                 }
@@ -853,7 +898,7 @@ struct OnboardingTutorialView: View {
                 let currentFrame = sourceCardFrame(for: currentStep)
                 let yOffset = yOffsetForStep(currentStep)
 
-                withAnimation(.spring(response: self.cardFlyDuration, dampingFraction: self.cardFlyDamping)) {
+                withAnimation(.easeInOut(duration: self.cardReturnDuration)) {
                     cardPosition      = CGPoint(x: currentFrame.midX, y: currentFrame.midY + yOffset)
                     cardScale         = currentFrame.height / floatingCardHeight
                     cardShadowRadius  = 5
@@ -862,7 +907,7 @@ struct OnboardingTutorialView: View {
                 }
 
                 // Card lands back, then fire next step
-                DispatchQueue.main.asyncAfter(deadline: .now() + self.cardFlyDuration + 0.1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.cardReturnDuration + 0.1) {
                     showFloatingCard = false
                     let nextStep = currentStep + 1
                     currentStep = nextStep
@@ -906,7 +951,7 @@ struct OnboardingTutorialView: View {
             let currentFrame = sourceCardFrame(for: currentStep)
             let yOffset = yOffsetForStep(currentStep)
 
-            withAnimation(.spring(response: self.cardFlyDuration, dampingFraction: self.cardFlyDamping)) {
+            withAnimation(.easeInOut(duration: self.cardReturnDuration)) {
                 cardPosition      = CGPoint(x: currentFrame.midX, y: currentFrame.midY + yOffset)
                 cardScale         = currentFrame.height / floatingCardHeight
                 cardShadowRadius  = 5
@@ -914,7 +959,7 @@ struct OnboardingTutorialView: View {
                 showOverlay       = false
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + self.cardFlyDuration + 0.1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.cardReturnDuration + 0.1) {
                 showFloatingCard = false
                 let previousStep = currentStep - 1
                 currentStep = previousStep
@@ -958,3 +1003,4 @@ struct DailyCardFramePreferenceKey: PreferenceKey {
         value = nextValue()
     }
 }
+
