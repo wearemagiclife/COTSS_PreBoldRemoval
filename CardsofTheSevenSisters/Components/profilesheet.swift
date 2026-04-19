@@ -15,11 +15,7 @@ struct ProfileSheet: View {
     @State private var dateText = ""
     @FocusState private var isTextFieldFocused: Bool
 
-    private let fieldBackgroundColor = Color(UIColor { traitCollection in
-        traitCollection.userInterfaceStyle == .dark
-            ? UIColor(red: 0.25, green: 0.22, blue: 0.18, alpha: 1.0)  // dark tan (matches AppTheme.cardBackground)
-            : UIColor(red: 0.97, green: 0.95, blue: 0.92, alpha: 1.0)  // soft off-white
-    })
+    private let fieldBackgroundColor = AppConstants.Colors.capsuleButton
 
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -164,7 +160,7 @@ struct ProfileSheet: View {
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                                        .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
                                 )
                             }
                             .padding(.horizontal)
@@ -187,7 +183,7 @@ struct ProfileSheet: View {
                                     )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 10)
-                                            .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                                            .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
                                     )
                                     .accessibilityLabel("Profile Name")
                             }
@@ -214,7 +210,7 @@ struct ProfileSheet: View {
                                     )
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 10)
-                                            .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                                            .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
                                     )
                                     .padding(.horizontal, AppConstants.Spacing.page)
                                     .onChange(of: dateText) { _, newValue in

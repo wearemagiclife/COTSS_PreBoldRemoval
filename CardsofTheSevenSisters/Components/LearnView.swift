@@ -115,7 +115,7 @@ struct LearnView: View {
                 .padding(.bottom, AppConstants.Spacing.section)
             }
         }
-        .navigationTitle("Learn")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LegalLinksView: View {
-    // Match SettingsMenuView button color
+    @Environment(\.dismiss) private var dismiss
     private let cardBackground = AppConstants.Colors.capsuleButton
 
     var body: some View {
@@ -63,8 +63,25 @@ struct LegalLinksView: View {
                 .padding(.bottom, AppConstants.Spacing.section)
             }
         }
-        .navigationTitle("Legal")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: AppConstants.ButtonSizes.backButton, height: AppConstants.ButtonSizes.backButton)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Returns to settings")
+            }
+        }
+        .toolbarBackground(Color.appLaunchBackground, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
 }
 

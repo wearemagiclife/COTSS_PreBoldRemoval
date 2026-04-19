@@ -38,10 +38,6 @@ struct NotificationSettingsView: View {
                         .padding(.vertical, AppConstants.Spacing.cardPadding)
                     } else {
                         VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
-                            Text("Reminders")
-                                .font(.custom("Iowan Old Style", size: 20))
-                                .foregroundColor(AppTheme.primaryText)
-
                             Toggle(isOn: $notificationManager.notificationsEnabled) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Daily Card Reminder")
@@ -74,7 +70,7 @@ struct NotificationSettingsView: View {
         }
         .navigationBarBackButtonHidden(true)
         .standardNavigation(
-            title: "Notifications",
+            title: "",
             hasBackButton: true,
             backAction: { dismiss() }
         )

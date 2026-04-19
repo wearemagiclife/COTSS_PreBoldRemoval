@@ -17,12 +17,6 @@ struct AppearanceSettingsView: View {
 
             ScrollView {
                 VStack(spacing: AppConstants.Spacing.cardPadding) {
-                    Text("Appearance")
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
-                        .foregroundColor(AppTheme.primaryText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, AppConstants.Spacing.tight)
-
                     VStack(spacing: AppConstants.Spacing.tight) {
                         ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
                             Button {

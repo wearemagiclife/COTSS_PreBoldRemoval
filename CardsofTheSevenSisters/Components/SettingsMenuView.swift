@@ -8,6 +8,7 @@ struct SettingsMenuView: View {
 
     @State private var showingDeleteAccountAlert = false
     @State private var showingRateApp = false
+    @State private var showingProfile = false
 
     // Adaptive card background for light/dark mode
     private let cardBackground = AppConstants.Colors.capsuleButton
@@ -26,22 +27,18 @@ struct SettingsMenuView: View {
 
                     ScrollView {
                         VStack(spacing: AppConstants.Spacing.cardPadding) {
-                            Text("Settings")
-                                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.dynamicBody))
-                                .foregroundColor(AppTheme.primaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.top, AppConstants.Spacing.tight)
-
-                        VStack(spacing: AppConstants.Spacing.tight) {
-                            NavigationLink {
-                                ProfileSheet()
-                            } label: {
+                            VStack(spacing: AppConstants.Spacing.tight) {
+                            Button { showingProfile = true } label: {
                                 SettingsRow(
                                     systemImage: "person.crop.circle",
                                     title: "Profile",
                                     subtitle: "Make Changes",
                                     cardBackground: cardBackground
                                 )
+                            }
+                            .buttonStyle(.plain)
+                            .sheet(isPresented: $showingProfile) {
+                                ProfileSheet()
                             }
 
                             NavigationLink {
