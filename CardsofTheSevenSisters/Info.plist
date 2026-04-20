@@ -66,5 +66,7 @@
 	<string>Copyright © 2025 Cards of The Seven Sisters. All rights reserved.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>We use motion data to create realistic lighting effects on cards.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

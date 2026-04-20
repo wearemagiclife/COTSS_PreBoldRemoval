@@ -6,6 +6,23 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		647427032F960BF100A65CFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0061DA22DE2DE1300644B93 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D0061DA92DE2DE1300644B93;
+			remoteInfo = CardsofTheSevenSisters;
+		};
+		647427212F9610FD00A65CFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0061DA22DE2DE1300644B93 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D0061DA92DE2DE1300644B93;
+			remoteInfo = CardsofTheSevenSisters;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		D03B892B2E965ED4008142F6 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -20,6 +37,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		647426FF2F960BF100A65CFA /* Cards of The Seven SistersTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cards of The Seven SistersTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6474271B2F9610FD00A65CFA /* Cards of The Seven Sisters UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cards of The Seven Sisters UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0061DAA2DE2DE1300644B93 /* CardsofTheSevenSisters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CardsofTheSevenSisters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D03B891B2E965ED4008142F6 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -35,6 +54,21 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		647427002F960BF100A65CFA /* Cards of The Seven SistersTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Cards of The Seven SistersTests";
+			sourceTree = "<group>";
+		};
+		6474270D2F960C9C00A65CFA /* Cards of The Seven Sisters UITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Cards of The Seven Sisters UITests";
+			sourceTree = "<group>";
+		};
+		6474271C2F9610FD00A65CFA /* Cards of The Seven Sisters UITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Cards of The Seven Sisters UITests";
+			sourceTree = "<group>";
+		};
 		D0061DAC2DE2DE1300644B93 /* CardsofTheSevenSisters */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -46,6 +80,20 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		647426FC2F960BF100A65CFA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		647427182F9610FD00A65CFA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D0061DA72DE2DE1300644B93 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -60,6 +108,9 @@
 			isa = PBXGroup;
 			children = (
 				D0061DAC2DE2DE1300644B93 /* CardsofTheSevenSisters */,
+				647427002F960BF100A65CFA /* Cards of The Seven SistersTests */,
+				6474270D2F960C9C00A65CFA /* Cards of The Seven Sisters UITests */,
+				6474271C2F9610FD00A65CFA /* Cards of The Seven Sisters UITests */,
 				D03B891A2E965ED4008142F6 /* Frameworks */,
 				D0061DAB2DE2DE1300644B93 /* Products */,
 			);
@@ -69,6 +120,8 @@
 			isa = PBXGroup;
 			children = (
 				D0061DAA2DE2DE1300644B93 /* CardsofTheSevenSisters.app */,
+				647426FF2F960BF100A65CFA /* Cards of The Seven SistersTests.xctest */,
+				6474271B2F9610FD00A65CFA /* Cards of The Seven Sisters UITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,6 +137,52 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		647426FE2F960BF100A65CFA /* Cards of The Seven SistersTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 647427052F960BF100A65CFA /* Build configuration list for PBXNativeTarget "Cards of The Seven SistersTests" */;
+			buildPhases = (
+				647426FB2F960BF100A65CFA /* Sources */,
+				647426FC2F960BF100A65CFA /* Frameworks */,
+				647426FD2F960BF100A65CFA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				647427042F960BF100A65CFA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				647427002F960BF100A65CFA /* Cards of The Seven SistersTests */,
+			);
+			name = "Cards of The Seven SistersTests";
+			packageProductDependencies = (
+			);
+			productName = "Cards of The Seven SistersTests";
+			productReference = 647426FF2F960BF100A65CFA /* Cards of The Seven SistersTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6474271A2F9610FD00A65CFA /* Cards of The Seven Sisters UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 647427232F9610FD00A65CFA /* Build configuration list for PBXNativeTarget "Cards of The Seven Sisters UITests" */;
+			buildPhases = (
+				647427172F9610FD00A65CFA /* Sources */,
+				647427182F9610FD00A65CFA /* Frameworks */,
+				647427192F9610FD00A65CFA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				647427222F9610FD00A65CFA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6474271C2F9610FD00A65CFA /* Cards of The Seven Sisters UITests */,
+			);
+			name = "Cards of The Seven Sisters UITests";
+			packageProductDependencies = (
+			);
+			productName = "Cards of The Seven Sisters UITests";
+			productReference = 6474271B2F9610FD00A65CFA /* Cards of The Seven Sisters UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		D0061DA92DE2DE1300644B93 /* CardsofTheSevenSisters */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D0061DB82DE2DE1500644B93 /* Build configuration list for PBXNativeTarget "CardsofTheSevenSisters" */;
@@ -115,9 +214,17 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					647426FE2F960BF100A65CFA = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = D0061DA92DE2DE1300644B93;
+					};
+					6474271A2F9610FD00A65CFA = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = D0061DA92DE2DE1300644B93;
+					};
 					D0061DA92DE2DE1300644B93 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -140,11 +247,27 @@
 			projectRoot = "";
 			targets = (
 				D0061DA92DE2DE1300644B93 /* CardsofTheSevenSisters */,
+				647426FE2F960BF100A65CFA /* Cards of The Seven SistersTests */,
+				6474271A2F9610FD00A65CFA /* Cards of The Seven Sisters UITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		647426FD2F960BF100A65CFA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		647427192F9610FD00A65CFA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D0061DA82DE2DE1300644B93 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -176,6 +299,20 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		647426FB2F960BF100A65CFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		647427172F9610FD00A65CFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D0061DA62DE2DE1300644B93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -185,7 +322,106 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		647427042F960BF100A65CFA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D0061DA92DE2DE1300644B93 /* CardsofTheSevenSisters */;
+			targetProxy = 647427032F960BF100A65CFA /* PBXContainerItemProxy */;
+		};
+		647427222F9610FD00A65CFA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D0061DA92DE2DE1300644B93 /* CardsofTheSevenSisters */;
+			targetProxy = 647427212F9610FD00A65CFA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		647427062F960BF100A65CFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6R87NMS8K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "wearemagiclife.Cards-of-The-Seven-SistersTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CardsofTheSevenSisters.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CardsofTheSevenSisters";
+			};
+			name = Debug;
+		};
+		647427072F960BF100A65CFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6R87NMS8K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "wearemagiclife.Cards-of-The-Seven-SistersTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CardsofTheSevenSisters.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CardsofTheSevenSisters";
+			};
+			name = Release;
+		};
+		647427242F9610FD00A65CFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6R87NMS8K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "wearemagiclife.Cards-of-The-Seven-Sisters-UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CardsofTheSevenSisters;
+			};
+			name = Debug;
+		};
+		647427252F9610FD00A65CFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = N6R87NMS8K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "wearemagiclife.Cards-of-The-Seven-Sisters-UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CardsofTheSevenSisters;
+			};
+			name = Release;
+		};
 		D0061DB62DE2DE1500644B93 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -386,6 +622,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		647427052F960BF100A65CFA /* Build configuration list for PBXNativeTarget "Cards of The Seven SistersTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				647427062F960BF100A65CFA /* Debug */,
+				647427072F960BF100A65CFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		647427232F9610FD00A65CFA /* Build configuration list for PBXNativeTarget "Cards of The Seven Sisters UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				647427242F9610FD00A65CFA /* Debug */,
+				647427252F9610FD00A65CFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D0061DA52DE2DE1300644B93 /* Build configuration list for PBXProject "CardsofTheSevenSisters" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

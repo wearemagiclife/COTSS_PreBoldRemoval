@@ -29,6 +29,30 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "647426FE2F960BF100A65CFA"
+               BuildableName = "Cards of The Seven SistersTests.xctest"
+               BlueprintName = "Cards of The Seven SistersTests"
+               ReferencedContainer = "container:CardsofTheSevenSisters.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6474271A2F9610FD00A65CFA"
+               BuildableName = "Cards of The Seven Sisters UITests.xctest"
+               BlueprintName = "Cards of The Seven Sisters UITests"
+               ReferencedContainer = "container:CardsofTheSevenSisters.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -51,7 +75,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../../CardsofTheSevenSisters/Resources/StoreKit_Config.storekit">
+         identifier = "CardsofTheSevenSisters/Resources/StoreKit_Config.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
