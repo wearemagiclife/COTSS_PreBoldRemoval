@@ -9,13 +9,9 @@ class SubscriptionManager: ObservableObject {
     let subscriptionProductIDs: [String] = [
         "com.CardsOfTheSevenSistersApp.subscription.weekly",
         "com.CardsOfTheSevenSistersApp.subscription.monthly",
+        "com.CardsOfTheSevenSistersApp.subscription.6months",
         "com.CardsOfTheSevenSistersApp.subscription.annual"
     ]
-    let lifetimeProductID = "com.CardsOfTheSevenSistersApp.purchase.lifetime"
-
-    var allProductIDs: [String] {
-        subscriptionProductIDs + [lifetimeProductID]
-    }
 
     // MARK: - Published State
     @Published var products: [Product] = []
@@ -46,9 +42,9 @@ class SubscriptionManager: ObservableObject {
     // MARK: - Fetch Products
     func fetchProducts() async {
         do {
-            let fetched = try await Product.products(for: allProductIDs)
-            // Sort: weekly, monthly, annual, lifetime
-            let order = allProductIDs
+            let fetched = try await Product.products(for: subscriptionProductIDs)
+            // Sort: weekly, monthly, 6months, annual
+            let order = subscriptionProductIDs
             products = fetched.sorted {
                 (order.firstIndex(of: $0.id) ?? 999) < (order.firstIndex(of: $1.id) ?? 999)
             }

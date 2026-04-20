@@ -1,22 +1,6 @@
 {
-  "identifier" : "B8C2A3D1-4E5F-6A7B-8C9D-0E1F2A3B4C5D",
-  "nonConsumableProducts" : [
-    {
-      "displayPrice" : "29.99",
-      "familyShareable" : false,
-      "internalID" : "lifetime_001",
-      "localizations" : [
-        {
-          "description" : "One-time purchase for permanent access to all features.",
-          "displayName" : "Lifetime",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "com.CardsOfTheSevenSistersApp.purchase.lifetime",
-      "referenceName" : "Lifetime Access",
-      "type" : "NonConsumable"
-    }
-  ],
+  "identifier" : "F2A7B831-9C4E-4D6F-A159-3E8F0B1C2D7A",
+  "nonConsumableProducts" : [],
   "settings" : {
     "_askToBuyEnabled" : false,
     "_billingGracePeriodEnabled" : true,
@@ -57,15 +41,15 @@
   },
   "subscriptionGroups" : [
     {
-      "id" : "A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
+      "id" : "8B3C1D4E-F5A6-4B7C-9D0E-1F2A3B4C5D6E",
       "localizations" : [],
-      "name" : "Seven Sisters Support",
+      "name" : "Seven Sisters Membership",
       "plans" : [],
       "products" : [
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "0.99",
+          "displayPrice" : "1.99",
           "familyShareable" : false,
           "freeTrialPeriod" : null,
           "groupNumber" : 1,
@@ -81,13 +65,13 @@
           "productID" : "com.CardsOfTheSevenSistersApp.subscription.weekly",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "Weekly Support",
-          "subscriptionGroupID" : "A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
+          "subscriptionGroupID" : "8B3C1D4E-F5A6-4B7C-9D0E-1F2A3B4C5D6E",
           "type" : "RecurringSubscription"
         },
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "2.99",
+          "displayPrice" : "5.99",
           "familyShareable" : false,
           "freeTrialPeriod" : null,
           "groupNumber" : 2,
@@ -103,18 +87,50 @@
           "productID" : "com.CardsOfTheSevenSistersApp.subscription.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Monthly Support",
-          "subscriptionGroupID" : "A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
+          "subscriptionGroupID" : "8B3C1D4E-F5A6-4B7C-9D0E-1F2A3B4C5D6E",
           "type" : "RecurringSubscription"
         },
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "19.99",
+          "displayPrice" : "34.99",
           "familyShareable" : false,
           "freeTrialPeriod" : null,
           "groupNumber" : 3,
+          "internalID" : "6months_001",
+          "introductoryOffer" : {
+            "displayPrice" : "14.99",
+            "period" : "P6M",
+            "periodCount" : 1,
+            "type" : "Discounted"
+          },
+          "localizations" : [
+            {
+              "description" : "Six-month support subscription.",
+              "displayName" : "6 Months",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.CardsOfTheSevenSistersApp.subscription.6months",
+          "recurringSubscriptionPeriod" : "P6M",
+          "referenceName" : "6 Month Support",
+          "subscriptionGroupID" : "8B3C1D4E-F5A6-4B7C-9D0E-1F2A3B4C5D6E",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "59.99",
+          "familyShareable" : false,
+          "freeTrialPeriod" : null,
+          "groupNumber" : 4,
           "internalID" : "annual_001",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "displayPrice" : "24.99",
+            "period" : "P1Y",
+            "periodCount" : 1,
+            "type" : "Discounted"
+          },
           "localizations" : [
             {
               "description" : "Annual support subscription — best value.",
@@ -125,7 +141,7 @@
           "productID" : "com.CardsOfTheSevenSistersApp.subscription.annual",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Annual Support",
-          "subscriptionGroupID" : "A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D",
+          "subscriptionGroupID" : "8B3C1D4E-F5A6-4B7C-9D0E-1F2A3B4C5D6E",
           "type" : "RecurringSubscription"
         }
       ]

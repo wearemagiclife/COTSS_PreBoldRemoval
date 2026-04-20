@@ -214,9 +214,6 @@ struct SubscriptionView: View {
         guard let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }) else {
             return "Support the App"
         }
-        if product.id == "com.CardsOfTheSevenSistersApp.purchase.lifetime" {
-            return "Get Lifetime Access"
-        }
         return "Begin Membership"
     }
 }
@@ -231,9 +228,9 @@ private struct SubscriptionPlanCard: View {
     private var planLabel: String {
         switch product.id {
         case _ where product.id.contains("weekly"):  return "Weekly"
+        case _ where product.id.contains("6month"):  return "6 Months"
         case _ where product.id.contains("monthly"): return "Monthly"
         case _ where product.id.contains("annual"):  return "Annual"
-        case _ where product.id.contains("lifetime"): return "Lifetime"
         default: return product.displayName
         }
     }
@@ -241,9 +238,9 @@ private struct SubscriptionPlanCard: View {
     private var planDescription: String {
         switch product.id {
         case _ where product.id.contains("weekly"):  return "Billed every week"
+        case _ where product.id.contains("6month"):  return "Billed every 6 months"
         case _ where product.id.contains("monthly"): return "Billed every month"
         case _ where product.id.contains("annual"):  return "Billed once per year"
-        case _ where product.id.contains("lifetime"): return "One-time purchase"
         default: return ""
         }
     }
@@ -297,9 +294,20 @@ private struct SubscriptionPlanCard: View {
                 Spacer()
 
                 // Price
-                Text(product.displayPrice)
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                    .foregroundColor(isSelected ? AppTheme.goldAccent : AppTheme.primaryText)
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let intro = product.subscription?.introductoryOffer {
+                        Text(intro.displayPrice)
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                            .foregroundColor(isSelected ? AppTheme.goldAccent : AppTheme.primaryText)
+                        Text("then \(product.displayPrice)")
+                            .font(.custom("Iowan Old Style", size: 11))
+                            .foregroundColor(AppTheme.secondaryText)
+                    } else {
+                        Text(product.displayPrice)
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                            .foregroundColor(isSelected ? AppTheme.goldAccent : AppTheme.primaryText)
+                    }
+                }
             }
             .padding(AppConstants.Spacing.tight)
             .frame(maxWidth: .infinity)
@@ -317,7 +325,7 @@ private struct SubscriptionPlanCard: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(planLabel), \(product.displayPrice), \(planDescription)")
+        .accessibilityLabel("\(planLabel), \(product.subscription?.introductoryOffer?.displayPrice ?? product.displayPrice), \(planDescription)")
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
