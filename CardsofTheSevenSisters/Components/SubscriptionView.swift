@@ -6,6 +6,7 @@ struct SubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedProductID: String = "com.CardsOfTheSevenSistersApp.subscription.annual"
+    @State private var showThankYou: Bool = false
 
     private let cardBackground = AppConstants.Colors.capsuleButton
 
@@ -40,6 +41,10 @@ struct SubscriptionView: View {
             if subscriptionManager.isPurchasing {
                 purchasingOverlay
             }
+
+            if showThankYou {
+                thankYouOverlay
+            }
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -69,6 +74,15 @@ struct SubscriptionView: View {
         .task {
             if subscriptionManager.products.isEmpty {
                 await subscriptionManager.fetchProducts()
+            }
+        }
+        .onChange(of: subscriptionManager.purchaseSucceeded) { _, succeeded in
+            guard succeeded else { return }
+            subscriptionManager.purchaseSucceeded = false
+            showThankYou = true
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                dismiss()
             }
         }
     }
@@ -130,10 +144,19 @@ struct SubscriptionView: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(cardBackground.opacity(0.5))
                     .frame(height: 72)
-                    .overlay(
-                        ProgressView()
-                    )
+                    .overlay(ProgressView())
             }
+
+            Button {
+                Task { await subscriptionManager.fetchProducts() }
+            } label: {
+                Text("Retry")
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                    .foregroundColor(AppTheme.secondaryText)
+                    .underline()
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
         }
     }
 
@@ -209,12 +232,34 @@ struct SubscriptionView: View {
         }
     }
 
+    // MARK: - Thank You Overlay
+    private var thankYouOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.55).ignoresSafeArea()
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(AppTheme.goldAccent)
+                Text("Thank you!")
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
+                    .foregroundColor(AppTheme.primaryText)
+                Text("Your support means everything.")
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                    .foregroundColor(AppTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(36)
+            .background(AppTheme.cardBackground)
+            .cornerRadius(20)
+            .shadow(color: .black.opacity(0.3), radius: 16, x: 0, y: 8)
+        }
+        .transition(.opacity)
+    }
+
     // MARK: - Helpers
     private var ctaTitle: String {
-        guard let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }) else {
-            return "Support the App"
-        }
-        return "Begin Membership"
+        subscriptionManager.products.contains { $0.id == selectedProductID }
+            ? "Pay with Apple" : "Support the App"
     }
 }
 

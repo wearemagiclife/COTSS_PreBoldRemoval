@@ -5,6 +5,7 @@ struct HomeView: View {
     @ObservedObject private var dataManager: DataManager = DataManager.shared
     @StateObject private var viewModel = HomeViewModel()
     @ObservedObject private var ratingService = RatingService.shared
+    @EnvironmentObject private var subscriptionManager: SubscriptionManager
 
     @State private var showingSettings = false
     
@@ -21,6 +22,7 @@ struct HomeView: View {
 
                         ScrollView {
                             VStack(spacing: 0) {
+                                BillingIssueBanner()
                                 headerView
                                 welcomeSection
                                 cardsGrid

@@ -19,6 +19,8 @@ class SubscriptionManager: ObservableObject {
     @Published var activeProductID: String? = nil
     @Published var isPurchasing: Bool = false
     @Published var errorMessage: String? = nil
+    @Published var hasBillingIssue: Bool = false
+    @Published var purchaseSucceeded: Bool = false
 
     private var transactionListenerTask: Task<Void, Never>?
 
@@ -32,6 +34,7 @@ class SubscriptionManager: ObservableObject {
         Task {
             await fetchProducts()
             await checkCurrentEntitlements()
+            await processUnfinishedTransactions()
         }
     }
 
@@ -43,10 +46,12 @@ class SubscriptionManager: ObservableObject {
     func fetchProducts() async {
         do {
             let fetched = try await Product.products(for: subscriptionProductIDs)
-            // Sort: weekly, monthly, 6months, annual
             let order = subscriptionProductIDs
             products = fetched.sorted {
                 (order.firstIndex(of: $0.id) ?? 999) < (order.firstIndex(of: $1.id) ?? 999)
+            }
+            if products.isEmpty {
+                errorMessage = "No subscription plans available. Check your connection and try again."
             }
         } catch {
             errorMessage = "Could not load products: \(error.localizedDescription)"
@@ -66,6 +71,7 @@ class SubscriptionManager: ObservableObject {
                 let transaction = try checkVerified(verification)
                 await updateSubscriptionStatus(from: transaction)
                 await transaction.finish()
+                purchaseSucceeded = true
             case .userCancelled:
                 break
             case .pending:
@@ -111,6 +117,7 @@ class SubscriptionManager: ObservableObject {
     func checkCurrentEntitlements() async {
         var foundActive = false
         var foundProductID: String? = nil
+        var foundBillingIssue = false
 
         for await result in Transaction.currentEntitlements {
             do {
@@ -124,10 +131,40 @@ class SubscriptionManager: ObservableObject {
             }
         }
 
+        // Ensure products are loaded before checking subscription status
+        if products.isEmpty { await fetchProducts() }
+
+        // Check for billing retry or grace period across all subscription products
+        for product in products {
+            guard let statuses = try? await product.subscription?.status else { continue }
+            for status in statuses {
+                switch status.state {
+                case .inBillingRetryPeriod, .inGracePeriod:
+                    foundBillingIssue = true
+                default:
+                    break
+                }
+            }
+        }
+
         isSubscribed = foundActive
         activeProductID = foundProductID
+        hasBillingIssue = foundBillingIssue
         UserDefaults.standard.set(foundActive, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(foundProductID, forKey: "subscriptionActiveProductID")
+    }
+
+    // MARK: - Process Unfinished Transactions
+    func processUnfinishedTransactions() async {
+        for await result in Transaction.unfinished {
+            do {
+                let transaction = try checkVerified(result)
+                await updateSubscriptionStatus(from: transaction)
+                await transaction.finish()
+            } catch {
+                // Ignore unverified
+            }
+        }
     }
 
     // MARK: - Helpers
@@ -141,7 +178,9 @@ class SubscriptionManager: ObservableObject {
     }
 
     private func updateSubscriptionStatus(from transaction: Transaction) async {
-        isSubscribed = transaction.revocationDate == nil
+        let notRevoked = transaction.revocationDate == nil
+        let notExpired = transaction.expirationDate.map { $0 > Date() } ?? true
+        isSubscribed = notRevoked && notExpired
         activeProductID = isSubscribed ? transaction.productID : nil
         UserDefaults.standard.set(isSubscribed, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(activeProductID, forKey: "subscriptionActiveProductID")

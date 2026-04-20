@@ -9,6 +9,7 @@ struct SettingsMenuView: View {
     @State private var showingDeleteAccountAlert = false
     @State private var showingRateApp = false
     @State private var showingProfile = false
+    @State private var showingSignedOutBanner = false
 
     // Adaptive card background for light/dark mode
     private let cardBackground = AppConstants.Colors.capsuleButton
@@ -122,12 +123,13 @@ struct SettingsMenuView: View {
 
                             // SIGN OUT BUTTON
                             Button {
-                                if DataManager.shared.isGuestMode {
-                                    DataManager.shared.clearProfile()
-                                } else {
+                                showingSignedOutBanner = true
+                                Task {
+                                    try? await Task.sleep(for: .seconds(1.5))
                                     authManager.signOut()
+                                    DataManager.shared.clearProfile()
+                                    isPresented = false
                                 }
-                                isPresented = false
                             } label: {
                                 SettingsRow(
                                     systemImage: "rectangle.portrait.and.arrow.right",
@@ -185,6 +187,9 @@ struct SettingsMenuView: View {
                 }
                 .toolbarBackground(AppTheme.backgroundColor, for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
+                .task {
+                    await subscriptionManager.checkCurrentEntitlements()
+                }
                 .sheet(isPresented: $showingRateApp) {
                     NavigationStack {
                         RateAppView()
@@ -206,6 +211,27 @@ struct SettingsMenuView: View {
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
             .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
             .padding(AppConstants.Spacing.pageInset)
+        if showingSignedOutBanner {
+            VStack {
+                Spacer()
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(AppTheme.goldAccent)
+                    Text(DataManager.shared.isGuestMode ? "Exited guest mode" : "Signed out successfully")
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                        .foregroundColor(AppTheme.primaryText)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 14)
+                .background(AppTheme.cardBackground)
+                .cornerRadius(14)
+                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                .padding(.bottom, 48)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+            .zIndex(30)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showingSignedOutBanner)
+        }
         }  // ZStack (backdrop + panel)
         .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
     }
