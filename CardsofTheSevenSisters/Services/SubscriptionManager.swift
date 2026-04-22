@@ -147,11 +147,15 @@ class SubscriptionManager: ObservableObject {
             }
         }
 
+        let wasSubscribed = isSubscribed
         isSubscribed = foundActive
         activeProductID = foundProductID
         hasBillingIssue = foundBillingIssue
         UserDefaults.standard.set(foundActive, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(foundProductID, forKey: "subscriptionActiveProductID")
+        if wasSubscribed && !foundActive {
+            Task { await CalendarSyncService.shared.removeFutureEvents() }
+        }
     }
 
     // MARK: - Process Unfinished Transactions
@@ -180,10 +184,14 @@ class SubscriptionManager: ObservableObject {
     private func updateSubscriptionStatus(from transaction: Transaction) async {
         let notRevoked = transaction.revocationDate == nil
         let notExpired = transaction.expirationDate.map { $0 > Date() } ?? true
+        let wasSubscribed = isSubscribed
         isSubscribed = notRevoked && notExpired
         activeProductID = isSubscribed ? transaction.productID : nil
         UserDefaults.standard.set(isSubscribed, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(activeProductID, forKey: "subscriptionActiveProductID")
+        if wasSubscribed && !isSubscribed {
+            Task { await CalendarSyncService.shared.removeFutureEvents() }
+        }
     }
 }
 

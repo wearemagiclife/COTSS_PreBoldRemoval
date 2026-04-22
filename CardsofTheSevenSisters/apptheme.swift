@@ -134,17 +134,17 @@ struct GoldButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppTheme.headline)
-            .foregroundColor(AppTheme.primaryText)
+            .foregroundColor(Color(UIColor(red: 0.15, green: 0.10, blue: 0.05, alpha: 1.0)))
             .padding(.horizontal, 24)
-            .padding(.vertical, 12)
+            .padding(.vertical, 10)
             .background(AppTheme.goldAccent)
             .cornerRadius(AppTheme.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                    .stroke(AppTheme.darkAccent, lineWidth: 1)
+                    .stroke(AppTheme.darkAccent.opacity(0.4), lineWidth: 1)
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
     }
 }
 

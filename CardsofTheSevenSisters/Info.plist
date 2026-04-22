@@ -66,6 +66,21 @@
 	<string>Copyright © 2025 Cards of The Seven Sisters. All rights reserved.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>We use motion data to create realistic lighting effects on cards.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.CardsOfTheSevenSistersApp.CardsOfTheSevenSisters</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sevensistersapp</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Seven Sisters adds your daily and cycle cards to your calendar so you can see your cosmic influences each day.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>Seven Sisters adds your daily and cycle cards to your calendar so you can see your cosmic influences each day.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

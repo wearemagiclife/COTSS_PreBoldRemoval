@@ -7,6 +7,10 @@ struct SubscriptionView: View {
 
     @State private var selectedProductID: String = "com.CardsOfTheSevenSistersApp.subscription.annual"
     @State private var showThankYou: Bool = false
+    @State private var showCalendarPrompt: Bool = false
+    @State private var purchasedProductID: String = ""
+    @State private var showUpdateAlert: Bool = false
+    @State private var showCancelAlert: Bool = false
 
     private let cardBackground = AppConstants.Colors.capsuleButton
 
@@ -71,6 +75,30 @@ struct SubscriptionView: View {
         } message: {
             Text(subscriptionManager.errorMessage ?? "")
         }
+        .alert("Update Subscription?", isPresented: $showUpdateAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Go to App Store") {
+                Task {
+                    if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                        try? await AppStore.showManageSubscriptions(in: scene)
+                    }
+                }
+            }
+        } message: {
+            Text("You'll be taken to the App Store to change your subscription plan.")
+        }
+        .alert("Cancel Subscription?", isPresented: $showCancelAlert) {
+            Button("Keep Subscription", role: .cancel) { }
+            Button("Cancel Subscription", role: .destructive) {
+                Task {
+                    if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                        try? await AppStore.showManageSubscriptions(in: scene)
+                    }
+                }
+            }
+        } message: {
+            Text("Are you sure? You'll keep access until the end of your current billing period. You'll be taken to the App Store to complete the cancellation.")
+        }
         .task {
             if subscriptionManager.products.isEmpty {
                 await subscriptionManager.fetchProducts()
@@ -79,11 +107,30 @@ struct SubscriptionView: View {
         .onChange(of: subscriptionManager.purchaseSucceeded) { _, succeeded in
             guard succeeded else { return }
             subscriptionManager.purchaseSucceeded = false
+            purchasedProductID = selectedProductID
             showThankYou = true
             Task {
                 try? await Task.sleep(for: .seconds(2))
+                showThankYou = false
+                showCalendarPrompt = true
+            }
+        }
+        .confirmationDialog(
+            "Add cards to your calendar?",
+            isPresented: $showCalendarPrompt,
+            titleVisibility: .visible
+        ) {
+            Button("Add to Calendar") {
+                let productID = purchasedProductID
+                let birthDate = DataManager.shared.userProfile.birthDate
+                Task { await CalendarSyncService.shared.syncCalendarEvents(for: productID, birthDate: birthDate) }
                 dismiss()
             }
+            Button("Not Now", role: .cancel) {
+                dismiss()
+            }
+        } message: {
+            Text("Your daily, 52-day cycle, and yearly cards will appear as events for the duration of your subscription.")
         }
     }
 
@@ -163,30 +210,74 @@ struct SubscriptionView: View {
     // MARK: - CTA Section
     private var ctaSection: some View {
         VStack(spacing: 12) {
-            Button {
-                Task {
-                    guard let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }) else { return }
-                    await subscriptionManager.purchase(product)
-                }
-            } label: {
-                Text(ctaTitle)
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-            }
-            .buttonStyle(GoldButtonStyle())
-            .disabled(subscriptionManager.isPurchasing || subscriptionManager.products.isEmpty)
+            if subscriptionManager.isSubscribed {
+                // Subscriber management buttons
+                HStack(spacing: 12) {
+                    Button { showUpdateAlert = true } label: {
+                        Text("Update")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .foregroundColor(AppTheme.primaryText)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(AppConstants.Colors.capsuleButton)
+                                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .stroke(AppTheme.goldAccent.opacity(0.5), lineWidth: 1))
+                            )
+                    }
+                    .buttonStyle(.plain)
 
-            Button {
-                Task { await subscriptionManager.restorePurchases() }
-            } label: {
-                Text("Restore Purchases")
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                    .foregroundColor(AppTheme.secondaryText)
-                    .underline()
+                    Button { showCancelAlert = true } label: {
+                        Text("Cancel")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.body))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .foregroundColor(.red.opacity(0.8))
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(AppConstants.Colors.capsuleButton)
+                                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                        .stroke(Color.red.opacity(0.25), lineWidth: 1))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            } else {
+                Button {
+                    Task {
+                        guard let product = subscriptionManager.products.first(where: { $0.id == selectedProductID }) else { return }
+                        await subscriptionManager.purchase(product)
+                    }
+                } label: {
+                    Text(ctaTitle)
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(GoldButtonStyle())
+                .disabled(subscriptionManager.isPurchasing || subscriptionManager.products.isEmpty)
+
+                Button {
+                    Task { await subscriptionManager.restorePurchases() }
+                } label: {
+                    Text("Restore Purchases")
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                        .foregroundColor(AppTheme.secondaryText)
+                        .underline()
+                }
+                .buttonStyle(.plain)
+                .disabled(subscriptionManager.isPurchasing)
             }
-            .buttonStyle(.plain)
-            .disabled(subscriptionManager.isPurchasing)
+
+            #if DEBUG
+            Button("DEBUG: Test Calendar Prompt") {
+                purchasedProductID = selectedProductID
+                showCalendarPrompt = true
+            }
+            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+            .foregroundColor(.orange)
+            #endif
         }
         .padding(.top, 4)
     }
@@ -339,14 +430,14 @@ private struct SubscriptionPlanCard: View {
                     if let intro = product.subscription?.introductoryOffer {
                         Text(intro.displayPrice)
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                            .foregroundColor(isSelected ? AppTheme.goldAccent : AppTheme.primaryText)
+                            .foregroundColor(AppTheme.primaryText)
                         Text("then \(product.displayPrice)")
                             .font(.custom("Iowan Old Style", size: 11))
                             .foregroundColor(AppTheme.secondaryText)
                     } else {
                         Text(product.displayPrice)
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                            .foregroundColor(isSelected ? AppTheme.goldAccent : AppTheme.primaryText)
+                            .foregroundColor(AppTheme.primaryText)
                     }
                 }
             }

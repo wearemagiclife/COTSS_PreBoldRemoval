@@ -3,6 +3,7 @@ import SwiftUI
 struct AppearanceSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var appSettings = AppSettings.shared
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
     private let cardBackground = Color(UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
@@ -17,6 +18,8 @@ struct AppearanceSettingsView: View {
 
             ScrollView {
                 VStack(spacing: AppConstants.Spacing.cardPadding) {
+
+                    // MARK: - Mode Selection
                     VStack(spacing: AppConstants.Spacing.tight) {
                         ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
                             Button {
@@ -39,6 +42,43 @@ struct AppearanceSettingsView: View {
                         .foregroundColor(AppTheme.secondaryText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, AppConstants.Spacing.tight)
+
+                    // MARK: - Dark Theme Preview
+                    VStack(spacing: AppConstants.Spacing.tight) {
+                        Text("Black & Gold Theme")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                            .foregroundColor(AppTheme.primaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        DarkThemePreview()
+
+                        // Apply / Subscribe button
+                        if subscriptionManager.isSubscribed {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    appSettings.appearanceMode = .dark
+                                }
+                            } label: {
+                                Text(appSettings.appearanceMode == .dark ? "Theme Applied ✓" : "Apply Theme")
+                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                            }
+                            .buttonStyle(GoldButtonStyle())
+                        } else {
+                            NavigationLink {
+                                SubscriptionView()
+                                    .environmentObject(subscriptionManager)
+                            } label: {
+                                Text("Subscribe to Unlock")
+                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                            }
+                            .buttonStyle(GoldButtonStyle())
+                        }
+                    }
+
                 }
                 .padding(.horizontal, AppConstants.Spacing.cardPadding)
                 .padding(.bottom, AppConstants.Spacing.section)
@@ -64,6 +104,26 @@ struct AppearanceSettingsView: View {
         .toolbarBackground(.visible, for: .navigationBar)
     }
 }
+
+// MARK: - Dark Theme Preview
+
+private struct DarkThemePreview: View {
+    private let gold = Color(red: 0.75, green: 0.60, blue: 0.35)
+
+    var body: some View {
+        Image("DarkThemePreview")
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: .infinity)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(gold.opacity(0.4), lineWidth: 1)
+            )
+    }
+}
+
+// MARK: - Appearance Row
 
 private struct AppearanceRow: View {
     let mode: AppearanceMode

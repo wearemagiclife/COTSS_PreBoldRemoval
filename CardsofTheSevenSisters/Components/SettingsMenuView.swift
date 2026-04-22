@@ -7,10 +7,7 @@ struct SettingsMenuView: View {
     @ObservedObject private var authManager = AuthenticationManager.shared
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
-    @State private var showingDeleteAccountAlert = false
     @State private var showingProfile = false
-    @State private var showingSignedOutBanner = false
-    @State private var showingDeletedBanner = false
     @State private var showingAppStorePrompt = false
     @State private var showingVisitListingPrompt = false
 
@@ -43,54 +40,83 @@ struct SettingsMenuView: View {
                     ScrollView {
                         VStack(spacing: AppConstants.Spacing.cardPadding) {
                             VStack(spacing: AppConstants.Spacing.tight) {
+                            // MARK: Manage Profile
                             Button { showingProfile = true } label: {
                                 SettingsRow(
                                     systemImage: "person.crop.circle",
-                                    title: "Profile",
-                                    subtitle: "Make Changes",
+                                    title: "Manage Profile",
+                                    subtitle: "Update, Sign Out or Delete",
                                     cardBackground: cardBackground
                                 )
                             }
                             .buttonStyle(.plain)
                             .sheet(isPresented: $showingProfile) {
-                                ProfileSheet()
+                                ProfileSheet(onDismissAll: { isPresented = false })
                             }
 
+                            // MARK: Learn
+                            NavigationLink {
+                                LearnView()
+                            } label: {
+                                SettingsRow(
+                                    systemImage: "book.fill",
+                                    title: "Learn",
+                                    subtitle: "Tips & Tutorials",
+                                    cardBackground: cardBackground
+                                )
+                            }
+
+                            // MARK: Subscription
                             NavigationLink {
                                 SubscriptionView()
                                     .environmentObject(subscriptionManager)
                             } label: {
                                 SettingsRow(
                                     systemImage: "star.fill",
-                                    title: "Subscription",
-                                    subtitle: subscriptionManager.isSubscribed ? "Active — thank you!" : "Support the Seven Sisters",
+                                    title: "⭐️ Subscription",
+                                    subtitle: "Manage your Subscription",
                                     cardBackground: cardBackground,
                                     subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
                                 )
                             }
 
-                            NavigationLink {
-                                   LearnView()
-                            } label: {
-                                   SettingsRow(
-                                       systemImage: "book.fill",
-                                       title: "Learn",
-                                       subtitle: "Tips & Tutorials",
-                                       cardBackground: cardBackground
-                                   )
+                            // MARK: Gold Benefits
+                            VStack(spacing: AppConstants.Spacing.tight) {
+                                NavigationLink {
+                                    AppearanceSettingsView()
+                                } label: {
+                                    SettingsRow(
+                                        systemImage: "moon.fill",
+                                        title: "⭐ Appearance",
+                                        subtitle: "New Black & Gold Theme!",
+                                        cardBackground: cardBackground
+                                    )
+                                }
+
+                                NavigationLink {
+                                    CalendarSyncView()
+                                } label: {
+                                    SettingsRow(
+                                        systemImage: "calendar.badge.plus",
+                                        title: "⭐ Sync to Calendar",
+                                        subtitle: "See beyond tomorrow",
+                                        cardBackground: cardBackground
+                                    )
+                                }
+
+                                NavigationLink {
+                                    WidgetInfoView()
+                                } label: {
+                                    SettingsRow(
+                                        systemImage: "rectangle.stack",
+                                        title: "⭐ Get the Widget",
+                                        subtitle: "Your Current Cards in view",
+                                        cardBackground: cardBackground
+                                    )
+                                }
                             }
 
-                            NavigationLink {
-                                AppearanceSettingsView()
-                            } label: {
-                                SettingsRow(
-                                    systemImage: "moon.fill",
-                                    title: "Appearance",
-                                    subtitle: "Light, Dark, or System",
-                                    cardBackground: cardBackground
-                                )
-                            }
-
+                            // MARK: Notifications
                             NavigationLink {
                                 NotificationSettingsView()
                             } label: {
@@ -102,17 +128,7 @@ struct SettingsMenuView: View {
                                 )
                             }
 
-                            NavigationLink {
-                                LegalLinksView()
-                            } label: {
-                                SettingsRow(
-                                    systemImage: "doc.text.magnifyingglass",
-                                    title: "Legal",
-                                    subtitle: "Our Policies & Terms",
-                                    cardBackground: cardBackground
-                                )
-                            }
-
+                            // MARK: Rate the App
                             Button {
                                 rateApp()
                             } label: {
@@ -120,6 +136,18 @@ struct SettingsMenuView: View {
                                     systemImage: "star.bubble",
                                     title: "Rate the App",
                                     subtitle: hasRated ? "Thanks for your rating! ♥" : "Share your experience",
+                                    cardBackground: cardBackground
+                                )
+                            }
+
+                            // MARK: Legal & Support
+                            NavigationLink {
+                                LegalLinksView()
+                            } label: {
+                                SettingsRow(
+                                    systemImage: "doc.text.magnifyingglass",
+                                    title: "Legal",
+                                    subtitle: "Our Policies & Terms",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -133,38 +161,6 @@ struct SettingsMenuView: View {
                                     subtitle: "wearemagic.life/support",
                                     cardBackground: cardBackground
                                 )
-                            }
-
-                            // SIGN OUT BUTTON
-                            Button {
-                                showingSignedOutBanner = true
-                                Task {
-                                    try? await Task.sleep(for: .seconds(1.5))
-                                    authManager.signOut()
-                                    DataManager.shared.clearProfile()
-                                    isPresented = false
-                                }
-                            } label: {
-                                SettingsRow(
-                                    systemImage: "rectangle.portrait.and.arrow.right",
-                                    title: DataManager.shared.isGuestMode ? "Exit Guest Mode" : "Sign Out",
-                                    subtitle: DataManager.shared.isGuestMode ? "Return to sign in screen" : "Sign out of your account",
-                                    cardBackground: cardBackground
-                                )
-                            }
-
-                            // DELETE ACCOUNT BUTTON - only show for non-guests
-                            if !DataManager.shared.isGuestMode {
-                                Button {
-                                    showingDeleteAccountAlert = true
-                                } label: {
-                                    SettingsRow(
-                                        systemImage: "trash",
-                                        title: "Delete Account",
-                                        subtitle: "Permanently delete all data",
-                                        cardBackground: cardBackground
-                                    )
-                                }
                             }
 
                         }  // inner VStack (settings rows)
@@ -224,19 +220,6 @@ struct SettingsMenuView: View {
                 } message: {
                     Text("Would you like to write a review on the App Store? It only takes a moment.")
                 }
-                .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
-                    Button("Cancel", role: .cancel) { }
-                    Button("Delete Account", role: .destructive) {
-                        showingDeletedBanner = true
-                        Task {
-                            try? await Task.sleep(for: .seconds(1.5))
-                            authManager.deleteAccount()
-                            isPresented = false
-                        }
-                    }
-                } message: {
-                    Text("This will permanently delete your account and all associated data — including your profile, preferences, and card history. This action cannot be undone.")
-                }
             }  // NavigationStack
             .background(AppTheme.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
@@ -244,48 +227,6 @@ struct SettingsMenuView: View {
             .padding(.horizontal, AppConstants.Spacing.pageInset)
             .padding(.bottom, AppConstants.Spacing.pageInset)
             .padding(.top, safeAreaTop + AppConstants.Spacing.pageInset)
-        if showingSignedOutBanner {
-            VStack {
-                Spacer()
-                HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(AppTheme.goldAccent)
-                    Text(DataManager.shared.isGuestMode ? "Exited guest mode" : "Signed out successfully")
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                        .foregroundColor(AppTheme.primaryText)
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 14)
-                .background(AppTheme.cardBackground)
-                .cornerRadius(14)
-                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                .padding(.bottom, 48)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            .zIndex(30)
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showingSignedOutBanner)
-        }
-        if showingDeletedBanner {
-            VStack {
-                Spacer()
-                HStack(spacing: 10) {
-                    Image(systemName: "trash.circle.fill")
-                        .foregroundColor(.red.opacity(0.8))
-                    Text("Account permanently deleted")
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                        .foregroundColor(AppTheme.primaryText)
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 14)
-                .background(AppTheme.cardBackground)
-                .cornerRadius(14)
-                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                .padding(.bottom, 48)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-            .zIndex(30)
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showingDeletedBanner)
-        }
         }  // ZStack (backdrop + panel)
         .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
     }
@@ -335,11 +276,15 @@ private struct SettingsRow: View {
                 Text(title)
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .foregroundColor(AppTheme.primaryText)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 if let subtitle = subtitle {
                     Text(subtitle)
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                         .foregroundColor(subtitleColor ?? AppTheme.secondaryText)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
