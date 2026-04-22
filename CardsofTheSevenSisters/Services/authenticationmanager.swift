@@ -131,22 +131,16 @@ class AuthenticationManager: ObservableObject {
     
     /// Sign out the user and clear all stored authentication data
     func signOut() {
-        // Clear stored data
         UserDefaults.standard.removeObject(forKey: userIdentifierKey)
         UserDefaults.standard.removeObject(forKey: userFullNameKey)
         UserDefaults.standard.removeObject(forKey: userEmailKey)
         UserDefaults.standard.set(false, forKey: isSignedInKey)
         UserDefaults.standard.synchronize()
 
-        // Clear in-memory data
         userIdentifier = ""
         fullName = nil
         email = nil
-
-        // Update signed-in state
-        DispatchQueue.main.async {
-            self.isSignedIn = false
-        }
+        isSignedIn = false
     }
 
     /// Delete account and all associated data permanently
@@ -160,17 +154,12 @@ class AuthenticationManager: ObservableObject {
         // Clear DataManager profile data
         DataManager.shared.clearProfile()
 
-        // Clear in-memory data
         userIdentifier = ""
         fullName = nil
         email = nil
-
-        // Update signed-in state
-        DispatchQueue.main.async {
-            self.isSignedIn = false
-        }
+        isSignedIn = false
     }
-    
+
     /// Get the user's display name
     var displayName: String {
         if let fullName = fullName {

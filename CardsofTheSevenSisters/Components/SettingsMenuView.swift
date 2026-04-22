@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 struct SettingsMenuView: View {
     @Binding var isPresented: Bool
@@ -7,9 +8,22 @@ struct SettingsMenuView: View {
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
     @State private var showingDeleteAccountAlert = false
-    @State private var showingRateApp = false
     @State private var showingProfile = false
     @State private var showingSignedOutBanner = false
+    @State private var showingDeletedBanner = false
+    @State private var showingAppStorePrompt = false
+    @State private var showingVisitListingPrompt = false
+
+    @Environment(\.requestReview) private var requestReview
+    private var hasRated: Bool {
+        UserDefaults.standard.bool(forKey: "hasRatedApp")
+    }
+
+    private var safeAreaTop: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.safeAreaInsets.top ?? 0
+    }
 
     // Adaptive card background for light/dark mode
     private let cardBackground = AppConstants.Colors.capsuleButton
@@ -100,12 +114,12 @@ struct SettingsMenuView: View {
                             }
 
                             Button {
-                                showingRateApp = true
+                                rateApp()
                             } label: {
                                 SettingsRow(
                                     systemImage: "star.bubble",
                                     title: "Rate the App",
-                                    subtitle: "Share your experience",
+                                    subtitle: hasRated ? "Thanks for your rating! ♥" : "Share your experience",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -190,27 +204,46 @@ struct SettingsMenuView: View {
                 .task {
                     await subscriptionManager.checkCurrentEntitlements()
                 }
-                .sheet(isPresented: $showingRateApp) {
-                    NavigationStack {
-                        RateAppView()
+                .alert("Visit Our App Store Listing?", isPresented: $showingVisitListingPrompt) {
+                    Button("Visit Listing") {
+                        if let url = URL(string: "itms-apps://apps.apple.com/ca/app/cards-of-the-seven-sisters/id6753740480") {
+                            UIApplication.shared.open(url)
+                        }
                     }
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
+                    Button("Maybe Later", role: .cancel) { }
+                } message: {
+                    Text("See your review, explore screenshots, or share the app with someone.")
+                }
+                .alert("Thank you for rating! ⭐️", isPresented: $showingAppStorePrompt) {
+                    Button("Write a Review") {
+                        if let url = URL(string: "itms-apps://apps.apple.com/ca/app/cards-of-the-seven-sisters/id6753740480?action=write-review") {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    Button("No Thanks", role: .cancel) { }
+                } message: {
+                    Text("Would you like to write a review on the App Store? It only takes a moment.")
                 }
                 .alert("Delete Account", isPresented: $showingDeleteAccountAlert) {
                     Button("Cancel", role: .cancel) { }
-                    Button("Delete", role: .destructive) {
-                        authManager.deleteAccount()
-                        isPresented = false
+                    Button("Delete Account", role: .destructive) {
+                        showingDeletedBanner = true
+                        Task {
+                            try? await Task.sleep(for: .seconds(1.5))
+                            authManager.deleteAccount()
+                            isPresented = false
+                        }
                     }
                 } message: {
-                    Text("This will permanently delete all your data including your profile, preferences, and card history. This action cannot be undone.")
+                    Text("This will permanently delete your account and all associated data — including your profile, preferences, and card history. This action cannot be undone.")
                 }
             }  // NavigationStack
             .background(AppTheme.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
             .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
-            .padding(AppConstants.Spacing.pageInset)
+            .padding(.horizontal, AppConstants.Spacing.pageInset)
+            .padding(.bottom, AppConstants.Spacing.pageInset)
+            .padding(.top, safeAreaTop + AppConstants.Spacing.pageInset)
         if showingSignedOutBanner {
             VStack {
                 Spacer()
@@ -232,8 +265,42 @@ struct SettingsMenuView: View {
             .zIndex(30)
             .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showingSignedOutBanner)
         }
+        if showingDeletedBanner {
+            VStack {
+                Spacer()
+                HStack(spacing: 10) {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red.opacity(0.8))
+                    Text("Account permanently deleted")
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                        .foregroundColor(AppTheme.primaryText)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 14)
+                .background(AppTheme.cardBackground)
+                .cornerRadius(14)
+                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+                .padding(.bottom, 48)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+            .zIndex(30)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showingDeletedBanner)
+        }
         }  // ZStack (backdrop + panel)
         .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
+    }
+
+    private func rateApp() {
+        if hasRated {
+            showingVisitListingPrompt = true
+        } else {
+            UserDefaults.standard.set(true, forKey: "hasRatedApp")
+            requestReview()
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                showingAppStorePrompt = true
+            }
+        }
     }
 
     private func openWebsite() {

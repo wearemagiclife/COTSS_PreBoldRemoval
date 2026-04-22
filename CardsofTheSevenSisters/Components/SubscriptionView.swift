@@ -169,14 +169,10 @@ struct SubscriptionView: View {
                     await subscriptionManager.purchase(product)
                 }
             } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "applelogo")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text(ctaTitle)
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                Text(ctaTitle)
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
             }
             .buttonStyle(GoldButtonStyle())
             .disabled(subscriptionManager.isPurchasing || subscriptionManager.products.isEmpty)
@@ -259,7 +255,7 @@ struct SubscriptionView: View {
     // MARK: - Helpers
     private var ctaTitle: String {
         subscriptionManager.products.contains { $0.id == selectedProductID }
-            ? "Pay with Apple" : "Support the App"
+            ? "Subscribe Now" : "Support the App"
     }
 }
 
