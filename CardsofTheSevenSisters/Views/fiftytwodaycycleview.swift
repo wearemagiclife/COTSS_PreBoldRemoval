@@ -50,18 +50,19 @@ struct FiftyTwoDayCycleView: View {
         return DataManager.shared.getCurrentPlanetaryPhase(for: DataManager.shared.userProfile.birthDate)
     }
 
-    // Formats a date using locale-appropriate format (e.g., 12/31 in US, 31/12 in UK, 31.12 in Germany)
     private func shortDateString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale.current
+        // Get locale-ordered components (MM/dd or dd/MM), then replace separator with "."
         formatter.setLocalizedDateFormatFromTemplate("MMdd")
-        return formatter.string(from: date)
+        let raw = formatter.string(from: date)
+        return raw.replacingOccurrences(of: "/", with: ".")
+                  .replacingOccurrences(of: "-", with: ".")
     }
 
-    // Formats a date range as MM-dd | MM-dd
     private func shortDateRangeString(start: Date, end: Date) -> String {
-        return "\(shortDateString(start)). \(shortDateString(end))"
+        return "\(shortDateString(start)) - \(shortDateString(end))"
     }
 
     private var navigationTitle: String {
@@ -202,7 +203,7 @@ struct FiftyTwoDayCycleView: View {
                                         planetTitle: sharePlanetInfo.title,
                                         planetDescription: sharePlanetInfo.description,
                                         cycleInfo: shareCycleInfoText,
-                                        headerTitle: "Last 52-Day Cycle"
+                                        headerTitle: "Last 52-Day Card"
                                     )
                                 } else if card.id == viewModel.nextPeriodCard.id {
                                     fiftytwoCycleShareLink(
@@ -248,7 +249,7 @@ struct FiftyTwoDayCycleView: View {
                                 planetTitle: planetInfo.title,
                                 planetDescription: planetInfo.description,
                                 cycleInfo: cycleInfoText,
-                                headerTitle: "Your Current 52-Day Card"
+                                headerTitle: "52-Day Card"
                             )
                         }
 
@@ -269,18 +270,25 @@ struct FiftyTwoDayCycleView: View {
         .errorFallback(message: viewModel.errorMessage)
     }
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     private var headerSection: some View {
         VStack(spacing: AppConstants.Spacing.tight) {
-            SectionHeader(
-                "CURRENT PLANETARY CYCLE",
-                fontSize: AppConstants.FontSizes.large
-            )
-
-            if let currentDates = currentCycleDates {
-                Text(shortDateRangeString(start: currentDates.start, end: currentDates.end))
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+            VStack(spacing: 2) {
+                Text("CURRENT PLANETARY CYCLE")
+                    .dynamicType(baseSize: AppConstants.FontSizes.large, textStyle: .headline)
+                    .fontWeight(.heavy)
                     .foregroundColor(AppTheme.primaryText)
                     .multilineTextAlignment(.center)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                    .minimumScaleFactor(dynamicTypeSize.isAccessibilitySize ? 1 : 0.5)
+
+                if let currentDates = currentCycleDates {
+                    Text(shortDateRangeString(start: currentDates.start, end: currentDates.end))
+                        .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                        .foregroundColor(AppTheme.primaryText)
+                        .multilineTextAlignment(.center)
+                }
             }
         }
         .padding(.top, AppConstants.Spacing.tight)
@@ -317,17 +325,19 @@ struct FiftyTwoDayCycleView: View {
     private var periodCardsSection: some View {
         HStack(spacing: AppConstants.Spacing.page) {
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("LAST CYCLE")
-                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
-                    .fontWeight(.heavy)
-                    .foregroundColor(AppTheme.primaryText)
-                    .multilineTextAlignment(.center)
-
-                if let previousDates = previousCycleDates {
-                    Text(shortDateRangeString(start: previousDates.start, end: previousDates.end))
-                        .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                VStack(spacing: 2) {
+                    Text("LAST CYCLE")
+                        .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
+                        .fontWeight(.heavy)
                         .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
+
+                    if let previousDates = previousCycleDates {
+                        Text(shortDateRangeString(start: previousDates.start, end: previousDates.end))
+                            .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                            .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                    }
                 }
 
                 TappableCard(
@@ -350,17 +360,19 @@ struct FiftyTwoDayCycleView: View {
             }
 
             VStack(spacing: AppConstants.Spacing.tight) {
-                Text("NEXT CYCLE")
-                    .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
-                    .fontWeight(.heavy)
-                    .foregroundColor(AppTheme.primaryText)
-                    .multilineTextAlignment(.center)
-
-                if let nextDates = nextCycleDates {
-                    Text(shortDateRangeString(start: nextDates.start, end: nextDates.end))
-                        .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                VStack(spacing: 2) {
+                    Text("NEXT CYCLE")
+                        .dynamicType(baseSize: AppConstants.FontSizes.body, textStyle: .headline)
+                        .fontWeight(.heavy)
                         .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
+
+                    if let nextDates = nextCycleDates {
+                        Text(shortDateRangeString(start: nextDates.start, end: nextDates.end))
+                            .dynamicType(baseSize: AppConstants.FontSizes.callout, textStyle: .callout)
+                            .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                    }
                 }
 
                 TappableCard(
