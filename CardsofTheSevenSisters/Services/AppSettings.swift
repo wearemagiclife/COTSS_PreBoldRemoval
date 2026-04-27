@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 
 enum AppearanceMode: Int, CaseIterable {
     case system = 0
@@ -30,6 +31,8 @@ class AppSettings: ObservableObject {
     @Published var appearanceMode: AppearanceMode {
         didSet {
             UserDefaults.standard.set(appearanceMode.rawValue, forKey: appearanceModeKey)
+            WidgetBridge.writeAppearanceMode(appearanceMode.rawValue)
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
@@ -39,6 +42,10 @@ class AppSettings: ObservableObject {
 
     private init() {
         let savedValue = UserDefaults.standard.integer(forKey: appearanceModeKey)
-        self.appearanceMode = AppearanceMode(rawValue: savedValue) ?? .system
+        let mode = AppearanceMode(rawValue: savedValue) ?? .system
+        self.appearanceMode = mode
+        // Mirror current value to App Group on cold launch so the widget is
+        // aligned even before any user toggle.
+        WidgetBridge.writeAppearanceMode(mode.rawValue)
     }
 }

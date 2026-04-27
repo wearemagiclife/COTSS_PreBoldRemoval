@@ -44,8 +44,8 @@ struct SettingsMenuView: View {
                             Button { showingProfile = true } label: {
                                 SettingsRow(
                                     systemImage: "person.crop.circle",
-                                    title: "Manage Profile",
-                                    subtitle: "Update, Sign Out or Delete",
+                                    title: "Your Profile",
+                                    subtitle: "Update, Sign Out, or Delete",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -73,8 +73,8 @@ struct SettingsMenuView: View {
                             } label: {
                                 SettingsRow(
                                     systemImage: "star.fill",
-                                    title: "⭐️ Subscription",
-                                    subtitle: "Manage your Subscription",
+                                    title: "Subcribe Today",
+                                    subtitle: "Unlock All ⭐️ Features",
                                     cardBackground: cardBackground,
                                     subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
                                 )
@@ -162,6 +162,32 @@ struct SettingsMenuView: View {
                                     cardBackground: cardBackground
                                 )
                             }
+
+                            #if DEBUG
+                            // MARK: Debug — force subscription on (Debug builds only)
+                            Toggle(isOn: Binding(
+                                get: { subscriptionManager.debugSubscriptionOverride },
+                                set: { subscriptionManager.debugSubscriptionOverride = $0 }
+                            )) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("DEBUG: Force Subscribed")
+                                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                                        .foregroundColor(AppTheme.primaryText)
+                                    Text("Override StoreKit; widget unlocks")
+                                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                                        .foregroundColor(AppTheme.secondaryText)
+                                }
+                            }
+                            .padding(AppConstants.Spacing.tight)
+                            .background(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(cardBackground.opacity(0.96))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
+                            )
+                            #endif
 
                         }  // inner VStack (settings rows)
                         .padding(.horizontal, AppConstants.Spacing.cardPadding)

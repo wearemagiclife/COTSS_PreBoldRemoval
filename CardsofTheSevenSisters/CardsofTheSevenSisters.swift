@@ -1,9 +1,12 @@
 import SwiftUI
+import WidgetKit
 
 @main
 struct CardsOfTheSevenSisters: App {
     @State private var showSplash = true
     @ObservedObject private var appSettings = AppSettings.shared
+    @StateObject private var deepLinkRouter = DeepLinkRouter()
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         setupGlobalAppearance()
@@ -29,9 +32,25 @@ struct CardsOfTheSevenSisters: App {
                         .environmentObject(AuthenticationManager.shared)
                         .environmentObject(DataManager.shared)
                         .environmentObject(SubscriptionManager.shared)
+                        .environmentObject(deepLinkRouter)
                 }
             }
             .preferredColorScheme(appSettings.colorScheme)
+            .onOpenURL { url in
+                deepLinkRouter.handle(url)
+                // If a deep link arrives while the splash is still up, skip ahead so
+                // the router can actually push a view.
+                if showSplash {
+                    _ = AuthenticationManager.shared
+                    _ = DataManager.shared
+                    showSplash = false
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
+            }
             .onAppear {
                 // Defer non-critical work
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

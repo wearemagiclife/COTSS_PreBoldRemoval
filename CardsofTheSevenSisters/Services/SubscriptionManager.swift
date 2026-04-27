@@ -1,5 +1,6 @@
 import Foundation
 import StoreKit
+import WidgetKit
 
 @MainActor
 class SubscriptionManager: ObservableObject {
@@ -24,10 +25,24 @@ class SubscriptionManager: ObservableObject {
 
     private var transactionListenerTask: Task<Void, Never>?
 
+    #if DEBUG
+    static let debugOverrideKey = "subscriptionDebugOverride"
+    #endif
+
     private init() {
         // Restore persisted state immediately so Settings shows correct badge on cold launch
-        isSubscribed = UserDefaults.standard.bool(forKey: "subscriptionIsActive")
+        let storedActive = UserDefaults.standard.bool(forKey: "subscriptionIsActive")
+        #if DEBUG
+        let overrideOn = UserDefaults.standard.bool(forKey: Self.debugOverrideKey)
+        isSubscribed = overrideOn || storedActive
+        #else
+        isSubscribed = storedActive
+        #endif
         activeProductID = UserDefaults.standard.string(forKey: "subscriptionActiveProductID")
+
+        // Keep the App Group mirror aligned with what we just restored so the widget
+        // renders correctly before any StoreKit transaction callbacks arrive.
+        WidgetBridge.writeIsSubscribed(isSubscribed)
 
         transactionListenerTask = listenForTransactions()
 
@@ -148,15 +163,43 @@ class SubscriptionManager: ObservableObject {
         }
 
         let wasSubscribed = isSubscribed
-        isSubscribed = foundActive
+        #if DEBUG
+        let overrideOn = UserDefaults.standard.bool(forKey: Self.debugOverrideKey)
+        let effectiveActive = foundActive || overrideOn
+        #else
+        let effectiveActive = foundActive
+        #endif
+        isSubscribed = effectiveActive
         activeProductID = foundProductID
         hasBillingIssue = foundBillingIssue
         UserDefaults.standard.set(foundActive, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(foundProductID, forKey: "subscriptionActiveProductID")
-        if wasSubscribed && !foundActive {
+        WidgetBridge.writeIsSubscribed(effectiveActive)
+        WidgetCenter.shared.reloadAllTimelines()
+        if wasSubscribed && !effectiveActive {
             Task { await CalendarSyncService.shared.removeFutureEvents() }
         }
     }
+
+    #if DEBUG
+    /// Debug-only override that forces subscriber state on regardless of StoreKit.
+    /// Persisted across launches; toggle from the Settings menu.
+    var debugSubscriptionOverride: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.debugOverrideKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Self.debugOverrideKey)
+            if newValue {
+                isSubscribed = true
+                WidgetBridge.writeIsSubscribed(true)
+                WidgetCenter.shared.reloadAllTimelines()
+            } else {
+                // Re-evaluate from real StoreKit state
+                Task { await checkCurrentEntitlements() }
+            }
+            objectWillChange.send()
+        }
+    }
+    #endif
 
     // MARK: - Process Unfinished Transactions
     func processUnfinishedTransactions() async {
@@ -184,12 +227,21 @@ class SubscriptionManager: ObservableObject {
     private func updateSubscriptionStatus(from transaction: Transaction) async {
         let notRevoked = transaction.revocationDate == nil
         let notExpired = transaction.expirationDate.map { $0 > Date() } ?? true
+        let storeActive = notRevoked && notExpired
         let wasSubscribed = isSubscribed
-        isSubscribed = notRevoked && notExpired
-        activeProductID = isSubscribed ? transaction.productID : nil
-        UserDefaults.standard.set(isSubscribed, forKey: "subscriptionIsActive")
+        #if DEBUG
+        let overrideOn = UserDefaults.standard.bool(forKey: Self.debugOverrideKey)
+        let effectiveActive = storeActive || overrideOn
+        #else
+        let effectiveActive = storeActive
+        #endif
+        isSubscribed = effectiveActive
+        activeProductID = storeActive ? transaction.productID : nil
+        UserDefaults.standard.set(storeActive, forKey: "subscriptionIsActive")
         UserDefaults.standard.set(activeProductID, forKey: "subscriptionActiveProductID")
-        if wasSubscribed && !isSubscribed {
+        WidgetBridge.writeIsSubscribed(effectiveActive)
+        WidgetCenter.shared.reloadAllTimelines()
+        if wasSubscribed && !effectiveActive {
             Task { await CalendarSyncService.shared.removeFutureEvents() }
         }
     }

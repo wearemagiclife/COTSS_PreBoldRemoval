@@ -1,7 +1,9 @@
 import SwiftUI
+import WidgetKit
 
 struct WidgetInfoView: View {
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var debugUnlocked: Bool = UserDefaults.standard.bool(forKey: "subscriptionDebugOverride")
 
     var body: some View {
         ZStack {
@@ -17,7 +19,7 @@ struct WidgetInfoView: View {
                             .foregroundColor(AppTheme.goldAccent)
                             .padding(.top, 12)
 
-                        Text("Get the Widget")
+                        Text("Your New Favorite Widget")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
                             .foregroundColor(AppTheme.primaryText)
                             .multilineTextAlignment(.center)
@@ -52,22 +54,33 @@ struct WidgetInfoView: View {
                             .foregroundColor(AppTheme.primaryText)
                             .padding(.bottom, 2)
 
+                        Text("Four cards arranged in a 2×2 grid:")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                            .foregroundColor(AppTheme.secondaryText)
+                            .padding(.bottom, 2)
+
                         WidgetFeatureRow(
                             icon: "sun.max.fill",
-                            title: "Today's Daily Card",
-                            description: "Your card for the day is shown at a glance — no need to open the app."
+                            title: "Daily Card",
+                            description: "The card influencing your day, refreshed every morning."
+                        )
+
+                        WidgetFeatureRow(
+                            icon: "globe",
+                            title: "Planet Card",
+                            description: "The planetary energy currently in play alongside your daily card."
                         )
 
                         WidgetFeatureRow(
                             icon: "arrow.triangle.2.circlepath",
-                            title: "Your 52-Day Cycle Card",
-                            description: "The card guiding your current planetary period, updated automatically when cycles shift."
+                            title: "52-Day Card",
+                            description: "The card guiding your current 52-day planetary cycle."
                         )
 
                         WidgetFeatureRow(
-                            icon: "star.fill",
-                            title: "Your Birth Card",
-                            description: "Your lifelong companion card, always present as a reminder of who you are."
+                            icon: "calendar",
+                            title: "Yearly Card",
+                            description: "The card that accompanies you through your entire birth year."
                         )
                     }
                     .padding(AppConstants.Spacing.tight)
@@ -124,6 +137,35 @@ struct WidgetInfoView: View {
                         .buttonStyle(GoldButtonStyle())
                         .padding(.top, 4)
                     }
+
+                    #if DEBUG
+                    // MARK: - Debug preview (Debug builds only)
+                    VStack(spacing: 10) {
+                        Button {
+                            let next = !debugUnlocked
+                            subscriptionManager.debugSubscriptionOverride = next
+                            debugUnlocked = next
+                            WidgetCenter.shared.reloadAllTimelines()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: debugUnlocked ? "checkmark.seal.fill" : "eye.fill")
+                                Text(debugUnlocked ? "Widget Preview Unlocked" : "Preview Widget (Debug)")
+                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                        }
+                        .buttonStyle(GoldButtonStyle())
+
+                        Text(debugUnlocked
+                             ? "Subscription override is ON. Tap again to turn off."
+                             : "Skips the subscription check so you can test the widget on the simulator.")
+                            .font(.custom("Iowan Old Style", size: 11))
+                            .foregroundColor(AppTheme.secondaryText)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 8)
+                    #endif
                 }
                 .padding(.horizontal, AppConstants.Spacing.cardPadding)
                 .padding(.top, AppConstants.Spacing.tight)
@@ -146,33 +188,41 @@ private struct WidgetPlaceholderPreview: View {
         ZStack {
             Color.black
 
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 Text("YOUR CARDS")
                     .font(.system(size: 9, weight: .semibold))
                     .tracking(2)
                     .foregroundColor(gold.opacity(0.6))
-                    .padding(.top, 20)
+                    .padding(.top, 18)
 
-                HStack(spacing: 14) {
-                    ForEach(["Daily", "52-Day", "Birth"], id: \.self) { label in
-                        VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .stroke(gold.opacity(0.6), lineWidth: 1)
-                                .frame(width: 60, height: 84)
-                                .overlay(
-                                    Image(systemName: label == "Daily" ? "sun.max.fill" : label == "52-Day" ? "arrow.triangle.2.circlepath" : "star.fill")
+                let rows: [(String, String, String, String)] = [
+                    ("sun.max.fill", "Daily", "globe", "Planet"),
+                    ("arrow.triangle.2.circlepath", "52-Day", "calendar", "Yearly")
+                ]
+
+                VStack(spacing: 10) {
+                    ForEach(rows, id: \.0) { row in
+                        HStack(spacing: 14) {
+                            ForEach([(row.0, row.1), (row.2, row.3)], id: \.0) { icon, label in
+                                VStack(spacing: 5) {
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .stroke(gold.opacity(0.6), lineWidth: 1)
+                                        .frame(width: 64, height: 88)
+                                        .overlay(
+                                            Image(systemName: icon)
+                                                .foregroundColor(gold.opacity(0.7))
+                                                .font(.system(size: 18))
+                                        )
+                                        .shadow(color: gold.opacity(0.25), radius: 8)
+                                    Text(label)
+                                        .font(.system(size: 9))
                                         .foregroundColor(gold.opacity(0.7))
-                                        .font(.system(size: 18))
-                                )
-                                .shadow(color: gold.opacity(0.25), radius: 8)
-
-                            Text(label)
-                                .font(.system(size: 9))
-                                .foregroundColor(gold.opacity(0.7))
+                                }
+                            }
                         }
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 18)
             }
         }
         .frame(maxWidth: .infinity)

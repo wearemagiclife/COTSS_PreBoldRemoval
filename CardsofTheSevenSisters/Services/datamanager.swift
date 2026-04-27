@@ -1,4 +1,5 @@
 import Foundation
+import WidgetKit
 
 class DataManager: ObservableObject {
     static let shared = DataManager()
@@ -49,6 +50,12 @@ class DataManager: ObservableObject {
         // Only load critical synchronous data
         loadUserProfile()
         checkDailyCardRevealStatus()
+
+        // Ensure the App Group birthDate reflects whatever was just loaded so the
+        // widget stays in sync even across app upgrades.
+        if isProfileComplete {
+            WidgetBridge.writeBirthDate(userProfile.birthDate)
+        }
 
         // Load heavy data asynchronously in background
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -266,6 +273,12 @@ class DataManager: ObservableObject {
         if let data = try? JSONEncoder().encode(userProfile) {
             UserDefaults.standard.set(data, forKey: "userProfile")
         }
+        syncWidgetBridge()
+    }
+
+    private func syncWidgetBridge() {
+        WidgetBridge.writeBirthDate(isProfileComplete || isGuestMode ? userProfile.birthDate : nil)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func loadUserProfile() {
@@ -291,6 +304,9 @@ class DataManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "userProfile")
         UserDefaults.standard.removeObject(forKey: "dailyCardRevealDate")
         UserDefaults.standard.removeObject(forKey: "isDailyCardRevealed")
+
+        WidgetBridge.writeBirthDate(nil)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // Guest Mode Sign In
@@ -298,6 +314,7 @@ class DataManager: ObservableObject {
         isGuestMode = true
         userProfile = UserProfile(name: "Guest", birthDate: birthDate)
         // Don't save to UserDefaults for guest mode
+        syncWidgetBridge()
     }
 }
 
