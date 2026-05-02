@@ -21,16 +21,16 @@ struct WidgetCards {
 
 struct SevenSistersProvider: TimelineProvider {
     func placeholder(in context: Context) -> SevenSistersEntry {
-        SevenSistersEntry(date: Date(), state: .locked)
+        Self.mockEntry()
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SevenSistersEntry) -> Void) {
-        completion(Self.makeEntry(at: Date()))
+        completion(Self.mockEntry())
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SevenSistersEntry>) -> Void) {
         let now = Date()
-        let entry = Self.makeEntry(at: now)
+        let entry = Self.mockEntry() // TODO: replace with makeEntry(at: now) before shipping
         let nextRefresh = Calendar.current.nextDate(
             after: now,
             matching: DateComponents(hour: 0, minute: 1),
@@ -39,10 +39,20 @@ struct SevenSistersProvider: TimelineProvider {
         completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
     }
 
+    static func mockEntry() -> SevenSistersEntry {
+        SevenSistersEntry(date: Date(), state: .ready(WidgetCards(
+            daily:       WidgetCard(id: 1,  name: "Ace of Hearts",   value: "a", suit: "hearts",   title: ""),
+            planet:      "mercury",
+            fiftyTwoDay: WidgetCard(id: 14, name: "Ace of Clubs",    value: "a", suit: "clubs",    title: ""),
+            yearly:      WidgetCard(id: 27, name: "Ace of Diamonds", value: "a", suit: "diamonds", title: "")
+        )))
+    }
+
     static func makeEntry(at date: Date) -> SevenSistersEntry {
         guard WidgetBridge.readIsSubscribed() else {
             return SevenSistersEntry(date: date, state: .locked)
         }
+
         guard let birthDate = WidgetBridge.readBirthDate() else {
             return SevenSistersEntry(date: date, state: .missingProfile)
         }
@@ -84,6 +94,8 @@ private let goldAccent = Color(red: 0.75, green: 0.60, blue: 0.35)
 struct SevenSistersWidgetView: View {
     var entry: SevenSistersProvider.Entry
 
+    @Environment(\.widgetFamily) var widgetFamily
+
     /// Resolves the in-app appearance preference (0=system, 1=light, 2=dark).
     /// `nil` returned for `.system` means inherit from system trait.
     private var preferredColorScheme: ColorScheme? {
@@ -91,6 +103,14 @@ struct SevenSistersWidgetView: View {
         case 1: return .light
         case 2: return .dark
         default: return nil
+        }
+    }
+
+    private var isDark: Bool {
+        switch WidgetBridge.readAppearanceMode() {
+        case 1: return false
+        case 2: return true
+        default: return true
         }
     }
 
@@ -104,18 +124,17 @@ struct SevenSistersWidgetView: View {
             }
         }
         .containerBackground(for: .widget) {
-            ZStack {
-                // Deep near-black base — slightly warmer than pure black
-                Color(red: 0.05, green: 0.04, blue: 0.04)
-
-                // Soft inner gold rim — thin stroke + diffused glow, matching the modal card style
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(goldAccent.opacity(0.30), lineWidth: 0.75)
-
-                // Inner edge shadow — simulates the modal's warm ambient rim
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.08), lineWidth: 10)
-                    .blur(radius: 8)
+            if isDark {
+                ZStack {
+                    Color(red: 0.05, green: 0.04, blue: 0.04)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(goldAccent.opacity(0.30), lineWidth: 0.75)
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.08), lineWidth: 10)
+                        .blur(radius: 8)
+                }
+            } else {
+                Color(red: 0.86, green: 0.75, blue: 0.55)
             }
         }
         .widgetURL(URL(string: "sevensistersapp://daily"))
@@ -134,71 +153,99 @@ struct SevenSistersWidgetView: View {
     }
 
     private func readyGrid(_ cards: WidgetCards) -> some View {
-        GeometryReader { geo in
-            // Card aspect ratio matches the deck art (~2.5:3.5).
-            let cardAspect: CGFloat = 2.5 / 3.5
-            // Reserve vertical for: header text (~18) + top card + ornament (~16) + bottom row (card + label ~12)
-            let headerH: CGFloat = 18
-            let ornamentH: CGFloat = 16
-            let labelH: CGFloat = 12
-            let vSpacing: CGFloat = 10  // generous spacing for airy feel
+        switch widgetFamily {
+        case .systemSmall:  AnyView(smallGrid(cards))
+        default:            AnyView(mediumGrid(cards))
+        }
+    }
 
-            // Cards sized to leave breathing room on all sides
-            let usableH = geo.size.height - headerH - ornamentH - labelH - vSpacing * 4
-            let heroH = usableH * 0.50          // smaller top cards
-            let heroW = heroH * cardAspect
-            let bottomH = heroH * 0.70          // notably smaller bottom cards
-            let bottomW = bottomH * cardAspect
+    private func smallGrid(_ cards: WidgetCards) -> some View {
+        GeometryReader { geo in
+            // Guard against zero-size on first pass; use 155pt as a safe fallback.
+            let safeW = geo.size.width  > 0 ? geo.size.width  : 155
+            let safeH = geo.size.height > 0 ? geo.size.height : 155
+            let headerH: CGFloat = 24
+            let vSpacing: CGFloat = 6
+            let hPadding: CGFloat = 4
+            let cardGap:  CGFloat = 10
+            let cardW = (safeW - hPadding * 2 - cardGap) / 2
+            let cardH = min(cardW / (2.5 / 3.5), safeH - headerH - vSpacing * 2)
 
             VStack(spacing: vSpacing) {
-                // Header
                 Text("TODAY'S CARD")
-                    .font(.custom("Iowan Old Style", size: 12))
+                    .font(.custom("Iowan Old Style", size: 13))
                     .tracking(2)
                     .foregroundStyle(goldAccent)
                     .frame(height: headerH)
 
-                // Top row: daily + planet — same size, same styling
-                HStack(alignment: .center, spacing: 14) {
-                    cardArt(cards.daily.imageName, width: heroW, height: heroH, isHero: true)
-                    cardArt(cards.planet.lowercased(), width: heroW, height: heroH, isHero: true)
-                }
-
-                // Ornament divider
-                if let line = UIImage(named: "linedesignd") {
-                    Image(uiImage: line)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: geo.size.width * 0.7, height: ornamentH)
-                } else {
-                    Rectangle()
-                        .fill(goldAccent.opacity(0.4))
-                        .frame(width: geo.size.width * 0.5, height: 1)
-                        .frame(height: ornamentH)
-                }
-
-                // Bottom row: 52-Day + Yearly with labels
-                HStack(spacing: 18) {
-                    labeledCard(imageName: cards.fiftyTwoDay.imageName,
-                                title: "52-Day Card",
-                                width: bottomW, height: bottomH, labelHeight: labelH)
-                    labeledCard(imageName: cards.yearly.imageName,
-                                title: "Yearly Card",
-                                width: bottomW, height: bottomH, labelHeight: labelH)
+                HStack(spacing: cardGap) {
+                    cardArt(cards.daily.imageName, width: cardW, height: cardH, isHero: true)
+                    cardArt(cards.planet.lowercased(), width: cardW, height: cardH, isHero: true)
                 }
             }
-            .frame(width: geo.size.width, height: geo.size.height)
+            .frame(width: safeW, height: safeH)
+        }
+    }
+
+    private func mediumGrid(_ cards: WidgetCards) -> some View {
+        GeometryReader { geo in
+            let safeW = geo.size.width  > 0 ? geo.size.width  : 329
+            let safeH = geo.size.height > 0 ? geo.size.height : 155
+            let cardAspect: CGFloat = 2.5 / 3.5
+            let headerH: CGFloat = 16
+            let vSpacing: CGFloat = 6
+            let groupGap: CGFloat = 26
+            let cardGap:  CGFloat = 22
+
+            let hPadding: CGFloat = 16
+            let cardW = (safeW - hPadding - groupGap - cardGap * 2) / 4
+            let cardH = min(cardW / cardAspect, safeH - headerH - vSpacing)
+            let twoCardGroupW = cardW * 2 + cardGap
+
+            let headingFont = Font.custom("Iowan Old Style", size: 12)
+
+            VStack(spacing: vSpacing) {
+                // Header row
+                HStack(spacing: 0) {
+                    Text("TODAY'S CARD")
+                        .font(headingFont)
+                        .tracking(2)
+                        .foregroundStyle(goldAccent)
+                        .frame(width: twoCardGroupW)
+                    Spacer().frame(width: groupGap)
+                    Text("52-DAY")
+                        .font(headingFont)
+                        .tracking(2)
+                        .foregroundStyle(goldAccent)
+                        .frame(width: cardW)
+                    Spacer().frame(width: cardGap)
+                    Text("YEAR")
+                        .font(headingFont)
+                        .tracking(2)
+                        .foregroundStyle(goldAccent)
+                        .frame(width: cardW)
+                }
+                .frame(height: headerH)
+
+                // Card row
+                HStack(spacing: 0) {
+                    HStack(spacing: cardGap) {
+                        cardArt(cards.daily.imageName, width: cardW, height: cardH, isHero: false)
+                        cardArt(cards.planet.lowercased(), width: cardW, height: cardH, isHero: false)
+                    }
+                    .frame(width: twoCardGroupW)
+                    Spacer().frame(width: groupGap)
+                    cardArt(cards.fiftyTwoDay.imageName, width: cardW, height: cardH, isHero: false)
+                    Spacer().frame(width: cardGap)
+                    cardArt(cards.yearly.imageName, width: cardW, height: cardH, isHero: false)
+                }
+            }
+            .frame(width: safeW, height: safeH)
         }
     }
 
     /// Card image with gold-glow shadow + drop shadow, matching the home view's `darkModeCardEffects`.
     private func cardArt(_ name: String, width: CGFloat, height: CGFloat, isHero: Bool) -> some View {
-        let isDark: Bool
-        switch WidgetBridge.readAppearanceMode() {
-        case 1: isDark = false
-        case 2: isDark = true
-        default: isDark = true   // widget container is black; treat system as dark for glow purposes
-        }
         let glowOpacity: Double = isHero ? 0.60 : 0.40
         let glowRadius: CGFloat = isHero ? 18 : 10
         return Image(name)
@@ -212,18 +259,6 @@ struct SevenSistersWidgetView: View {
                     radius: glowRadius * 2.5, x: 0, y: 0)
             // Base drop shadow for depth
             .shadow(color: .black.opacity(0.5), radius: 6, x: 0, y: 3)
-    }
-
-    private func labeledCard(imageName: String, title: String,
-                             width: CGFloat, height: CGFloat, labelHeight: CGFloat) -> some View {
-        VStack(spacing: 4) {
-            cardArt(imageName, width: width, height: height, isHero: false)
-            Text(title)
-                .font(.custom("Iowan Old Style", size: 10))
-                .foregroundStyle(goldAccent.opacity(0.9))
-                .lineLimit(1)
-                .frame(height: labelHeight)
-        }
     }
 
     private var lockedView: some View {
@@ -269,6 +304,6 @@ struct SevenSistersWidget: Widget {
         }
         .configurationDisplayName("Seven Sisters")
         .description("Your daily, planet, 52-day, and yearly cards at a glance.")
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
