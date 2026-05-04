@@ -36,11 +36,6 @@ class CalendarSyncService {
         let birthCardId = BirthCardLookup.shared.calculateCardForDate(for: birthDate)
         let birthMMDD = cal.dateComponents([.month, .day], from: birthDate)
 
-        // Snapshot description dictionaries on main thread to avoid data races
-        let dailyDescs = await MainActor.run { DescriptionRepository.shared.dailyDescriptions }
-        let cycleDescs = await MainActor.run { DescriptionRepository.shared.fiftyTwoDescriptions }
-        let yearlyDescs = await MainActor.run { DescriptionRepository.shared.yearlyDescriptions }
-
         var savedEvents: [EKEvent] = []
         var previousPlanet: String? = nil
 

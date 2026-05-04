@@ -22,7 +22,7 @@ struct HomeView: View {
     var body: some View {
         Group {
             if dataManager.isProfileComplete {
-                NavigationView {
+                NavigationStack {
                     GeometryReader { geometry in
                         let isSmallScreen = geometry.size.height < 700
 
@@ -36,11 +36,14 @@ struct HomeView: View {
                             .padding(.top, isSmallScreen ? 10 : 0)
                             .padding(.bottom, 62)
                         }
-                        .background(deepLinkNavigation)
                     }
                     .background(AppTheme.backgroundColor)
                     .ignoresSafeArea(edges: .bottom)
                     .navigationBarHidden(true)
+                    .navigationDestination(isPresented: $deepLinkDaily) { DailyCardView() }
+                    .navigationDestination(isPresented: $deepLinkCycle52) { FiftyTwoDayCycleView() }
+                    .navigationDestination(isPresented: $deepLinkYearly) { YearlySpreadView() }
+                    .navigationDestination(isPresented: $deepLinkSubscribe) { SubscriptionView().environmentObject(subscriptionManager) }
                     .onAppear { applyPendingDeepLink() }
                     .onChange(of: deepLinkRouter.pendingDestination) { _, _ in
                         applyPendingDeepLink()
@@ -101,7 +104,6 @@ struct HomeView: View {
                         }
                     }
                 }
-                .navigationViewStyle(.stack)
             } else {
                 ProfileSetupBlockingView()
             }
@@ -215,18 +217,6 @@ struct HomeView: View {
     }
 
     // MARK: - Deep Link Navigation (widget-driven)
-
-    @ViewBuilder
-    private var deepLinkNavigation: some View {
-        VStack(spacing: 0) {
-            NavigationLink(destination: DailyCardView(), isActive: $deepLinkDaily) { EmptyView() }
-            NavigationLink(destination: FiftyTwoDayCycleView(), isActive: $deepLinkCycle52) { EmptyView() }
-            NavigationLink(destination: YearlySpreadView(), isActive: $deepLinkYearly) { EmptyView() }
-            NavigationLink(destination: SubscriptionView().environmentObject(subscriptionManager), isActive: $deepLinkSubscribe) { EmptyView() }
-        }
-        .frame(width: 0, height: 0)
-        .hidden()
-    }
 
     private func applyPendingDeepLink() {
         guard let destination = deepLinkRouter.pendingDestination else { return }
