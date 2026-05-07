@@ -58,7 +58,7 @@ class DescriptionRepository: ObservableObject {
     // Ensure descriptions are loaded synchronously if needed
     func ensureLoaded() {
         // If descriptions are already loaded, return immediately
-        guard birthDescriptions.isEmpty else { return }
+        guard dailyDescriptions.isEmpty else { return }
 
         // Load synchronously on main thread
         birthDescriptions = Self.loadJSON(named: "birth_descriptions")
