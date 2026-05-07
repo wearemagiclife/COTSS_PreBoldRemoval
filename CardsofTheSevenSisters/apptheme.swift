@@ -40,6 +40,13 @@ struct AppTheme {
             : UIColor.black.withAlphaComponent(0.8)
     })
     static let goldAccent = Color(red: 0.83, green: 0.69, blue: 0.22)
+
+    /// Adaptive accent for text — dark amber in light mode (readable on tan), bright gold in dark mode.
+    static let accentText = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.83, green: 0.69, blue: 0.22, alpha: 1.0)  // bright gold on black
+            : UIColor(red: 0.50, green: 0.33, blue: 0.02, alpha: 1.0)  // dark amber on tan
+    })
     
     static let largeTitle = Font.custom("Iowan Old Style", size: 34)
     static let title = Font.custom("Iowan Old Style", size: 22)
