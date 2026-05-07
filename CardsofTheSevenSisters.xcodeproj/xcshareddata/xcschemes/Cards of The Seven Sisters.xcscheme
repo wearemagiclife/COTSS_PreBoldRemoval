@@ -75,7 +75,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "CardsofTheSevenSisters/Resources/StoreKit_Config.storekit">
+         identifier = "../../CardsofTheSevenSisters/Resources/StoreKit_Config.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
