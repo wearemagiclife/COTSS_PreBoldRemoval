@@ -19,7 +19,13 @@ struct SettingsMenuView: View {
     private var safeAreaTop: CGFloat {
         UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .first?.windows.first?.safeAreaInsets.top ?? 0
+            .first?.windows.first?.safeAreaInsets.top ?? 59
+    }
+
+    private var safeAreaBottom: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows.first?.safeAreaInsets.bottom ?? 0
     }
 
     // Adaptive card background for light/dark mode
@@ -32,13 +38,14 @@ struct SettingsMenuView: View {
                 .ignoresSafeArea()
                 .onTapGesture { isPresented = false }
 
-            // Settings panel — inset on all 4 sides, same as CardDetailModalView
-            NavigationStack {
+            // Settings panel
+            VStack {
+                NavigationStack {
                 ZStack {
                     AppTheme.backgroundColor.ignoresSafeArea()
 
                     ScrollView {
-                        VStack(spacing: AppConstants.Spacing.cardPadding) {
+                        VStack(spacing: AppConstants.Spacing.ornament) {
                             VStack(spacing: AppConstants.Spacing.tight) {
                             // MARK: Manage Profile
                             Button { showingProfile = true } label: {
@@ -142,23 +149,12 @@ struct SettingsMenuView: View {
 
                             // MARK: Legal & Support
                             NavigationLink {
-                                LegalLinksView()
+                                SupportView()
                             } label: {
                                 SettingsRow(
-                                    systemImage: "doc.text.magnifyingglass",
-                                    title: "Legal",
-                                    subtitle: "Our Policies & Terms",
-                                    cardBackground: cardBackground
-                                )
-                            }
-
-                            Button {
-                                openWebsite()
-                            } label: {
-                                SettingsRow(
-                                    systemImage: "globe",
-                                    title: "Need Support?",
-                                    subtitle: "wearemagic.life/support",
+                                    systemImage: "bubble.left.and.bubble.right",
+                                    title: "Get Support",
+                                    subtitle: "Policies & Contact",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -190,8 +186,8 @@ struct SettingsMenuView: View {
                             #endif
 
                         }  // inner VStack (settings rows)
-                        .padding(.horizontal, AppConstants.Spacing.cardPadding)
-                        .padding(.bottom, AppConstants.Spacing.section)
+                        .padding(.horizontal, AppConstants.Spacing.pageInset)
+                        .padding(.bottom, AppConstants.Spacing.tight)
                         }  // outer VStack
                     }  // ScrollView
                 }  // ZStack (background + ScrollView)
@@ -200,21 +196,13 @@ struct SettingsMenuView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(action: { isPresented = false }) {
-                            if UIScreen.main.bounds.height < 700 {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(AppTheme.primaryText)
-                                    .frame(width: 28, height: 28)
-                                    .background(AppConstants.Colors.capsuleButton)
-                                    .clipShape(Circle())
-                                    .contentShape(Circle())
-                            } else {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(AppTheme.primaryText)
-                                    .frame(width: AppConstants.ButtonSizes.closeButton, height: AppConstants.ButtonSizes.closeButton)
-                                    .contentShape(Rectangle())
-                            }
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(AppTheme.primaryText)
+                                .frame(width: 32, height: 32)
+                                .background(AppConstants.Colors.capsuleButton)
+                                .clipShape(Circle())
+                                .contentShape(Circle())
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Close settings")
@@ -223,6 +211,16 @@ struct SettingsMenuView: View {
                 }
                 .toolbarBackground(AppTheme.backgroundColor, for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarColorScheme(.none, for: .navigationBar)
+                .onAppear {
+                    // Remove the hairline separator below the navigation bar
+                    let appearance = UINavigationBarAppearance()
+                    appearance.configureWithOpaqueBackground()
+                    appearance.backgroundColor = .clear
+                    appearance.shadowColor = .clear
+                    UINavigationBar.appearance().standardAppearance = appearance
+                    UINavigationBar.appearance().scrollEdgeAppearance = appearance
+                }
                 .task {
                     await subscriptionManager.checkCurrentEntitlements()
                 }
@@ -250,9 +248,10 @@ struct SettingsMenuView: View {
             .background(AppTheme.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
             .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
-            .padding(.horizontal, AppConstants.Spacing.pageInset)
-            .padding(.bottom, AppConstants.Spacing.pageInset)
-            .padding(.top, safeAreaTop + AppConstants.Spacing.pageInset)
+            }  // VStack
+            .padding(.horizontal, 28)
+            .padding(.top, safeAreaTop + 8)
+            .padding(.bottom, 8)
         }  // ZStack (backdrop + panel)
         .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
     }
@@ -298,7 +297,7 @@ private struct SettingsRow: View {
                     .accessibilityHidden(true)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(title)
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .foregroundColor(AppTheme.primaryText)
@@ -316,6 +315,112 @@ private struct SettingsRow: View {
 
             Spacer()
         }
+        .padding(.vertical, AppConstants.Spacing.small)
+        .padding(.horizontal, AppConstants.Spacing.ornament)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(cardBackground.opacity(0.96))
+                .shadow(color: .black.opacity(0.10), radius: 4, x: 0, y: 2)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+}
+// MARK: - SupportView
+
+struct SupportView: View {
+    @Environment(\.dismiss) private var dismiss
+    private let cardBackground = AppConstants.Colors.capsuleButton
+
+    var body: some View {
+        ZStack {
+            AppTheme.backgroundColor.ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppConstants.Spacing.ornament) {
+                    Text("We're here to help.")
+                        .font(.custom("Iowan Old Style", size: 28))
+                        .foregroundColor(AppTheme.primaryText)
+                        .padding(.bottom, AppConstants.Spacing.tight)
+
+                    Text("Reach out anytime, or review our policies below. We designed this app to respect your privacy and keep things simple.")
+                        .font(.custom("Iowan Old Style", size: 16))
+                        .foregroundColor(AppTheme.secondaryText)
+                        .padding(.bottom, AppConstants.Spacing.tight)
+
+                    // Get Support
+                    Button(action: {
+                        if let url = URL(string: "https://wearemagic.life/support") {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        SupportSectionCard(
+                            title: "Get Support",
+                            subtitle: "Reach us at wearemagic.life/support",
+                            cardBackground: cardBackground
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    // Our Policies
+                    NavigationLink {
+                        LegalLinksView()
+                    } label: {
+                        SupportSectionCard(
+                            title: "Our Policies",
+                            subtitle: "Privacy Policy, Terms of Service & more",
+                            cardBackground: cardBackground
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer(minLength: AppConstants.Spacing.cardPadding)
+                }
+                .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                .padding(.top, AppConstants.Spacing.pageInset)
+                .padding(.bottom, AppConstants.Spacing.section)
+            }
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.primaryText)
+                        .frame(width: AppConstants.ButtonSizes.backButton, height: AppConstants.ButtonSizes.backButton)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Returns to settings")
+            }
+        }
+        .toolbarBackground(AppTheme.backgroundColor, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+    }
+}
+
+private struct SupportSectionCard: View {
+    let title: String
+    let subtitle: String
+    let cardBackground: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.custom("Iowan Old Style", size: 18))
+                .foregroundColor(AppTheme.primaryText)
+            Text(subtitle)
+                .font(.custom("Iowan Old Style", size: 14))
+                .foregroundColor(AppTheme.secondaryText)
+        }
         .padding(AppConstants.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
@@ -327,6 +432,6 @@ private struct SettingsRow: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
         )
-        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
+
