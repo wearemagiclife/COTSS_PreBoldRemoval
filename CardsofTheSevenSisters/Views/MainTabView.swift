@@ -9,7 +9,6 @@ struct MainTabView: View {
 
     var body: some View {
         ZStack {
-            // HomeView must not ignore the bottom safe area, or its content will be hidden by the custom tab bar.
             HomeView()
                 .opacity(selectedTab == .home ? 1 : 0)
                 .allowsHitTesting(selectedTab == .home)
@@ -23,13 +22,14 @@ struct MainTabView: View {
         }
     }
 
+    @Environment(\.colorScheme) private var colorScheme
+
     private var navBar: some View {
         HStack(spacing: 32) {
             navPill(for: .home)
             navPill(for: .calendar)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
         .background(AppTheme.backgroundColor)
         .overlay(alignment: .top) {
             Rectangle()
@@ -37,8 +37,6 @@ struct MainTabView: View {
                 .frame(height: 0.5)
         }
     }
-
-    @Environment(\.colorScheme) private var colorScheme
 
     private func navPill(for tab: AppTab) -> some View {
         let activeOpacity: Double = colorScheme == .dark ? 0.45 : 0.72
@@ -53,7 +51,7 @@ struct MainTabView: View {
                       : AppTheme.primaryText.opacity(0.13))
                 .frame(width: 64, height: 3)
                 .padding(.horizontal, 18)
-                .padding(.vertical, 16)
+                .padding(.vertical, 6)
         }
         .buttonStyle(.plain)
         .contentShape(Rectangle())
