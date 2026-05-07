@@ -147,7 +147,7 @@ struct SubscriptionView: View {
                 .foregroundColor(AppTheme.primaryText)
                 .multilineTextAlignment(.center)
 
-            Text("All features are free. Your support\nkeeps the cards turning.")
+            Text("We're committed to keeping this app accessible and offering a free version including daily interpretations. Get the most out of the app with new features available to subscribers. Subscribers will gain access to our new black and gold view, and a widget in each of these settings. We've also added a calendar in app and as an integration so you can see your cards in advance. Any additional features released in the future will also be included in your subscription.")
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                 .foregroundColor(AppTheme.secondaryText)
                 .multilineTextAlignment(.center)
