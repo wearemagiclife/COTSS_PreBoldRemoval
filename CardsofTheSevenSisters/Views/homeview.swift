@@ -23,20 +23,19 @@ struct HomeView: View {
         Group {
             if dataManager.isProfileComplete {
                 NavigationStack {
-                    GeometryReader { geometry in
-                        let isSmallScreen = geometry.size.height < 700
-
-                        ScrollView {
-                            VStack(spacing: 0) {
-                                BillingIssueBanner()
-                                headerView
-                                welcomeSection
-                                cardsGrid
-                            }
-                            .padding(.top, isSmallScreen ? 10 : 0)
-                            .padding(.bottom, 62)
+                    Group {
+                        VStack(spacing: 0) {
+                            BillingIssueBanner()
+                            headerView
+                            welcomeSection
+                            cardsGrid
                         }
+                        .padding(.top, UIScreen.main.bounds.height < 700 ? 10 : 0)
+                        .padding(.bottom, 16)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     }
+                    .scaleEffect(showingSettings ? 0.93 : 1.0)
+                    .offset(y: showingSettings ? 12 : 0)
                     .background(AppTheme.backgroundColor)
                     .ignoresSafeArea(edges: .bottom)
                     .navigationBarHidden(true)
@@ -115,7 +114,6 @@ struct HomeView: View {
                     .zIndex(20)
             }
         }
-        .ignoresSafeArea()
     }
     
     private var headerView: some View {
@@ -144,9 +142,11 @@ struct HomeView: View {
                 .padding(.bottom, AppConstants.Spacing.tight)
                 .opacity(showWelcome ? 1 : 0)
 
-            LineBreak(width: 320)
+            LineBreak("linedesign", width: 200)
                 .padding(.top, AppConstants.Spacing.tight)
+                .padding(.bottom, AppConstants.Spacing.ornament)
                 .opacity(showContent ? 1 : 0)
+                .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
     
@@ -159,31 +159,30 @@ struct HomeView: View {
                 SectionHeader(AppConstants.Strings.yourDailyCard, fontSize: AppConstants.FontSizes.title)
                 Spacer()
             }
-            .padding(.bottom, AppConstants.Spacing.tight)
+            .padding(.bottom, AppConstants.Spacing.ornament)
 
             VStack(spacing: 0) {
                 let showTapText = !dataManager.isDailyCardRevealed && viewModel.showTapToReveal
 
-                Spacer(minLength: isSmallScreen ? 4 : 6)
 
                 DailyCardLarge(dailyCard: viewModel.userDailyCard)
 
                 // Status area below the daily card: show hint before reveal, line design after reveal
                 if showTapText {
                     Text(AppConstants.Strings.tapToReveal)
-                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
                         .foregroundColor(AppTheme.primaryText)
                         .multilineTextAlignment(.center)
                         .scaleEffect(viewModel.pulseScale)
-                        .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
+                        .padding(.top, AppConstants.Spacing.ornament)
                         .transition(.asymmetric(
                             insertion: .opacity.combined(with: .move(edge: .top)),
                             removal: .opacity.combined(with: .move(edge: .top))
                         ))
                         .animation(.easeInOut(duration: 0.35), value: showTapText)
                 } else if dataManager.isDailyCardRevealed {
-                    LineBreak("linedesignd", width: 320)
-                        .padding(.top, isSmallScreen ? 6 : AppConstants.Spacing.ornament)
+                    LineBreak("linedesignd", width: 250)
+                        .padding(.top, AppConstants.Spacing.ornament)
                         .padding(.bottom, AppConstants.Spacing.ornament)
                         .opacity(showContent ? 1 : 0)
                         .transition(.opacity.combined(with: .move(edge: .top)))
