@@ -27,7 +27,7 @@ struct CardsOfTheSevenSisters: App {
                     })
                     .zIndex(1)
                 } else {
-                    HomeView()
+                    MainTabView()
                         .zIndex(0)
                         .environmentObject(AuthenticationManager.shared)
                         .environmentObject(DataManager.shared)
@@ -98,8 +98,7 @@ struct CardsOfTheSevenSisters: App {
 
         UIView.appearance().tintColor = adaptiveText
 
-        UITabBar.appearance().backgroundColor = adaptiveBackground
-        UITabBar.appearance().barTintColor = adaptiveBackground
+        UITabBar.appearance().isHidden = true
 
         UITableView.appearance().backgroundColor = adaptiveBackground
         UITableViewCell.appearance().backgroundColor = adaptiveBackground
