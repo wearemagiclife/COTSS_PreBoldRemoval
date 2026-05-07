@@ -17,12 +17,15 @@ class RatingService: ObservableObject {
     private let dailyCardRevealCountKey = "dailyCardRevealCount"
     private let consecutiveDaysKey = "consecutiveDaysOpened"
     private let lastOpenDateKey = "lastAppOpenDate"
+    private let firstOpenDateKey = "firstAppOpenDate"
 
     // Thresholds for requesting rating
-    private let minimumAppOpens = 5
-    private let minimumBirthCardViews = 3
-    private let minimumDailyReveals = 5
-    private let minimumConsecutiveDays = 3
+    private let minimumAppOpens = 15
+    private let minimumBirthCardViews = 8
+    private let minimumDailyReveals = 10
+    private let minimumConsecutiveDays = 5
+    // Minimum number of days since first launch before ever showing the prompt
+    private let minimumDaysSinceInstall = 7
 
     private init() {}
 
@@ -32,6 +35,12 @@ class RatingService: ObservableObject {
     func trackAppOpen() {
         let count = defaults.integer(forKey: appOpenCountKey) + 1
         defaults.set(count, forKey: appOpenCountKey)
+
+        // Record first open date if not already set
+        if defaults.object(forKey: firstOpenDateKey) == nil {
+            defaults.set(Date(), forKey: firstOpenDateKey)
+        }
+
         updateConsecutiveDays()
     }
 
@@ -107,6 +116,17 @@ class RatingService: ObservableObject {
             return
         }
 
+        // Check minimum days since install
+        if let firstOpen = defaults.object(forKey: firstOpenDateKey) as? Date {
+            let daysSinceInstall = Calendar.current.dateComponents([.day], from: firstOpen, to: Date()).day ?? 0
+            if daysSinceInstall < minimumDaysSinceInstall {
+                return
+            }
+        } else {
+            // First open date not recorded yet — too early
+            return
+        }
+
         // All conditions met - request rating
         requestRating()
     }
@@ -116,9 +136,9 @@ class RatingService: ObservableObject {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
         defaults.set(currentVersion, forKey: lastRatingRequestVersionKey)
 
-        // Show our custom prompt after a brief delay so it doesn't interrupt
-        // whatever interaction triggered the rating check
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        // Show our custom prompt after a longer delay so it doesn't feel
+        // like an interruption to whatever the user was just doing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
             self.shouldShowRatingPrompt = true
         }
     }
@@ -133,5 +153,6 @@ class RatingService: ObservableObject {
         defaults.removeObject(forKey: dailyCardRevealCountKey)
         defaults.removeObject(forKey: consecutiveDaysKey)
         defaults.removeObject(forKey: lastOpenDateKey)
+        defaults.removeObject(forKey: firstOpenDateKey)
     }
 }
