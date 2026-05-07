@@ -48,7 +48,7 @@ class CalendarSyncService {
                 primaryCard: birthCardId,
                 evaluationDate: date
             )
-            let dailyShortName = "\(dailyResult.card.value)\(dailyResult.card.suitSymbol)"
+            let dailyShortName = "\(dailyResult.card.value) \(dailyResult.card.suitSymbol)"
 
             if let event = makeAllDayEvent(
                 title: dailyShortName,
@@ -68,7 +68,7 @@ class CalendarSyncService {
                     phaseNumber: planetNumber(planet)
                 )
                 let cycleCard = DataManager.shared.getCard(by: cycleCardId)
-                let cycleShortName = "\(cycleCard.value)\(cycleCard.suitSymbol)"
+                let cycleShortName = "\(cycleCard.value) \(cycleCard.suitSymbol)"
 
                 if let event = makeAllDayEvent(
                     title: "Welcoming the \(cycleShortName) in \(planet)",
@@ -86,7 +86,7 @@ class CalendarSyncService {
                 let age = calc.calculatePersonAge(birthDate: birthDate, onDate: date)
                 let yearlyCardId = calc.deriveAnnualInfluence(primaryCard: birthCardId, personAge: age)
                 let yearlyCard = DataManager.shared.getCard(by: yearlyCardId)
-                let yearlyShortName = "\(yearlyCard.value)\(yearlyCard.suitSymbol)"
+                let yearlyShortName = "\(yearlyCard.value) \(yearlyCard.suitSymbol)"
 
                 if let event = makeAllDayEvent(
                     title: "Happy Birthday from the \(yearlyShortName)!",
@@ -182,10 +182,10 @@ class CalendarSyncService {
     }
 
     private func durationDays(for productID: String) -> Int {
-        if productID.contains("weekly")  { return 7 }
-        if productID.contains("6month")  { return 180 }
-        if productID.contains("monthly") { return 30 }
-        if productID.contains("annual")  { return 365 }
+        if productID.contains("weekly")  { return 30 }
+        if productID.contains("6month")  { return 365 }
+        if productID.contains("monthly") { return 90 }
+        if productID.contains("annual")  { return 520 }
         return 30
     }
 
