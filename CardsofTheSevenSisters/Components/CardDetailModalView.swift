@@ -14,7 +14,9 @@ struct CardDetailModalView: View {
     let cardType: CardType
     let contentType: DetailContentType?
     @Binding var isPresented: Bool
+    var dateLabel: String? = nil
     @Environment(\.colorScheme) private var colorScheme
+    @ObservedObject private var repo = DescriptionRepository.shared
 
     // MARK: - Title glyph sizing to visually match (or exceed) 24pt text
     private var titleUIFont: UIFont { UIFont(name: "Iowan Old Style", size: 24) ?? .systemFont(ofSize: 24) }
@@ -85,8 +87,20 @@ struct CardDetailModalView: View {
                 .accessibilityAddTraits(.isButton)
                 .accessibilityHint("Double tap to close")
 
-            ScrollView {
+            VStack(spacing: 0) {
+                if let label = dateLabel {
+                    Text(label)
+                        .font(.custom("Iowan Old Style", size: scaledFont(AppConstants.FontSizes.callout)))
+                        .foregroundColor(AppTheme.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, AppConstants.Spacing.section)
+                        .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                }
+
+                ScrollView {
                 VStack(spacing: AppConstants.Spacing.tight) {
+
                     Group {
                         if case .planetary(let planet) = contentType {
                             if let planetImage = ImageManager.shared.loadPlanetImage(for: planet) {
@@ -168,13 +182,20 @@ struct CardDetailModalView: View {
                         LineBreak(width: isIPad ? 260 : 180)
                             .padding(.vertical, AppConstants.Spacing.ornament)
 
-                        Text(descriptionText())
-                            .font(.custom("Iowan Old Style", size: scaledFont(17)))
-                            .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
-                            .tracking(0.3)
-                            .foregroundColor(AppTheme.primaryText)
-                            .multilineTextAlignment(.leading)
-                            .padding(.horizontal, isIPad ? 12 : 4)
+                        let desc = descriptionText()
+                        if desc.isEmpty {
+                            ProgressView()
+                                .tint(AppTheme.primaryText)
+                                .padding(.vertical, AppConstants.Spacing.ornament)
+                        } else {
+                            Text(desc)
+                                .font(.custom("Iowan Old Style", size: scaledFont(17)))
+                                .lineSpacing(AppConstants.Typography.adaptiveLineSpacing)
+                                .tracking(0.3)
+                                .foregroundColor(AppTheme.primaryText)
+                                .multilineTextAlignment(.leading)
+                                .padding(.horizontal, isIPad ? 12 : 4)
+                        }
 
                         // Birth dates for karma cards - below description
                         if case .karma = contentType {
@@ -199,10 +220,11 @@ struct CardDetailModalView: View {
                 }
                 .padding(.vertical, AppConstants.Spacing.cardPadding)
                 .padding(.horizontal, AppConstants.Spacing.cardPadding)
+                }
+                .scrollIndicators(.hidden)
+                .scrollTargetLayout()
+                .scrollPosition(id: .constant("cardTop"))
             }
-            .scrollIndicators(.hidden)
-            .scrollTargetLayout()
-            .scrollPosition(id: .constant("cardTop"))
             .padding(.vertical, AppConstants.Spacing.section)
             .padding(.horizontal, AppConstants.Spacing.tight)
             .background(
@@ -236,19 +258,18 @@ struct CardDetailModalView: View {
         case .extended:
             return "Extended content handled by view"
         case .standard, .none:
-            let repo = DescriptionRepository.shared
             let cardID = String(card.id)
             switch cardType {
             case .daily:
-                return repo.dailyDescriptions[cardID] ?? "No daily description available."
+                return repo.dailyDescriptions[cardID] ?? ""
             case .birth:
-                return repo.birthDescriptions[cardID] ?? "No birth description available."
+                return repo.birthDescriptions[cardID] ?? ""
             case .yearly:
-                return repo.yearlyDescriptions[cardID] ?? "No yearly description available."
+                return repo.yearlyDescriptions[cardID] ?? ""
             case .fiftyTwoDay:
-                return repo.fiftyTwoDescriptions[cardID] ?? "No 52-day description available."
+                return repo.fiftyTwoDescriptions[cardID] ?? ""
             case .planetary:
-                return "Error: Planetary descriptions should be passed via contentType"
+                return ""
             }
         }
     }
