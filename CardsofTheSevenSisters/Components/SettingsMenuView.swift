@@ -220,6 +220,15 @@ struct SettingsMenuView: View {
                     appearance.shadowColor = .clear
                     UINavigationBar.appearance().standardAppearance = appearance
                     UINavigationBar.appearance().scrollEdgeAppearance = appearance
+
+                    let toolAppearance = UIToolbarAppearance()
+                    toolAppearance.configureWithTransparentBackground()
+                    toolAppearance.backgroundEffect = nil
+                    toolAppearance.backgroundColor = .clear
+                    toolAppearance.shadowColor = .clear
+                    UIToolbar.appearance().standardAppearance = toolAppearance
+                    UIToolbar.appearance().compactAppearance = toolAppearance
+                    UIToolbar.appearance().scrollEdgeAppearance = toolAppearance
                 }
                 .task {
                     await subscriptionManager.checkCurrentEntitlements()
