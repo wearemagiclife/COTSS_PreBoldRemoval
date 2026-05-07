@@ -14,17 +14,13 @@ struct WidgetInfoView: View {
 
                     // MARK: - Header
                     VStack(spacing: 14) {
-                        Image(systemName: "rectangle.stack")
-                            .font(.system(size: 48))
-                            .foregroundColor(AppTheme.goldAccent)
-                            .padding(.top, 12)
 
-                        Text("Your New Favorite Widget")
+                        Text("Your Current Cards")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
                             .foregroundColor(AppTheme.primaryText)
                             .multilineTextAlignment(.center)
 
-                        Text("Your current cards, always in view.")
+                        Text("always in view.")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                             .foregroundColor(AppTheme.secondaryText)
                             .multilineTextAlignment(.center)
@@ -49,25 +45,25 @@ struct WidgetInfoView: View {
 
                     // MARK: - What the Widget Shows
                     VStack(alignment: .leading, spacing: AppConstants.Spacing.tight) {
-                        Text("What you'll see")
+                        Text("Your current spread")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                             .foregroundColor(AppTheme.primaryText)
                             .padding(.bottom, 2)
 
-                        Text("Four cards arranged in a 2×2 grid:")
+                        Text("Our new widget features:")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                             .foregroundColor(AppTheme.secondaryText)
                             .padding(.bottom, 2)
 
                         WidgetFeatureRow(
                             icon: "sun.max.fill",
-                            title: "Daily Card",
+                            title: "Your Daily Card",
                             description: "The card influencing your day, refreshed every morning."
                         )
 
                         WidgetFeatureRow(
                             icon: "globe",
-                            title: "Planet Card",
+                            title: "Today's Planetary Influence",
                             description: "The planetary energy currently in play alongside your daily card."
                         )
 
@@ -79,8 +75,8 @@ struct WidgetInfoView: View {
 
                         WidgetFeatureRow(
                             icon: "calendar",
-                            title: "Yearly Card",
-                            description: "The card that accompanies you through your entire birth year."
+                            title: "This Year's Card",
+                            description: "A long range theme to focus growth."
                         )
                     }
                     .padding(AppConstants.Spacing.tight)
