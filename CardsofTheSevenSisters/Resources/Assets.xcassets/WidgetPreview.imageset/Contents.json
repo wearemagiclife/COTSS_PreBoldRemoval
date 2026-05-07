@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "widgetpreviewsevensisters 1.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "widgetpreviewsevensisters.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "widgetpreviewsevensisters 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
