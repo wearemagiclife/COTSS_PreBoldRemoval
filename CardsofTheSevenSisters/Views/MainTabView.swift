@@ -6,19 +6,27 @@ private enum AppTab {
 
 struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
+    @State private var showingSettings = false
 
     var body: some View {
         ZStack {
-            HomeView()
+            HomeView(showingSettings: $showingSettings)
                 .opacity(selectedTab == .home ? 1 : 0)
                 .allowsHitTesting(selectedTab == .home)
 
-            SubscriberCalendarView()
+            SubscriberCalendarView(showingSettings: $showingSettings)
                 .opacity(selectedTab == .calendar ? 1 : 0)
                 .allowsHitTesting(selectedTab == .calendar)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             navBar
+        }
+        .overlay {
+            if showingSettings {
+                SettingsMenuView(isPresented: $showingSettings)
+                    .ignoresSafeArea()
+                    .zIndex(20)
+            }
         }
     }
 
@@ -30,7 +38,7 @@ struct MainTabView: View {
             navPill(for: .calendar)
         }
         .frame(maxWidth: .infinity)
-        .background(AppTheme.backgroundColor)
+        .background(.clear)
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(AppTheme.primaryText.opacity(0.08))
@@ -57,3 +65,4 @@ struct MainTabView: View {
         .contentShape(Rectangle())
     }
 }
+
