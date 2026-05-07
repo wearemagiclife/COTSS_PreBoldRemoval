@@ -8,7 +8,7 @@ struct HomeView: View {
     @EnvironmentObject private var subscriptionManager: SubscriptionManager
     @EnvironmentObject private var deepLinkRouter: DeepLinkRouter
 
-    @State private var showingSettings = false
+    @Binding var showingSettings: Bool
 
     @State private var showTutorial = false
     @State private var showWelcome = false
@@ -108,12 +108,6 @@ struct HomeView: View {
             }
         }
         .errorFallback(message: viewModel.errorMessage)
-        .overlay {
-            if showingSettings {
-                SettingsMenuView(isPresented: $showingSettings)
-                    .zIndex(20)
-            }
-        }
     }
     
     private var headerView: some View {
@@ -742,6 +736,6 @@ struct GuestBirthdaySheet: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(showingSettings: .constant(false))
 }
 
