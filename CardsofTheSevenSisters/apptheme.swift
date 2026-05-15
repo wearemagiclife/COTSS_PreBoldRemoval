@@ -41,10 +41,10 @@ struct AppTheme {
     })
     static let goldAccent = Color(red: 0.83, green: 0.69, blue: 0.22)
 
-    /// Adaptive accent for text — dark amber in light mode (readable on tan), bright gold in dark mode.
+    /// Adaptive accent for text — dark amber in light mode (readable on tan), warm gold in dark mode (matches widget).
     static let accentText = Color(UIColor { traitCollection in
         traitCollection.userInterfaceStyle == .dark
-            ? UIColor(red: 0.83, green: 0.69, blue: 0.22, alpha: 1.0)  // bright gold on black
+            ? UIColor(red: 0.78, green: 0.58, blue: 0.18, alpha: 1.0)  // warm amber-gold on black (matches widget)
             : UIColor(red: 0.50, green: 0.33, blue: 0.02, alpha: 1.0)  // dark amber on tan
     })
     

@@ -90,6 +90,8 @@ struct SevenSistersProvider: TimelineProvider {
 }
 
 private let goldAccent = Color(red: 0.75, green: 0.60, blue: 0.35)
+/// Matches AppTheme.accentText light-mode value exactly — dark amber on tan.
+private let lightModeAccent = Color(red: 0.50, green: 0.33, blue: 0.02)
 
 struct SevenSistersWidgetView: View {
     var entry: SevenSistersProvider.Entry
@@ -185,29 +187,27 @@ struct SevenSistersWidgetView: View {
 
             VStack(spacing: vSpacing) {
                 // Header row
+                let headerColor: Color = isDark ? goldAccent : lightModeAccent
                 HStack(spacing: 0) {
                     Text("TODAY'S CARD")
                         .font(headingFont)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.brown)
                         .tracking(2)
-                        .foregroundStyle(goldAccent)
+                        .foregroundStyle(headerColor)
                         .frame(width: twoCardGroupW)
                     Spacer().frame(width: groupGap)
                     Text("52-DAY")
                         .font(headingFont)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.brown)
                         .tracking(2)
-                        .foregroundStyle(goldAccent)
+                        .foregroundStyle(headerColor)
                         .frame(width: cardW)
                     Spacer().frame(width: cardGap)
                     Text("YEAR")
                         .font(headingFont)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.brown)
                         .tracking(2)
-                        .foregroundStyle(goldAccent)
+                        .foregroundStyle(headerColor)
                         .frame(width: cardW)
                 }
 

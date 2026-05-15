@@ -130,20 +130,10 @@ struct SubscriberCalendarView: View {
                     .padding(.horizontal, AppConstants.Spacing.pageInset)
                     .padding(.vertical, AppConstants.Spacing.tight)
 
-                // Week header + grid inside the ledger frame
-                VStack(spacing: 0) {
-                    weekdayHeaderRow
-                        .padding(.horizontal, AppConstants.Spacing.pageInset)
-                        .padding(.vertical, 10)
-
-                    // Double-line header rule (vintage ledger style)
-                    VintageLedgerRule()
-                        .padding(.horizontal, AppConstants.Spacing.pageInset)
-
-                    calendarGrid
-                        .padding(.horizontal, AppConstants.Spacing.pageInset)
-                        .padding(.vertical, AppConstants.Spacing.ornament)
-                }
+                // Week header + grid share the same LazyVGrid so columns are pixel-perfect
+                calendarGridWithHeader
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
+                    .padding(.vertical, AppConstants.Spacing.ornament)
 
                 // Bottom ornament
                 VintageBottomOrnament()
@@ -158,17 +148,11 @@ struct SubscriberCalendarView: View {
     // MARK: - Vintage Title Banner
 
     private var vintageTitleBanner: some View {
-        VStack(spacing: 4) {
-            Text("✦  CARD ALMANAC  ✦")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
-                .tracking(3.5)
-                .foregroundColor(AppTheme.accentText.opacity(0.75))
-
-            Text("Your Month at a Glance")
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
-                .foregroundColor(AppTheme.primaryText)
-                .multilineTextAlignment(.center)
-        }
+        Text("✦  CARD ALMANAC  ✦")
+            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+            .fontWeight(.bold)
+            .tracking(3.5)
+            .foregroundColor(AppTheme.accentText)
     }
 
     // MARK: - Vintage Month Navigation
@@ -183,6 +167,7 @@ struct SubscriberCalendarView: View {
             } label: {
                 Text("‹")
                     .font(.custom("Iowan Old Style", size: 36))
+                    .fontWeight(.bold)
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
@@ -191,9 +176,9 @@ struct SubscriberCalendarView: View {
 
             VStack(spacing: 3) {
                 Text(monthYearString(for: currentMonth).uppercased())
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .tracking(2)
-                    .foregroundColor(AppTheme.primaryText)
+                    .foregroundColor(AppTheme.primaryText.opacity(0.90))
 
                 let thisMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? Date()
                 if !cal.isDate(currentMonth, equalTo: thisMonth, toGranularity: .month) {
@@ -220,35 +205,50 @@ struct SubscriberCalendarView: View {
             } label: {
                 Text("›")
                     .font(.custom("Iowan Old Style", size: 36))
+                    .fontWeight(.bold)
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
         }
     }
 
-    // MARK: - Weekday Header
-
-    private var weekdayHeaderRow: some View {
-        HStack(spacing: 0) {
-            ForEach(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], id: \.self) { label in
-                Text(label)
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
-                    .tracking(1.5)
-                    .foregroundColor(AppTheme.accentText.opacity(0.8))
-                    .frame(maxWidth: .infinity)
-            }
-        }
-    }
-
-    // MARK: - Calendar Grid
+    // MARK: - Calendar Grid (header + cells share one LazyVGrid for exact column alignment)
 
     @State private var showCardDetailModal = false
     @State private var cardModalCard: Card? = nil
     @State private var cardModalDate: Date? = nil
 
-    private var calendarGrid: some View {
+    private let weekdayLabels = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+
+    private var calendarGridWithHeader: some View {
         let dates = gridDates()
-        return LazyVGrid(columns: gridColumns, spacing: 10) {
+        return VStack(spacing: 0) {
+            // Weekday labels row — shares same column structure as the grid below
+            LazyVGrid(columns: gridColumns, spacing: 0) {
+                ForEach(weekdayLabels, id: \.self) { label in
+                    Text(label)
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                        .fontWeight(.bold)
+                        .tracking(1)
+                        .foregroundColor(AppTheme.accentText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 8)
+                }
+            }
+
+            // Single full-width ledger rule — no column gaps
+            VStack(spacing: 2) {
+                Rectangle()
+                    .fill(AppTheme.primaryText.opacity(0.45))
+                    .frame(height: 1)
+                Rectangle()
+                    .fill(AppTheme.primaryText.opacity(0.15))
+                    .frame(height: 0.5)
+            }
+
+            // Date cells grid — top padding on each cell controls gap below rule
+            LazyVGrid(columns: gridColumns, spacing: 0) {
+            // Date cells — fixed height so every row is identical
             ForEach(0..<dates.count, id: \.self) { i in
                 if let date = dates[i] {
                     let inMonth = cal.isDate(date, equalTo: currentMonth, toGranularity: .month)
@@ -276,10 +276,11 @@ struct SubscriberCalendarView: View {
                         }
                     )
                 } else {
-                    Color.clear.frame(height: dayCellHeight)
+                    Color.clear.frame(height: 86)
                 }
             }
-        }
+            } // end inner LazyVGrid
+        } // end outer VStack
     }
 
     // MARK: - Subscriber Gate
@@ -292,7 +293,7 @@ struct SubscriberCalendarView: View {
                     Text("✦  CARD ALMANAC  ✦")
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
                         .tracking(3.5)
-                        .foregroundColor(AppTheme.accentText.opacity(0.75))
+                        .foregroundColor(AppTheme.accentText.opacity(1))
                         .padding(.top, 20)
 
                     Text("Your Card Calendar")
@@ -312,13 +313,6 @@ struct SubscriberCalendarView: View {
                 ZStack {
                     // Preview calendar (blurred)
                     VStack(spacing: 0) {
-                        weekdayHeaderRow
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 12)
-
-                        VintageLedgerRule()
-                            .padding(.horizontal, 8)
-
                         gatePreviewGrid
                             .padding(.horizontal, 4)
                             .padding(.vertical, 10)
@@ -677,77 +671,70 @@ struct VintageCalendarDayCell: View {
     var onDayTap: () -> Void = {}
     var onCardTap: () -> Void = {}
 
+    /// ♦ and ♠ are geometrically narrow glyphs and read smaller than ♥/♣ at the same size.
+    /// ♠ gets +4pt, ♦ gets +3pt.
+    private func symbolSize(base: CGFloat) -> CGFloat {
+        if card.suit == .spades { return base + 4 }
+        if card.suit == .diamonds { return base + 3 }
+        return base
+    }
+
     var body: some View {
         let dayNumber = Calendar.current.component(.day, from: date)
         let isCycleStart = cycleCard != nil
+        let rankSize: CGFloat = AppConstants.FontSizes.subheadline
+        let suitSize: CGFloat = symbolSize(base: rankSize)
+        let cardColor = AppTheme.accentText
 
-        VStack(spacing: 3) {
-            // Day number
-            ZStack {
-                if isToday {
-                    // Vintage "today" indicator — a small filled diamond/square stamp
-                    RoundedRectangle(cornerRadius: 2, style: .continuous)
-                        .fill(AppTheme.accentText)
-                        .frame(width: 26, height: 26)
-                }
+        // Outer frame IS the cell slot — padding lives inside so grid always sees the same height
+        ZStack(alignment: .top) {
+            Color.clear
+
+            VStack(spacing: 5) {
+                // Day number
                 Text("\(dayNumber)")
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                    .fontWeight(isToday ? .bold : .regular)
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                    .fontWeight(.regular)
                     .foregroundColor(
-                        isToday ? AppTheme.backgroundColor :
-                        (isCurrentMonth ? AppTheme.primaryText : AppTheme.secondaryText.opacity(0.3))
+                        isCurrentMonth ? AppTheme.primaryText : AppTheme.primaryText.opacity(0.25)
                     )
-            }
-            .frame(width: 26, height: 26)
-            .contentShape(Rectangle())
-            .onTapGesture { onDayTap() }
+                    .frame(maxWidth: .infinity, minHeight: 22, maxHeight: 22, alignment: .center)
+                    .contentShape(Rectangle())
+                    .onTapGesture { onDayTap() }
 
-            // Card shorthand — styled like a tiny ledger entry
-            let baseSize: CGFloat = AppConstants.FontSizes.caption
-            (
-                Text(card.value)
-                    .font(.custom("Iowan Old Style", size: baseSize))
-                    .fontWeight(.semibold)
-                    .foregroundColor(isToday ? AppTheme.accentText : AppTheme.primaryText)
-                + Text(" \(card.suitSymbol)")
-                    .font(.custom("Iowan Old Style", size: baseSize + 2))
-                    .foregroundColor(isToday ? AppTheme.accentText : AppTheme.secondaryText)
-            )
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .padding(.horizontal, 5)
-            .padding(.vertical, 3)
-            .frame(maxWidth: .infinity)
-            .background(
-                // Aged parchment-tinted cell background
-                RoundedRectangle(cornerRadius: 2, style: .continuous)
-                    .fill(isToday
-                          ? AppTheme.accentText.opacity(0.10)
-                          : AppTheme.cardBackground.opacity(isCurrentMonth ? 1.0 : 0.3))
-            )
-            .overlay(
-                // Single hairline border — like a printed ledger box
-                RoundedRectangle(cornerRadius: 2, style: .continuous)
-                    .stroke(
-                        isToday ? AppTheme.accentText.opacity(0.5) : AppTheme.primaryText.opacity(0.12),
-                        lineWidth: 0.5
-                    )
-            )
-            .opacity(isCurrentMonth ? 1.0 : 0.25)
-            .onTapGesture { onCardTap() }
+                // Card shorthand — HStack isolates glyphs so font-size variance can't shift rows
+                HStack(alignment: .center, spacing: 3) {
+                    Text(card.value)
+                        .font(.custom("Iowan Old Style", size: rankSize))
+                        .fontWeight(.bold)
+                        .foregroundColor(cardColor)
+                        .fixedSize()
+                    Text(card.suitSymbol)
+                        .font(.custom("Iowan Old Style", size: suitSize))
+                        .fontWeight(.bold)
+                        .foregroundColor(cardColor)
+                        .fixedSize()
+                }
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, minHeight: 22, maxHeight: 22, alignment: .center)
+                .clipped()
+                .opacity(isCurrentMonth ? 1.0 : 0.25)
+                .onTapGesture { onCardTap() }
 
-            // Cycle-start marker — small gold diamond instead of a dot
-            if isCycleStart && isCurrentMonth {
-                Text("✦")
-                    .font(.system(size: 6))
-                    .foregroundColor(AppTheme.accentText.opacity(0.7))
-            } else {
-                // Spacer to keep all cells the same height
-                Color.clear.frame(height: 8)
+                // Cycle-start marker — reserved slot regardless of presence
+                Color.clear.frame(height: 8).overlay(
+                    Group {
+                        if isCycleStart && isCurrentMonth {
+                            Text("✦")
+                                .font(.system(size: 6))
+                                .foregroundColor(AppTheme.accentText)
+                        }
+                    }
+                )
             }
+            .padding(.top, 16)
         }
-        .frame(maxHeight: .infinity, alignment: .top)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 86, maxHeight: 86, alignment: .top)
     }
 }
 
