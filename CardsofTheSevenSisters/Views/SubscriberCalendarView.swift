@@ -17,7 +17,7 @@ struct SubscriberCalendarView: View {
     @State private var cellCache: [Double: (DailyCardResult, Bool)] = [:]  // date → (result, isCycleStart)
 
     private let cal = Calendar.current
-    private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 3), count: 7)
+    private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
 
     var body: some View {
         NavigationStack {
@@ -115,54 +115,85 @@ struct SubscriberCalendarView: View {
 
     private var subscriberCalendar: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: AppConstants.Spacing.ornament) {
-                // Month navigation (no decorated background)
-                monthNavigationSection
+            VStack(spacing: 0) {
+                // Vintage title banner
+                vintageTitleBanner
                     .padding(.horizontal, AppConstants.Spacing.pageInset)
-                    .padding(.top, AppConstants.Spacing.tight)
+                    .padding(.bottom, AppConstants.Spacing.ornament)
 
-                // Week header + grid (flat, native-like)
+                // Month navigation inside a decorative frame
+                vintageMonthNavigation
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
+
+                // Ornamental rule
+                VintageOrnamentalRule()
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
+                    .padding(.vertical, AppConstants.Spacing.tight)
+
+                // Week header + grid inside the ledger frame
                 VStack(spacing: 0) {
                     weekdayHeaderRow
                         .padding(.horizontal, AppConstants.Spacing.pageInset)
-                        .padding(.vertical, AppConstants.Spacing.tight)
+                        .padding(.vertical, 10)
 
-                    Rectangle()
-                        .fill(AppTheme.primaryText.opacity(0.08))
-                        .frame(height: 0.5)
+                    // Double-line header rule (vintage ledger style)
+                    VintageLedgerRule()
                         .padding(.horizontal, AppConstants.Spacing.pageInset)
 
                     calendarGrid
                         .padding(.horizontal, AppConstants.Spacing.pageInset)
                         .padding(.vertical, AppConstants.Spacing.ornament)
                 }
+
+                // Bottom ornament
+                VintageBottomOrnament()
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
+                    .padding(.bottom, AppConstants.Spacing.section)
             }
             .padding(.bottom, AppConstants.Spacing.section)
         }
         .scrollIndicators(.hidden)
     }
 
-    // MARK: - Month Navigation Section
+    // MARK: - Vintage Title Banner
 
-    private var monthNavigationSection: some View {
-        HStack {
+    private var vintageTitleBanner: some View {
+        VStack(spacing: 4) {
+            Text("✦  CARD ALMANAC  ✦")
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
+                .tracking(3.5)
+                .foregroundColor(AppTheme.accentText.opacity(0.75))
+
+            Text("Your Month at a Glance")
+                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
+                .foregroundColor(AppTheme.primaryText)
+                .multilineTextAlignment(.center)
+        }
+    }
+
+    // MARK: - Vintage Month Navigation
+
+    private var vintageMonthNavigation: some View {
+        HStack(alignment: .center, spacing: 0) {
+            // Left arrow — vintage serif style
             Button {
                 withAnimation(.easeInOut(duration: 0.22)) {
                     currentMonth = cal.date(byAdding: .month, value: -1, to: currentMonth) ?? currentMonth
                 }
             } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .semibold))
+                Text("‹")
+                    .font(.custom("Iowan Old Style", size: 36))
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
 
             Spacer()
 
-            VStack(spacing: 2) {
-                Text(monthYearString(for: currentMonth))
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline + 2))
-                    .foregroundColor(AppTheme.secondaryText)
+            VStack(spacing: 3) {
+                Text(monthYearString(for: currentMonth).uppercased())
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.headline))
+                    .tracking(2)
+                    .foregroundColor(AppTheme.primaryText)
 
                 let thisMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date())) ?? Date()
                 if !cal.isDate(currentMonth, equalTo: thisMonth, toGranularity: .month) {
@@ -171,8 +202,9 @@ struct SubscriberCalendarView: View {
                             currentMonth = thisMonth
                         }
                     } label: {
-                        Text("Back to Today")
-                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                        Text("— Return to Present —")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
+                            .tracking(1)
                             .foregroundColor(AppTheme.accentText)
                     }
                 }
@@ -180,13 +212,14 @@ struct SubscriberCalendarView: View {
 
             Spacer()
 
+            // Right arrow
             Button {
                 withAnimation(.easeInOut(duration: 0.22)) {
                     currentMonth = cal.date(byAdding: .month, value: 1, to: currentMonth) ?? currentMonth
                 }
             } label: {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 15, weight: .semibold))
+                Text("›")
+                    .font(.custom("Iowan Old Style", size: 36))
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
@@ -197,10 +230,11 @@ struct SubscriberCalendarView: View {
 
     private var weekdayHeaderRow: some View {
         HStack(spacing: 0) {
-            ForEach(["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"], id: \.self) { label in
+            ForEach(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], id: \.self) { label in
                 Text(label)
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                    .foregroundColor(AppTheme.secondaryText)
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
+                    .tracking(1.5)
+                    .foregroundColor(AppTheme.accentText.opacity(0.8))
                     .frame(maxWidth: .infinity)
             }
         }
@@ -214,7 +248,7 @@ struct SubscriberCalendarView: View {
 
     private var calendarGrid: some View {
         let dates = gridDates()
-        return LazyVGrid(columns: gridColumns, spacing: 14) {
+        return LazyVGrid(columns: gridColumns, spacing: 10) {
             ForEach(0..<dates.count, id: \.self) { i in
                 if let date = dates[i] {
                     let inMonth = cal.isDate(date, equalTo: currentMonth, toGranularity: .month)
@@ -222,7 +256,7 @@ struct SubscriberCalendarView: View {
                     let cached = cellCache[key]
                     let card = cached?.0.card ?? dailyResult(for: date).card
                     let isCycleStart = cached?.1 ?? false
-                    CalendarDayCell(
+                    VintageCalendarDayCell(
                         date: date,
                         card: card,
                         cycleCard: isCycleStart ? DataManager.shared.current52DayCard(for: dataManager.userProfile.birthDate, on: cal.startOfDay(for: date)) : nil,
@@ -253,11 +287,12 @@ struct SubscriberCalendarView: View {
     private var subscriberGate: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: AppConstants.Spacing.ornament) {
-                // Header — matches subscriber view for visual consistency
+                // Vintage header
                 VStack(spacing: 10) {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 36))
-                        .foregroundColor(AppTheme.accentText)
+                    Text("✦  CARD ALMANAC  ✦")
+                        .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption))
+                        .tracking(3.5)
+                        .foregroundColor(AppTheme.accentText.opacity(0.75))
                         .padding(.top, 20)
 
                     Text("Your Card Calendar")
@@ -281,9 +316,7 @@ struct SubscriberCalendarView: View {
                             .padding(.horizontal, 6)
                             .padding(.vertical, 12)
 
-                        Rectangle()
-                            .fill(AppTheme.primaryText.opacity(0.12))
-                            .frame(height: 1)
+                        VintageLedgerRule()
                             .padding(.horizontal, 8)
 
                         gatePreviewGrid
@@ -291,20 +324,20 @@ struct SubscriberCalendarView: View {
                             .padding(.vertical, 10)
                     }
                     .background(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .fill(AppConstants.Colors.capsuleButton.opacity(0.96))
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .stroke(AppTheme.primaryText.opacity(0.15), lineWidth: 1)
                     )
                     .blur(radius: 10)
                     .allowsHitTesting(false)
 
                     // Lock overlay card
                     VStack(spacing: 18) {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 30))
+                        Text("⚿")
+                            .font(.system(size: 28))
                             .foregroundColor(AppTheme.accentText)
 
                         VStack(spacing: 8) {
@@ -336,12 +369,12 @@ struct SubscriberCalendarView: View {
                     .padding(.horizontal, 28)
                     .padding(.vertical, 28)
                     .background(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .fill(AppTheme.backgroundColor.opacity(0.94))
                             .shadow(color: Color.black.opacity(0.22), radius: 18, x: 0, y: 6)
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .stroke(AppTheme.accentText.opacity(0.25), lineWidth: 1)
                     )
                     .padding(.horizontal, 24)
@@ -357,10 +390,10 @@ struct SubscriberCalendarView: View {
     private var gatePreviewGrid: some View {
         let dates = gridDates()
         let previewCount = min(dates.count, 35)
-        return LazyVGrid(columns: gridColumns, spacing: 18) {
+        return LazyVGrid(columns: gridColumns, spacing: 10) {
             ForEach(0..<previewCount, id: \.self) { i in
                 if let date = dates[i] {
-                    CalendarDayCell(
+                    VintageCalendarDayCell(
                         date: date,
                         card: cellCache[date.timeIntervalSinceReferenceDate]?.0.card ?? dailyResult(for: date).card,
                         cycleCard: nil,
@@ -429,6 +462,60 @@ struct SubscriberCalendarView: View {
     }
 }
 
+// MARK: - Vintage Ornamental Components
+
+/// A double-line rule reminiscent of antique ledger books
+private struct VintageLedgerRule: View {
+    var body: some View {
+        VStack(spacing: 2) {
+            Rectangle()
+                .fill(AppTheme.primaryText.opacity(0.55))
+                .frame(height: 1)
+            Rectangle()
+                .fill(AppTheme.primaryText.opacity(0.18))
+                .frame(height: 0.5)
+        }
+    }
+}
+
+/// A centered ornamental rule with a diamond motif
+private struct VintageOrnamentalRule: View {
+    var body: some View {
+        HStack(spacing: 6) {
+            Rectangle()
+                .fill(AppTheme.accentText.opacity(0.35))
+                .frame(height: 0.5)
+
+            Text("✦")
+                .font(.custom("Iowan Old Style", size: 10))
+                .foregroundColor(AppTheme.accentText.opacity(0.55))
+
+            Rectangle()
+                .fill(AppTheme.accentText.opacity(0.35))
+                .frame(height: 0.5)
+        }
+    }
+}
+
+/// A small decorative ornament for the bottom of the calendar
+private struct VintageBottomOrnament: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Rectangle()
+                .fill(AppTheme.primaryText.opacity(0.12))
+                .frame(height: 0.5)
+
+            Text("· · ✦ · ·")
+                .font(.custom("Iowan Old Style", size: 11))
+                .foregroundColor(AppTheme.accentText.opacity(0.4))
+
+            Rectangle()
+                .fill(AppTheme.primaryText.opacity(0.12))
+                .frame(height: 0.5)
+        }
+    }
+}
+
 // MARK: - Sheet date wrapper (avoids .sheet(isPresented:) race condition)
 
 private struct IdentifiableDate: Identifiable {
@@ -483,13 +570,20 @@ struct CalendarDayDetailSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(dateString)
-                .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
-                .foregroundColor(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-                .padding(.top, AppConstants.Spacing.section)
-                .padding(.bottom, AppConstants.Spacing.ornament)
+            // Date heading with ornament
+            VStack(spacing: 6) {
+                Text(dateString.uppercased())
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                    .tracking(2)
+                    .foregroundColor(AppTheme.accentText.opacity(0.85))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+
+                VintageOrnamentalRule()
+                    .padding(.horizontal, AppConstants.Spacing.pageInset)
+            }
+            .padding(.top, AppConstants.Spacing.section)
+            .padding(.bottom, AppConstants.Spacing.ornament)
 
             digestView
                 .padding(.horizontal, AppConstants.Spacing.pageInset)
@@ -572,9 +666,9 @@ struct CalendarDayDetailSheet: View {
     }
 }
 
-// MARK: - Calendar Day Cell
+// MARK: - Vintage Calendar Day Cell
 
-struct CalendarDayCell: View {
+struct VintageCalendarDayCell: View {
     let date: Date
     let card: Card
     let cycleCard: Card?
@@ -587,58 +681,69 @@ struct CalendarDayCell: View {
         let dayNumber = Calendar.current.component(.day, from: date)
         let isCycleStart = cycleCard != nil
 
-        VStack(spacing: 4) {
-            // Day number — fixed 28×28 frame so all cells stay the same height
-            // Tap → daily digest sheet
+        VStack(spacing: 3) {
+            // Day number
             ZStack {
                 if isToday {
-                    Circle()
-                        .fill(AppTheme.primaryText.opacity(0.12))
-                        .frame(width: 28, height: 28)
+                    // Vintage "today" indicator — a small filled diamond/square stamp
+                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                        .fill(AppTheme.accentText)
+                        .frame(width: 26, height: 26)
                 }
                 Text("\(dayNumber)")
-                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
+                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                    .fontWeight(isToday ? .bold : .regular)
                     .foregroundColor(
-                        isToday ? AppTheme.accentText :
-                        (isCurrentMonth ? AppTheme.primaryText : AppTheme.secondaryText.opacity(0.4))
+                        isToday ? AppTheme.backgroundColor :
+                        (isCurrentMonth ? AppTheme.primaryText : AppTheme.secondaryText.opacity(0.3))
                     )
             }
-            .frame(width: 28, height: 28)
-            .contentShape(Circle())
+            .frame(width: 26, height: 26)
+            .contentShape(Rectangle())
             .onTapGesture { onDayTap() }
 
-            // Card shorthand — warm card-background fill, no grey
-            let baseSize: CGFloat = AppConstants.FontSizes.callout
-            let symbolSize: CGFloat = baseSize + 4
+            // Card shorthand — styled like a tiny ledger entry
+            let baseSize: CGFloat = AppConstants.FontSizes.caption
             (
                 Text(card.value)
                     .font(.custom("Iowan Old Style", size: baseSize))
                     .fontWeight(.semibold)
                     .foregroundColor(isToday ? AppTheme.accentText : AppTheme.primaryText)
                 + Text(" \(card.suitSymbol)")
-                    .font(.custom("Iowan Old Style", size: symbolSize))
+                    .font(.custom("Iowan Old Style", size: baseSize + 2))
                     .foregroundColor(isToday ? AppTheme.accentText : AppTheme.secondaryText)
             )
             .lineLimit(1)
-            .minimumScaleFactor(0.85)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 3)
+            .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(isToday ? AppTheme.accentText.opacity(0.12) : AppTheme.cardBackground)
+                // Aged parchment-tinted cell background
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .fill(isToday
+                          ? AppTheme.accentText.opacity(0.10)
+                          : AppTheme.cardBackground.opacity(isCurrentMonth ? 1.0 : 0.3))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .stroke(AppTheme.primaryText.opacity(0.10), lineWidth: 0.5)
+                // Single hairline border — like a printed ledger box
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .stroke(
+                        isToday ? AppTheme.accentText.opacity(0.5) : AppTheme.primaryText.opacity(0.12),
+                        lineWidth: 0.5
+                    )
             )
-            .opacity(isCurrentMonth ? 1.0 : 0.35)
+            .opacity(isCurrentMonth ? 1.0 : 0.25)
             .onTapGesture { onCardTap() }
 
-            // Subtle accent dot on 52-day cycle-start days
+            // Cycle-start marker — small gold diamond instead of a dot
             if isCycleStart && isCurrentMonth {
-                Circle()
-                    .fill(AppTheme.accentText.opacity(0.6))
-                    .frame(width: 5, height: 5)
+                Text("✦")
+                    .font(.system(size: 6))
+                    .foregroundColor(AppTheme.accentText.opacity(0.7))
+            } else {
+                // Spacer to keep all cells the same height
+                Color.clear.frame(height: 8)
             }
         }
         .frame(maxHeight: .infinity, alignment: .top)
@@ -646,3 +751,5 @@ struct CalendarDayCell: View {
     }
 }
 
+// Keep old name as alias so any other references compile
+typealias CalendarDayCell = VintageCalendarDayCell
