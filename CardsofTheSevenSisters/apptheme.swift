@@ -39,7 +39,11 @@ struct AppTheme {
             ? UIColor(red: 0.95, green: 0.91, blue: 0.82, alpha: 0.8)  // cream 80%
             : UIColor.black.withAlphaComponent(0.8)
     })
-    static let goldAccent = Color(red: 0.83, green: 0.69, blue: 0.22)
+    static let goldAccent = Color(UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(red: 0.78, green: 0.58, blue: 0.18, alpha: 1.0)  // rusty amber on black
+            : UIColor(red: 0.55, green: 0.36, blue: 0.05, alpha: 1.0)  // deep amber on tan
+    })
 
     /// Adaptive accent for text — dark amber in light mode (readable on tan), warm gold in dark mode (matches widget).
     static let accentText = Color(UIColor { traitCollection in
@@ -141,17 +145,16 @@ struct GoldButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppTheme.headline)
-            .foregroundColor(Color(UIColor(red: 0.15, green: 0.10, blue: 0.05, alpha: 1.0)))
+            .foregroundColor(AppTheme.goldAccent)
             .padding(.horizontal, 24)
             .padding(.vertical, 10)
-            .background(AppTheme.goldAccent)
+            .background(AppTheme.goldAccent.opacity(0.10))
             .cornerRadius(AppTheme.cornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
-                    .stroke(AppTheme.darkAccent.opacity(0.4), lineWidth: 1)
+                    .stroke(AppTheme.goldAccent.opacity(0.65), lineWidth: 1.5)
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 1)
     }
 }
 
