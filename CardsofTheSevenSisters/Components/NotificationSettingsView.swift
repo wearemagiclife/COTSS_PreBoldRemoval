@@ -11,6 +11,8 @@ struct NotificationSettingsView: View {
     @ObservedObject private var notificationManager = NotificationManager.shared
     @ObservedObject private var dataManager = DataManager.shared
     private let cardBackground = AppConstants.Colors.capsuleButton
+    @Environment(\.colorScheme) private var colorScheme
+    private var toggleTint: Color { colorScheme == .dark ? AppTheme.goldAccent : AppTheme.darkAccent }
 
     var body: some View {
         ZStack {
@@ -49,7 +51,7 @@ struct NotificationSettingsView: View {
                                         .foregroundColor(AppTheme.secondaryText)
                                 }
                             }
-                            .toggleStyle(SwitchToggleStyle(tint: AppTheme.darkAccent))
+                            .toggleStyle(SwitchToggleStyle(tint: toggleTint))
                             .padding(AppConstants.Spacing.tight)
                             .background(
                                 RoundedRectangle(cornerRadius: 18, style: .continuous)

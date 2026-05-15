@@ -293,16 +293,19 @@ private struct SettingsRow: View {
     let cardBackground: Color
     var subtitleColor: Color? = nil
 
+    @Environment(\.colorScheme) private var colorScheme
+    private var iconColor: Color { colorScheme == .dark ? AppTheme.accentText : AppTheme.primaryText }
+
     var body: some View {
         HStack(spacing: AppConstants.Spacing.ornament) {
             ZStack {
                 Circle()
-                    .strokeBorder(AppTheme.primaryText.opacity(0.25), lineWidth: 1)
+                    .strokeBorder(iconColor.opacity(0.45), lineWidth: 1)
                     .frame(width: 40, height: 40)
 
                 Image(systemName: systemImage)
                     .font(.system(size: AppConstants.FontSizes.subheadline, weight: .semibold))
-                    .foregroundColor(AppTheme.primaryText)
+                    .foregroundColor(iconColor)
                     .accessibilityHidden(true)
             }
 

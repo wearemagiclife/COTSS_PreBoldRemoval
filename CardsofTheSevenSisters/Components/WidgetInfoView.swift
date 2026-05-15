@@ -39,8 +39,10 @@ struct WidgetInfoView: View {
                                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                                     .stroke(AppTheme.goldAccent.opacity(0.4), lineWidth: 1)
                             )
+                            .accessibilityLabel("Widget preview showing your daily, planetary, 52-day, and yearly cards")
                     } else {
                         WidgetPlaceholderPreview()
+                            .accessibilityHidden(true)
                     }
 
                     // MARK: - What the Widget Shows
@@ -245,6 +247,7 @@ private struct WidgetFeatureRow: View {
                 .foregroundColor(AppTheme.goldAccent)
                 .frame(width: 28)
                 .padding(.top, 2)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
@@ -278,6 +281,7 @@ private struct WidgetStep: View {
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                     .foregroundColor(AppTheme.goldAccent)
             }
+            .accessibilityHidden(true)
 
             Text(text)
                 .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
@@ -285,6 +289,7 @@ private struct WidgetStep: View {
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 3)
+                .accessibilityLabel("Step \(number): \(text)")
         }
         .padding(.vertical, 4)
     }

@@ -71,7 +71,7 @@
         {
           "adHocOffers" : [],
           "codeOffers" : [],
-          "displayPrice" : "5.99",
+          "displayPrice" : "6.99",
           "familyShareable" : false,
           "freeTrialPeriod" : null,
           "groupNumber" : 2,
@@ -121,7 +121,7 @@
           "adHocOffers" : [],
           "codeOffers" : [],
           "displayPrice" : "59.99",
-          "familyShareable" : false,
+          "familyShareable" : true,
           "freeTrialPeriod" : null,
           "groupNumber" : 4,
           "internalID" : "annual_001",

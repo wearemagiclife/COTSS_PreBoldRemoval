@@ -20,6 +20,7 @@ struct CalendarSyncView: View {
                             .font(.system(size: 48))
                             .foregroundColor(AppTheme.goldAccent)
                             .padding(.top, 12)
+                            .accessibilityHidden(true)
 
                         Text("Sync to Your Calendar")
                             .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
@@ -111,21 +112,32 @@ struct CalendarSyncView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "checkmark.seal.fill")
                                     .foregroundColor(AppTheme.goldAccent)
+                                    .accessibilityHidden(true)
                                 Text("Calendar synced successfully!")
                                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                                     .foregroundColor(AppTheme.goldAccent)
                             }
                             .padding(.vertical, 8)
                         } else {
+                            if syncFailed {
+                                Text("Calendar access was denied. Please allow access in Settings, then try again.")
+                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
+                                    .foregroundColor(AppTheme.secondaryText)
+                                    .multilineTextAlignment(.center)
+                            }
                             Button {
                                 Task {
                                     isSyncing = true
                                     syncFailed = false
                                     let productID = SubscriptionManager.shared.activeProductID ?? ""
                                     let birthDate = DataManager.shared.userProfile.birthDate
-                                    await CalendarSyncService.shared.syncCalendarEvents(for: productID, birthDate: birthDate)
+                                    let success = await CalendarSyncService.shared.syncCalendarEvents(for: productID, birthDate: birthDate)
                                     isSyncing = false
-                                    syncComplete = true
+                                    if success {
+                                        syncComplete = true
+                                    } else {
+                                        syncFailed = true
+                                    }
                                 }
                             } label: {
                                 HStack(spacing: 10) {
@@ -142,6 +154,7 @@ struct CalendarSyncView: View {
                             }
                             .buttonStyle(GoldButtonStyle())
                             .disabled(isSyncing)
+                            .accessibilityLabel(isSyncing ? "Syncing calendar, please wait" : "Sync to Calendar")
                         }
 
                         Text("Seven Sisters will ask for Calendar access the first time you sync.")
@@ -177,6 +190,7 @@ private struct CalendarFeatureRow: View {
                 .foregroundColor(AppTheme.goldAccent)
                 .frame(width: 28)
                 .padding(.top, 2)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)

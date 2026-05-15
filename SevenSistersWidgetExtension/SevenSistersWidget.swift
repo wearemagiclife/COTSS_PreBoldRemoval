@@ -89,7 +89,7 @@ struct SevenSistersProvider: TimelineProvider {
     }
 }
 
-private let goldAccent = Color(red: 0.75, green: 0.60, blue: 0.35)
+private let goldAccent = Color(red: 0.78, green: 0.58, blue: 0.18)
 /// Matches AppTheme.accentText light-mode value exactly — dark amber on tan.
 private let lightModeAccent = Color(red: 0.50, green: 0.33, blue: 0.02)
 
@@ -139,11 +139,8 @@ struct SevenSistersWidgetView: View {
         }
         .widgetURL({
             switch entry.state {
-            case .ready(let cards):
-                // Deep link directly to the modal detail for today's daily card
-                // Expecting the host app to handle this route and present the detail modally
-                let urlString = "sevensistersapp://card/detail?type=daily&id=\(cards.daily.id)"
-                return URL(string: urlString)
+            case .ready:
+                return URL(string: "sevensistersapp://daily")
             case .locked:
                 return URL(string: "sevensistersapp://subscribe")
             case .missingProfile:
@@ -166,6 +163,8 @@ struct SevenSistersWidgetView: View {
 
     private func readyGrid(_ cards: WidgetCards) -> some View {
         mediumGrid(cards)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Seven Sisters. Today's card: \(cards.daily.name) in \(cards.planet.capitalized). 52-day card: \(cards.fiftyTwoDay.name). This year's card: \(cards.yearly.name).")
     }
 
     private func mediumGrid(_ cards: WidgetCards) -> some View {
@@ -236,11 +235,11 @@ struct SevenSistersWidgetView: View {
             .frame(width: width, height: height)
             .padding(1)
             // Stronger gold aura — two layered shadows for bold glow
-            .shadow(color: isDark ? goldAccent.opacity(0.55) : .clear, radius: 13, x: 0, y: 0)
-            .shadow(color: isDark ? goldAccent.opacity(0.25) : .clear, radius: 22, x: 0, y: 0)
+            .shadow(color: isDark ? goldAccent.opacity(0.15) : .clear, radius: 2, x: 0, y: 0)
+            .shadow(color: isDark ? goldAccent.opacity(0.10) : .clear, radius: 4, x: 0, y: 0)
             // Base drop shadow for depth
-            .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 3)
-            .shadow(color: .brown.opacity(0.25), radius: 15, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.7), radius: 4, x: 0, y: 3)
+            .shadow(color: .brown.opacity(0.45), radius: 15, x: 0, y: 3)
     }
 
     private var lockedView: some View {
@@ -258,6 +257,7 @@ struct SevenSistersWidgetView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .accessibilityLabel("Subscribe to unlock the Seven Sisters widget. Tap to view subscription options.")
     }
 
     private var missingProfileView: some View {
@@ -274,6 +274,7 @@ struct SevenSistersWidgetView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
         }
+        .accessibilityLabel("Profile setup needed. Tap to open the app and set up your cards.")
     }
 }
 

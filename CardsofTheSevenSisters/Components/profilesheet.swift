@@ -188,27 +188,16 @@ struct ProfileSheet: View {
                                         if isSaving {
                                             ProgressView()
                                                 .scaleEffect(0.8)
-                                                .foregroundColor(Color(UIColor { traitCollection in
-                                                    traitCollection.userInterfaceStyle == .dark
-                                                        ? UIColor.black : UIColor.white
-                                                }))
+                                                .foregroundColor(AppTheme.accentText)
                                         }
                                         Text(isSaving ? "Saving..." : "Save Changes")
                                             .font(.custom("Iowan Old Style", size: 19))
                                             .tracking(0.5)
-                                            .foregroundColor(Color(UIColor { traitCollection in
-                                                traitCollection.userInterfaceStyle == .dark
-                                                    ? UIColor.black : UIColor.white
-                                            }))
                                     }
-                                    .padding(.horizontal, 50)
+                                    .frame(maxWidth: .infinity)
                                     .padding(.vertical, 18)
-                                    .background(AppTheme.darkAccent)
-                                    .cornerRadius(30)
-                                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
-                                    .multilineTextAlignment(.center)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .center)
+                                .buttonStyle(GoldButtonStyle())
                                 .disabled(isSaving)
                                 .accessibilityLabel("Save Changes")
                             }

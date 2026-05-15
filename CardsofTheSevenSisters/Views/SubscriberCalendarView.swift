@@ -38,18 +38,12 @@ struct SubscriberCalendarView: View {
 
                 // Card detail modal overlay — must live inside ZStack to avoid split-screen
                 if showCardDetailModal, let card = cardModalCard {
-                    let dateLabel: String? = {
-                        guard let d = cardModalDate else { return nil }
-                        let f = DateFormatter()
-                        f.dateFormat = "EEEE, MMMM d"
-                        return f.string(from: d)
-                    }()
                     CardDetailModalView(
                         card: card,
                         cardType: .daily,
                         contentType: .standard,
                         isPresented: $showCardDetailModal,
-                        dateLabel: dateLabel
+                        dateLabel: nil
                     )
                     .zIndex(10)
                 }
@@ -153,6 +147,7 @@ struct SubscriberCalendarView: View {
             .fontWeight(.bold)
             .tracking(3.5)
             .foregroundColor(AppTheme.accentText)
+            .accessibilityLabel("Card Almanac")
     }
 
     // MARK: - Vintage Month Navigation
@@ -171,6 +166,7 @@ struct SubscriberCalendarView: View {
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
+            .accessibilityLabel("Previous month")
 
             Spacer()
 
@@ -192,6 +188,7 @@ struct SubscriberCalendarView: View {
                             .tracking(1)
                             .foregroundColor(AppTheme.accentText)
                     }
+                    .accessibilityLabel("Return to current month")
                 }
             }
 
@@ -209,6 +206,7 @@ struct SubscriberCalendarView: View {
                     .foregroundColor(AppTheme.accentText)
                     .frame(width: 44, height: 44)
             }
+            .accessibilityLabel("Next month")
         }
     }
 
@@ -233,6 +231,7 @@ struct SubscriberCalendarView: View {
                         .foregroundColor(AppTheme.accentText)
                         .frame(maxWidth: .infinity)
                         .padding(.bottom, 8)
+                        .accessibilityHidden(true)
                 }
             }
 
@@ -295,6 +294,7 @@ struct SubscriberCalendarView: View {
                         .tracking(3.5)
                         .foregroundColor(AppTheme.accentText.opacity(1))
                         .padding(.top, 20)
+                        .accessibilityLabel("Card Almanac")
 
                     Text("Your Card Calendar")
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.title))
@@ -327,12 +327,14 @@ struct SubscriberCalendarView: View {
                     )
                     .blur(radius: 10)
                     .allowsHitTesting(false)
+                    .accessibilityHidden(true)
 
                     // Lock overlay card
                     VStack(spacing: 18) {
                         Text("⚿")
                             .font(.system(size: 28))
                             .foregroundColor(AppTheme.accentText)
+                            .accessibilityHidden(true)
 
                         VStack(spacing: 8) {
                             Text("Subscribe to Unlock")
@@ -566,10 +568,11 @@ struct CalendarDayDetailSheet: View {
         VStack(alignment: .leading, spacing: 0) {
             // Date heading with ornament
             VStack(spacing: 6) {
-                Text(dateString.uppercased())
+                Text("✦  \(dateString.uppercased())  ✦")
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
-                    .tracking(2)
-                    .foregroundColor(AppTheme.accentText.opacity(0.85))
+                    .fontWeight(.bold)
+                    .tracking(3.5)
+                    .foregroundColor(AppTheme.accentText)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
 
@@ -582,13 +585,12 @@ struct CalendarDayDetailSheet: View {
             digestView
                 .padding(.horizontal, AppConstants.Spacing.pageInset)
                 .padding(.top, AppConstants.Spacing.ornament)
-
-            Spacer()
+                .padding(.bottom, AppConstants.Spacing.section)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppTheme.backgroundColor)
-        .presentationDetents([.fraction(0.30)])
+        .frame(maxWidth: .infinity)
+        .presentationDetents([.height(340)])
         .presentationDragIndicator(.visible)
+        .presentationBackground(AppTheme.backgroundColor)
     }
 
     // MARK: - Digest text
@@ -611,7 +613,14 @@ struct CalendarDayDetailSheet: View {
                     .font(.custom("Iowan Old Style", size: fontSize))
                     .fontWeight(.bold)
                     .foregroundColor(AppTheme.accentText)
-                + Text(" in \(planet).")
+                + Text(" in ")
+                    .font(.custom("Iowan Old Style", size: fontSize))
+                    .foregroundColor(AppTheme.primaryText)
+                + Text("\(planet)")
+                    .font(.custom("Iowan Old Style", size: fontSize))
+                    .fontWeight(.bold)
+                    .foregroundColor(AppTheme.accentText)
+                + Text(".")
                     .font(.custom("Iowan Old Style", size: fontSize))
                     .foregroundColor(AppTheme.primaryText)
             )
@@ -679,6 +688,16 @@ struct VintageCalendarDayCell: View {
         return base
     }
 
+    private func cellAccessibilityLabel(dayNumber: Int, isCycleStart: Bool) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d"
+        let dateStr = formatter.string(from: date)
+        let prefix = isToday ? "Today, \(dateStr)" : dateStr
+        let cardStr = "\(card.value) of \(card.suit.rawValue.capitalized)"
+        let cycleStr = isCycleStart ? ". New 52-day cycle begins" : ""
+        return "\(prefix). \(cardStr)\(cycleStr)."
+    }
+
     var body: some View {
         let dayNumber = Calendar.current.component(.day, from: date)
         let isCycleStart = cycleCard != nil
@@ -699,6 +718,14 @@ struct VintageCalendarDayCell: View {
                         isCurrentMonth ? AppTheme.primaryText : AppTheme.primaryText.opacity(0.25)
                     )
                     .frame(maxWidth: .infinity, minHeight: 22, maxHeight: 22, alignment: .center)
+                    .overlay(alignment: .bottom) {
+                        if isToday {
+                            Capsule()
+                                .fill(AppTheme.primaryText.opacity(0.25))
+                                .frame(width: 14, height: 1.5)
+                                .offset(y: 3)
+                        }
+                    }
                     .contentShape(Rectangle())
                     .onTapGesture { onDayTap() }
 
@@ -735,6 +762,12 @@ struct VintageCalendarDayCell: View {
             .padding(.top, 16)
         }
         .frame(maxWidth: .infinity, minHeight: 86, maxHeight: 86, alignment: .top)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(cellAccessibilityLabel(dayNumber: dayNumber, isCycleStart: isCycleStart))
+        .accessibilityHint(isCurrentMonth ? "Tap to view all cards for this day" : "")
+        .accessibilityAddTraits(isCurrentMonth ? .isButton : [])
+        .accessibilityAction(.default) { onDayTap() }
+        .accessibilityHidden(!isCurrentMonth)
     }
 }
 

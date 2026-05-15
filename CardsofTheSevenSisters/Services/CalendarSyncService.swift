@@ -26,8 +26,9 @@ class CalendarSyncService {
         }
     }
 
-    func syncCalendarEvents(for productID: String, birthDate: Date) async {
-        guard await requestAccess() else { return }
+    @discardableResult
+    func syncCalendarEvents(for productID: String, birthDate: Date) async -> Bool {
+        guard await requestAccess() else { return false }
 
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
@@ -106,6 +107,7 @@ class CalendarSyncService {
 
         let newIDs = savedEvents.compactMap { $0.eventIdentifier }.filter { !$0.isEmpty }
         saveEventIDs(loadEventIDs() + newIDs)
+        return true
     }
 
     func removeFutureEvents() async {
