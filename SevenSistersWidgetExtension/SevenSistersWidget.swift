@@ -77,11 +77,14 @@ struct SevenSistersProvider: TimelineProvider {
             return SevenSistersEntry(date: date, state: .missingProfile)
         }
 
+        let planetNames = ["mercury","venus","mars","jupiter","saturn","uranus","neptune"]
+        let dailyPlanet = planetNames[max(0, min(6, daily.planetNum - 1))]
+
         return SevenSistersEntry(
             date: date,
             state: .ready(WidgetCards(
                 daily: dailyCard,
-                planet: planet,
+                planet: dailyPlanet,
                 fiftyTwoDay: fiftyTwoCard,
                 yearly: yearlyCard
             ))
