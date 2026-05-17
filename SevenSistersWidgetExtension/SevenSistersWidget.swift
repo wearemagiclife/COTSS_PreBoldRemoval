@@ -188,25 +188,33 @@ struct SevenSistersWidgetView: View {
                 // Header row
                 let headerColor: Color = isDark ? goldAccent : lightModeAccent
                 HStack(spacing: 0) {
-                    Text("TODAY'S CARD")
-                        .font(headingFont)
-                        .fontWeight(.semibold)
-                        .tracking(2)
-                        .foregroundStyle(headerColor)
-                        .frame(width: twoCardGroupW)
+                    ViewThatFits(in: .horizontal) {
+                        Text("TODAY'S CARD")
+                            .font(headingFont).fontWeight(.semibold).tracking(2)
+                            .foregroundStyle(headerColor).lineLimit(1)
+                        Text("TODAY")
+                            .font(headingFont).fontWeight(.semibold).tracking(2)
+                            .foregroundStyle(headerColor).lineLimit(1)
+                    }
+                    .frame(width: twoCardGroupW)
                     Spacer().frame(width: groupGap)
-                    Text("52-DAY")
-                        .font(headingFont)
-                        .fontWeight(.semibold)
-                        .tracking(2)
-                        .foregroundStyle(headerColor)
-                        .frame(width: cardW)
+                    ViewThatFits(in: .horizontal) {
+                        Text("52-DAY")
+                            .font(headingFont).fontWeight(.semibold).tracking(2)
+                            .foregroundStyle(headerColor).lineLimit(1)
+                        Text("52")
+                            .font(headingFont).fontWeight(.semibold).tracking(2)
+                            .foregroundStyle(headerColor).lineLimit(1)
+                    }
+                    .frame(width: cardW)
                     Spacer().frame(width: cardGap)
                     Text("YEAR")
                         .font(headingFont)
                         .fontWeight(.semibold)
                         .tracking(2)
                         .foregroundStyle(headerColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                         .frame(width: cardW)
                 }
 
