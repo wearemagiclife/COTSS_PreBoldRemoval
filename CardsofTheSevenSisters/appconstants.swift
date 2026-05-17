@@ -77,7 +77,7 @@ struct AppConstants {
         static let aspect: CGFloat = 3.5 / 2.5 // ≈ 1.4
 
         // Design reference sizes (for iPhone 16)
-        private static let extraLargeBase = CGSize(width: 202, height: 284)
+        private static let extraLargeBase = CGSize(width: 188, height: 270)
         private static let largeWidthBase: CGFloat = 156
         private static let mediumWidthBase: CGFloat = 120
         private static let smallWidthBase: CGFloat = 91
