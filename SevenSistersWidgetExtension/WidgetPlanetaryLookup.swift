@@ -28,7 +28,7 @@ enum WidgetPlanetaryLookup {
     }()
 
     private static let periods: [String: Period] = {
-        guard let url = Bundle.main.url(forResource: "birth_card_planetary_periods", withExtension: "json"),
+        guard let url = Bundle.main.url(forResource: "52planetary_dates", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let payload = try? JSONDecoder().decode(PeriodsPayload.self, from: data) else {
             return [:]
