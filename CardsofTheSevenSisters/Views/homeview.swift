@@ -31,7 +31,6 @@ struct HomeView: View {
                             cardsGrid
                         }
                         .padding(.top, UIScreen.main.bounds.height < 700 ? 10 : 0)
-                        .padding(.bottom, 16)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     }
                     .scaleEffect(showingSettings ? 0.93 : 1.0)
@@ -158,7 +157,6 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 let showTapText = !dataManager.isDailyCardRevealed && viewModel.showTapToReveal
 
-
                 DailyCardLarge(dailyCard: viewModel.userDailyCard)
 
                 // Status area below the daily card: show hint before reveal, line design after reveal
@@ -205,6 +203,7 @@ struct HomeView: View {
             }
             .padding(.horizontal, AppConstants.Spacing.pageInset)
             .padding(.top, isSmallScreen ? AppConstants.Spacing.tight : AppConstants.Spacing.ornament)
+            .padding(.bottom, AppConstants.Spacing.section)
         }
         .opacity(showContent ? 1 : 0)
     }
@@ -431,17 +430,22 @@ struct ProfileSetupBlockingView: View {
             } else {
                 VStack(spacing: 4) {
                     Text("CARDS OF THE")
-                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: size, base: 36)))
+                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: size, base: 30)))
                         .foregroundColor(AppTheme.primaryText)
                         .tracking(3)
                         .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
 
                     Text("SEVEN SISTERS")
-                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: size, base: 36)))
+                        .font(.custom("Iowan Old Style", size: dynamicFontSize(for: size, base: 30)))
                         .foregroundColor(AppTheme.primaryText)
                         .tracking(3)
                         .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
                 }
+                .frame(maxWidth: titleWidth)
             }
         }
         .frame(maxWidth: .infinity)
@@ -458,72 +462,101 @@ struct DailyCardLarge: View {
     @ObservedObject private var dataManager: DataManager = DataManager.shared
     @Environment(\.colorScheme) private var colorScheme
 
-    // Smaller card size for SE and other small screens
+    @State private var flipDegrees: Double = 0
+    @State private var navigateToDaily = false
+
     private var cardSize: CGSize {
         let screenHeight = UIScreen.main.bounds.height
         if screenHeight < 700 {
-            // iPhone SE - use smaller size
-            return CGSize(width: 160, height: 224)
+            return CGSize(width: 140, height: 196)
         }
         return AppConstants.CardSizes.extraLarge
     }
 
     var body: some View {
-        NavigationLink(destination: DailyCardView()) {
-            Group {
-                if dataManager.isDailyCardRevealed {
-                    let cardImageName = dailyCard.imageName
+        ZStack {
+            cardBack
+                .rotation3DEffect(.degrees(flipDegrees), axis: (x: 0, y: 1, z: 0))
+                .opacity(flipDegrees <= 90 ? 1 : 0)
 
-                    if let cardImage = ImageManager.shared.loadCardImage(named: cardImageName) {
-                        Image(uiImage: cardImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: cardSize.width, height: cardSize.height)
-                            .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
-                            .darkModeCardEffects(size: cardSize)
-                            .accessibilityLabel("\(dailyCard.value) of \(dailyCard.suit.rawValue), your daily card")
-                            .accessibilityAddTraits(.isImage)
-                    } else {
-                        RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: cardSize.width, height: cardSize.height)
-                            .overlay(
-                                Text("Card Image\nNot Found")
-                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
-                                    .foregroundColor(AppTheme.primaryText)
-                                    .multilineTextAlignment(.center)
-                            )
-                            .darkModeCardEffects(size: cardSize)
-                    }
-                } else {
-                    if let cardBackImage = UIImage(named: "cardback") {
-                        Image(uiImage: cardBackImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: cardSize.width, height: cardSize.height)
-                            .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
-                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
-                            .darkModeCardEffects(size: cardSize)
-                            .accessibilityLabel("Daily card, Tap Card to Reveal")
-                            .accessibilityAddTraits(.isImage)
-                            .accessibilityAddTraits(.isButton)
-                    } else {
-                        RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: cardSize.width, height: cardSize.height)
-                            .overlay(
-                                Text("Card Back\nNot Found")
-                                    .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
-                                    .foregroundColor(AppTheme.primaryText)
-                                    .multilineTextAlignment(.center)
-                            )
-                            .darkModeCardEffects(size: cardSize)
-                    }
+            cardFront
+                .rotation3DEffect(.degrees(flipDegrees - 180), axis: (x: 0, y: 1, z: 0))
+                .opacity(flipDegrees > 90 ? 1 : 0)
+        }
+        .onTapGesture {
+            if !dataManager.isDailyCardRevealed {
+                withAnimation(.spring(response: 0.7, dampingFraction: 0.8)) {
+                    flipDegrees = 180
                 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    dataManager.markDailyCardAsRevealed()
+                }
+            } else {
+                navigateToDaily = true
             }
         }
-        .buttonStyle(PlainButtonStyle())
+        .onAppear {
+            if dataManager.isDailyCardRevealed {
+                flipDegrees = 180
+            }
+        }
+        .navigationDestination(isPresented: $navigateToDaily) {
+            DailyCardView()
+        }
+    }
+
+    private var cardFront: some View {
+        Group {
+            if let cardImage = ImageManager.shared.loadCardImage(named: dailyCard.imageName) {
+                Image(uiImage: cardImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: cardSize.width, height: cardSize.height)
+                    .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
+                    .darkModeCardEffects(size: cardSize)
+                    .accessibilityLabel("\(dailyCard.value) of \(dailyCard.suit.rawValue), your daily card. Tap to view details.")
+                    .accessibilityAddTraits([.isImage, .isButton])
+            } else {
+                RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: cardSize.width, height: cardSize.height)
+                    .overlay(
+                        Text("Card Image\nNot Found")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
+                            .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                    )
+                    .darkModeCardEffects(size: cardSize)
+            }
+        }
+    }
+
+    private var cardBack: some View {
+        Group {
+            if let cardBackImage = UIImage(named: "cardback") {
+                Image(uiImage: cardBackImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: cardSize.width, height: cardSize.height)
+                    .scaleEffect(colorScheme == .dark ? 0.95 : 1.0)
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize)))
+                    .darkModeCardEffects(size: cardSize)
+                    .accessibilityLabel("Daily card, tap to reveal")
+                    .accessibilityAddTraits([.isImage, .isButton])
+            } else {
+                RoundedRectangle(cornerRadius: AppConstants.CardStyle.cornerRadius(for: cardSize))
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: cardSize.width, height: cardSize.height)
+                    .overlay(
+                        Text("Card Back\nNot Found")
+                            .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.caption + 2))
+                            .foregroundColor(AppTheme.primaryText)
+                            .multilineTextAlignment(.center)
+                    )
+                    .darkModeCardEffects(size: cardSize)
+            }
+        }
     }
 }
 
