@@ -259,7 +259,8 @@ class DataManager: ObservableObject {
     }
 
     func updateProfile(name: String, birthDate: Date) -> Bool {
-        guard validateBirthDate(birthDate) else {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, validateBirthDate(birthDate) else {
             return false
         }
 
@@ -351,9 +352,9 @@ extension DataManager {
 
         // Try different possible paths for the JSON file
         let possiblePaths = [
-            ("birth_card_planetary_periods", "json", "Resources/Data"),
-            ("birth_card_planetary_periods", "json", "resources/data"),
-            ("birth_card_planetary_periods", "json", nil)
+            ("52planetary_dates", "json", "Resources/Data"),
+            ("52planetary_dates", "json", "resources/data"),
+            ("52planetary_dates", "json", nil)
         ]
 
         for (resource, ext, subdir) in possiblePaths {
