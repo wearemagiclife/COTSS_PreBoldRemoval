@@ -25,7 +25,7 @@ struct SettingsMenuView: View {
     private var safeAreaBottom: CGFloat {
         UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .first?.windows.first?.safeAreaInsets.bottom ?? 0
+            .first?.windows.first?.safeAreaInsets.bottom ?? 59
     }
 
     // Adaptive card background for light/dark mode
@@ -45,14 +45,16 @@ struct SettingsMenuView: View {
                     AppTheme.backgroundColor.ignoresSafeArea()
 
                     ScrollView {
-                        VStack(spacing: AppConstants.Spacing.ornament) {
+                        VStack(spacing: AppConstants.Spacing.tight) {
+                            Spacer().frame(height: AppConstants.Spacing.tight)
+
                             VStack(spacing: AppConstants.Spacing.tight) {
                             // MARK: Manage Profile
                             Button { showingProfile = true } label: {
                                 SettingsRow(
                                     systemImage: "person.crop.circle",
                                     title: "Your Profile",
-                                    subtitle: "Update, Sign Out, or Delete",
+                                    subtitle: "Edit, Sign Out, or Delete",
                                     cardBackground: cardBackground
                                 )
                             }
@@ -80,7 +82,7 @@ struct SettingsMenuView: View {
                             } label: {
                                 SettingsRow(
                                     systemImage: "star.fill",
-                                    title: subscriptionManager.isSubscribed ? "Manage Subscription" : "Subscribe Today",
+                                    title: subscriptionManager.isSubscribed ? "Your Subscription" : "Subscribe Today",
                                     subtitle: subscriptionManager.isSubscribed ? "⭐️ Thank you ⭐️" : "Unlock All ⭐️ Features",
                                     cardBackground: cardBackground,
                                     subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
@@ -95,7 +97,7 @@ struct SettingsMenuView: View {
                                     SettingsRow(
                                         systemImage: "moon.fill",
                                         title: "⭐ Appearance",
-                                        subtitle: "New Black & Gold Theme!",
+                                        subtitle: "New Dark Mode",
                                         cardBackground: cardBackground
                                     )
                                 }
@@ -186,7 +188,7 @@ struct SettingsMenuView: View {
                             #endif
 
                         }  // inner VStack (settings rows)
-                        .padding(.horizontal, AppConstants.Spacing.pageInset)
+                            .padding(.horizontal, AppConstants.Spacing.pageInset - 3)
                         .padding(.bottom, AppConstants.Spacing.tight)
                         }  // outer VStack
                     }  // ScrollView
@@ -209,13 +211,13 @@ struct SettingsMenuView: View {
                         .accessibilityHint("Returns to home screen")
                     }
                 }
-                .toolbarBackground(AppTheme.backgroundColor, for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbarColorScheme(.none, for: .navigationBar)
                 .onAppear {
-                    // Remove the hairline separator below the navigation bar
+                    // Hide hairline and make nav bar fully transparent to avoid a defined edge
                     let appearance = UINavigationBarAppearance()
-                    appearance.configureWithOpaqueBackground()
+                    appearance.configureWithTransparentBackground()
+                    appearance.backgroundEffect = nil
                     appearance.backgroundColor = .clear
                     appearance.shadowColor = .clear
                     UINavigationBar.appearance().standardAppearance = appearance
@@ -254,13 +256,15 @@ struct SettingsMenuView: View {
                     Text("Would you like to write a review on the App Store? It only takes a moment.")
                 }
             }  // NavigationStack
+            .padding(.top, AppConstants.Spacing.pageInset - 15)
+            .padding(.horizontal, AppConstants.Spacing.pageInset - 10)
             .background(AppTheme.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.modal))
             .shadow(color: Color(red: 1.0, green: 0.95, blue: 0.88).opacity(0.12), radius: 120, x: 0, y: 0)
             }  // VStack
-            .padding(.horizontal, 28)
-            .padding(.top, safeAreaTop + 8)
-            .padding(.bottom, 8)
+            .padding(.horizontal, 18)
+            .padding(.top, safeAreaTop + AppConstants.Spacing.pageInset)
+            .padding(.bottom, safeAreaBottom + AppConstants.Spacing.pageInset - 5)
         }  // ZStack (backdrop + panel)
         .animation(.spring(response: AppConstants.Animation.springResponse, dampingFraction: AppConstants.Animation.springDamping), value: isPresented)
     }
@@ -298,7 +302,7 @@ private struct SettingsRow: View {
     private var iconColor: Color { colorScheme == .dark ? AppTheme.accentText : AppTheme.primaryText }
 
     var body: some View {
-        HStack(spacing: AppConstants.Spacing.ornament) {
+        HStack(spacing: AppConstants.Spacing.tight) {
             ZStack {
                 Circle()
                     .strokeBorder(iconColor.opacity(0.45), lineWidth: 1)
@@ -310,7 +314,7 @@ private struct SettingsRow: View {
                     .accessibilityHidden(true)
             }
 
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(title)
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .foregroundColor(AppTheme.primaryText)
@@ -324,7 +328,6 @@ private struct SettingsRow: View {
                 }
             }
 
-            Spacer()
         }
         .padding(.vertical, AppConstants.Spacing.small)
         .padding(.horizontal, AppConstants.Spacing.ornament)
