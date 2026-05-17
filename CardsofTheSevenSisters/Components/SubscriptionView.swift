@@ -69,7 +69,7 @@ struct SubscriptionView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .alert("Error", isPresented: Binding(
             get: { subscriptionManager.errorMessage != nil },
-            set: { if !$0 { subscriptionManager.errorMessage = nil } }
+            set: { if !$0 { DispatchQueue.main.async { subscriptionManager.errorMessage = nil } } }
         )) {
             Button("OK", role: .cancel) { subscriptionManager.errorMessage = nil }
         } message: {
