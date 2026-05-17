@@ -80,8 +80,8 @@ struct SettingsMenuView: View {
                             } label: {
                                 SettingsRow(
                                     systemImage: "star.fill",
-                                    title: "Subcribe Today",
-                                    subtitle: "Unlock All ⭐️ Features",
+                                    title: subscriptionManager.isSubscribed ? "Manage Subscription" : "Subscribe Today",
+                                    subtitle: subscriptionManager.isSubscribed ? "⭐️ Thank you ⭐️" : "Unlock All ⭐️ Features",
                                     cardBackground: cardBackground,
                                     subtitleColor: subscriptionManager.isSubscribed ? AppTheme.goldAccent : nil
                                 )
@@ -294,6 +294,7 @@ private struct SettingsRow: View {
     var subtitleColor: Color? = nil
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private var iconColor: Color { colorScheme == .dark ? AppTheme.accentText : AppTheme.primaryText }
 
     var body: some View {
@@ -313,15 +314,13 @@ private struct SettingsRow: View {
                 Text(title)
                     .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.subheadline))
                     .foregroundColor(AppTheme.primaryText)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
 
                 if let subtitle = subtitle {
                     Text(subtitle)
                         .font(.custom("Iowan Old Style", size: AppConstants.FontSizes.callout))
                         .foregroundColor(subtitleColor ?? AppTheme.secondaryText)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 }
             }
 
@@ -424,14 +423,18 @@ private struct SupportSectionCard: View {
     let subtitle: String
     let cardBackground: Color
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.custom("Iowan Old Style", size: 18))
                 .foregroundColor(AppTheme.primaryText)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
             Text(subtitle)
                 .font(.custom("Iowan Old Style", size: 14))
                 .foregroundColor(AppTheme.secondaryText)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
         }
         .padding(AppConstants.Spacing.tight)
         .frame(maxWidth: .infinity, alignment: .leading)
