@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class DeepLinkRouter: ObservableObject {
     enum Destination: String {
+        case home
         case daily
         case planet
         case cycle52

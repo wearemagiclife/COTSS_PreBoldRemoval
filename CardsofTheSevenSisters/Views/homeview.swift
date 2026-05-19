@@ -213,6 +213,8 @@ struct HomeView: View {
     private func applyPendingDeepLink() {
         guard let destination = deepLinkRouter.pendingDestination else { return }
         switch destination {
+        case .home:
+            break
         case .daily, .planet:
             deepLinkDaily = true
         case .cycle52:

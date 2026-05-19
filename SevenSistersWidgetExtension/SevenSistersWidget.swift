@@ -143,7 +143,7 @@ struct SevenSistersWidgetView: View {
         .widgetURL({
             switch entry.state {
             case .ready:
-                return URL(string: "sevensistersapp://daily")
+                return URL(string: "sevensistersapp://home")
             case .locked:
                 return URL(string: "sevensistersapp://subscribe")
             case .missingProfile:
